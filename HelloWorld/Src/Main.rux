@@ -1,6 +1,6 @@
-use System::Print;
+import Std::Io::Print;
 
-func Main() -> int32 {
-	Print("Hello World!");
+func Main() -> int {
+	Print("Hello, World!");
 	return 0;
 }

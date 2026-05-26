@@ -1,26 +1,8 @@
 [Package]
 Name = "HelloWorld"
 Version = "0.1.0"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "My first program"
-License = "MIT"
-Authors = ["Ivan Muzyka"]
-Edition = "2025"
-
-[Build]
-Target = "x86_64"
-OptLevel = "Release"
-
-[Profile.Debug]
-OptLevel = 0
-Output = "Bin/Debug"
-
-[Profile.Release]
-OptLevel = 3
-Output = "Bin/Release"
 
 [Dependencies]
-Std = "0.1.0"
-
-[Scripts]
-Build = "rux build"
-Test = "rux test"
+Std = "*"
