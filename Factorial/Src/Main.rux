@@ -1,0 +1,12 @@
+import Std::Io::PrintLine;
+
+func Main() -> int {
+    PrintLine("Factorial calculation");
+    let n = 10;
+    var result = 1;
+    for i in 1..=n {
+        result *= i;
+        PrintLine("{}! = {}", i, result);
+    }
+    return 0;
+}
