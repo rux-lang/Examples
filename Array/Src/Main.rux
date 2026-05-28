@@ -1,0 +1,35 @@
+import Std::Memory::{ Alloc, Free, Zero };
+import Std::Io::{ Print, PrintLine };
+
+func Main() -> int {
+    PrintLine("Dynamic array");
+    let count: uint = 16;
+    let size = count * sizeof(uint);
+    var ptr = Alloc(size) as *uint;
+    if (ptr == null) {
+        PrintLine("Failed to allocate memory");
+        return 1;
+    }
+    PrintLine("Allocated memory {} bytes at address {}", size, ptr as uint);
+    Zero(ptr, size);
+    for i in 0..count {
+        Print("{}; ", ptr[i]);
+    }
+    PrintLine();
+    for i in 0..count {
+        ptr[i] = i as uint;
+    }
+    PrintLine("Initialized array with values:");
+    for i in 0..count {
+        Print("{}; ", ptr[i]);
+    }
+    PrintLine();
+    var sum: uint = 0;
+    for i in 0..count {
+        sum += ptr[i];
+    }
+    PrintLine("Sum of array values: {}", sum);
+    Free(ptr);
+    PrintLine("Freed memory at address {}", ptr as uint);
+    return 0;
+}

@@ -1,0 +1,52 @@
+import Std::Io::PrintLine;
+
+func Main() -> int {
+    let val1: int8 = 127;
+    let val2: int16 = 32767;
+    let val3: int32 = 2147483647;
+    let val4: int64 = 9223372036854775807;
+    let val5: int = -1000;
+
+    let val6: uint8 = 255;
+    let val7: uint16 = 65535;
+    let val8: uint32 = 4294967295;
+    let val9: uint64 = 18446744073709551615;
+    let val10: uint = 1000;
+
+    let val11: float32 = 3.4028235e+20f32;
+    let val12: float64 = 1.7976931348623157e+200;
+    let val13: float = 2.718281828459045;
+    
+    let val14: bool8 = true;
+    let val15: bool16 = false;
+    let val16: bool32 = true;
+    let val17: bool = false;
+
+    let val18: char8 = c8'W';
+    let val19: char16 = c16'Я';
+    let val20: char32 = c32'π';
+    let val21: char = 'Ψ';
+ 
+    PrintLine(val1);
+    PrintLine(val2);
+    PrintLine(val3);
+    PrintLine(val4);
+    PrintLine(val5);
+    PrintLine(val6);
+    PrintLine(val7);
+    PrintLine(val8);
+    PrintLine(val9);
+    PrintLine(val10);
+    PrintLine(val11);
+    PrintLine(val12); 
+    PrintLine(val13);
+    PrintLine(val14);
+    PrintLine(val15);
+    PrintLine(val16);
+    PrintLine(val17);
+    PrintLine(val18);
+    PrintLine(val19);
+    PrintLine(val20);
+    PrintLine(val21);
+    return 0;
+}

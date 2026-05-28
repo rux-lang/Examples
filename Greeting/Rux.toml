@@ -1,0 +1,8 @@
+[Package]
+Name = "Greeting"
+Version = "0.1.0"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "A simple greeting program in Rux"
+
+[Dependencies]
+Std = "*"
