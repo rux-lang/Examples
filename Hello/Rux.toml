@@ -1,8 +1,8 @@
 [Package]
-Name = "HelloWorld"
+Name = "Hello"
 Version = "0.1.0"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "My first program"
+Description = "Simple console application"
 
 [Dependencies]
 Std = "*"

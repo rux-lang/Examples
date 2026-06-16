@@ -1,15 +1,33 @@
-# Rux Tutorials
+# Rux Examples
 
-Programming tutorials in the [Rux](https://rux-lang.dev) language.
+Example projects and programming tutorials for the [Rux](https://rux-lang.dev) language.
 
-## Tutorials
+## List of Projects
 
-| Project                   | Description                                                                       |
-| ------------------------- | --------------------------------------------------------------------------------- |
-| [HelloWorld](HelloWorld/) | Print "Hello, World!" — the minimal Rux program                                   |
-| [Greeting](Greeting/)     | Iterate over a string array and print greetings in multiple languages             |
-| [Primitive](Primitive/)   | Declare and print all primitive types: integers, floats, booleans, and characters |
-| [Array](Array/)           | Dynamic array using manual memory management (`Alloc`, `Zero`, `Free`)            |
+| Package                 | Description                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| [Hello](Hello/)         | Print "Hello, World!" — the minimal Rux application                               |
+| [Greeting](Greeting/)   | Iterate over a string array and print greetings in multiple languages             |
+| [Primitive](Primitive/) | Declare and print all primitive types: integers, floats, booleans, and characters |
+| [Factorial](Factorial/) | Calculate and print factorial values with a loop                                  |
+| [Array](Array/)         | Use a dynamic array with manual memory management (`Alloc`, `Zero`, `Free`)       |
+
+## Running an Example
+
+Each example is a standalone Rux package with its own `Rux.toml`.
+
+```sh
+cd Hello
+rux run
+```
+
+If necessary, install the dependencies first:
+
+```sh
+cd Hello
+rux install
+rux run
+```
 
 ## License
 
