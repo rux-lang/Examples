@@ -1,6 +1,6 @@
 import Std::Io::Print;
 
 func Main() -> int {
-	Print("Hello, World!");
+	Print("Hello, World!\n");
 	return 0;
 }
