@@ -1,0 +1,34 @@
+@[Import(lib: "Kernel32.dll")] 
+extern {
+    func CreateFileA(
+        fileName: *const char8,
+        dwDesiredAccess: uint32,
+        dwShareMode: uint32,
+        lpSecurityAttributes: *opaque,
+        creationDisposition: uint32,
+        dwFlagsAndAttributes: uint32,
+        templateFile: *opaque
+    ) -> *opaque;
+
+    func WriteFile(
+        file: *opaque,
+        buffer: *const opaque,
+        numberOfBytesToWrite: uint32,
+        numberOfBytesWritten: *uint32,
+        overlapped: *opaque
+    ) -> bool32;
+
+    func CloseHandle( object: *opaque) -> bool32;
+}
+
+func Main() -> int {
+    let filename = "Info.txt\0";
+    let file = CreateFileA(filename.data, 0x40000000, 0, null, 2, 0, null);
+    if (file == null) {
+        return 1;
+    }
+    let text = "Hello, Rux!";
+    WriteFile(file, text.data, text.length as uint32, null, null);
+    CloseHandle(file);
+    return 0;
+}

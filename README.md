@@ -11,6 +11,7 @@ Example projects and programming tutorials for the [Rux](https://rux-lang.dev) l
 | [Primitive](Primitive/) | Declare and print all primitive types: integers, floats, booleans, and characters |
 | [Factorial](Factorial/) | Calculate and print factorial values with a loop                                  |
 | [Array](Array/)         | Use a dynamic array with manual memory management (`Alloc`, `Zero`, `Free`)       |
+| [File](File/)           | Write text to a file with WinAPI                                                  |
 
 ## Running an Example
 

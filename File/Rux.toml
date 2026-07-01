@@ -1,0 +1,5 @@
+[Package]
+Name = "File"
+Version = "0.1.0"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Write text to a file"
