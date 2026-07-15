@@ -5,4 +5,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A simple greeting program in Rux"
 
 [Dependencies]
-Std = "*"
+Io = "*"

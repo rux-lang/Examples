@@ -5,4 +5,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Simple console application"
 
 [Dependencies]
-Std = "*"
+Io = "*"

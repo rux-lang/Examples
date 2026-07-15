@@ -5,4 +5,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Primitive types in Rux"
 
 [Dependencies]
-Std = "*"
+Io = "*"

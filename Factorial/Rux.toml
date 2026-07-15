@@ -5,4 +5,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Factorial application in Rux"
 
 [Dependencies]
-Std = "*"
+Io = "*"

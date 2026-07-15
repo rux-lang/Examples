@@ -5,4 +5,5 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Dynamic arrays in Rux"
 
 [Dependencies]
-Std = "*"
+Io = "*"
+Memory = "*"

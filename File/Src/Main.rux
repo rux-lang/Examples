@@ -1,4 +1,4 @@
-@[Import(lib: "Kernel32.dll")] 
+#Link("Kernel32.dll") 
 extern {
     func CreateFileA(
         fileName: *const char8,

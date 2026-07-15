@@ -1,4 +1,4 @@
-import Std::Io::PrintLine;
+import Io::PrintLine;
 
 func Main() -> int {
     let val1: int8 = 127;

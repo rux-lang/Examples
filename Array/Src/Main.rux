@@ -1,5 +1,5 @@
-import Std::Memory::{ Alloc, Free, Zero };
-import Std::Io::{ Print, PrintLine };
+import Memory::{ Alloc, Free, Zero };
+import Io::{ Print, PrintLine };
 
 func Main() -> int {
     PrintLine("Dynamic array");
