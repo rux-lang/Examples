@@ -32,4 +32,4 @@ rux run
 
 ## License
 
-[MIT](LICENSE)
+Licensed under the [MIT License](LICENSE.md).
