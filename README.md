@@ -12,6 +12,7 @@ Example projects and programming tutorials for the [Rux](https://rux-lang.dev) l
 | [Factorial](Factorial/) | Calculate and print factorial values with a loop                                  |
 | [Array](Array/)         | Use a dynamic array with manual memory management (`Alloc`, `Zero`, `Free`)       |
 | [File](File/)           | Write text to a file with WinAPI                                                  |
+| [Circle](Circle/)       | Read input from stdin, parse a string to a number, and match on the result        |
 
 ## Running an Example
 
