@@ -1,0 +1,13 @@
+[Package]
+Name = "Circle"
+Version = "0.1.0"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Calculates the circumference and area of a circle"
+
+[Dependencies]
+Format = "*"
+Io = "*"
+Math = "*"
+
+[Build]
+Output = "Bin"
