@@ -1,0 +1,57 @@
+// Finding every prime below a limit, using the sieve of Eratosthenes — which
+// is older than arithmetic notation and still the way to do it.
+//
+// The idea: write down every number, then repeatedly take the next one not yet
+// crossed out and cross out all its multiples. Whatever survives is prime. It
+// is faster than testing each number for divisors because it never divides at
+// all; it only counts.
+import Allocator::{ Allocator, SystemAllocator };
+import Collections::Vector;
+import Io::{ Print, PrintLine };
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    let limit: uint = 100;
+
+    // One flag per number, all starting true. Index into it by the number
+    // itself, which is why it is one longer than the limit.
+    var crossedOut = Vector::Vector<bool>(allocator);
+    for i in 0..=limit {
+        crossedOut.Push(false);
+    }
+
+    var flags = crossedOut.AsMutableSlice();
+
+    // 0 and 1 are not prime, and no rule below would exclude them.
+    flags[0] = true;
+    flags[1] = true;
+
+    // Cross out multiples. Starting each pass at n*n is the one optimisation
+    // worth taking: anything smaller has a factor below n and was crossed out
+    // by an earlier pass already.
+    var n: uint = 2;
+    while n * n <= limit {
+        if !flags[n] {
+            var multiple = n * n;
+            while multiple <= limit {
+                flags[multiple] = true;
+                multiple += n;
+            }
+        }
+        n += 1;
+    }
+
+    var found = 0;
+    Print("primes below {}:", limit);
+    for i in 0..=limit {
+        if !flags[i] {
+            Print(" {}", i);
+            found += 1;
+        }
+    }
+    PrintLine();
+    PrintLine("{} of them", found);
+    return 0;
+}
