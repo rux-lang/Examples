@@ -1,35 +1,70 @@
-import Memory::{ Alloc, Free, Zero };
+// Every value so far has been sized when the program was compiled: an `int` is
+// eight bytes, an array of twelve greetings is twelve. When the size is not
+// known until the program runs, the memory has to be asked for.
+//
+// This is the raw form, where you ask, use, and give back by hand. The
+// Allocator lesson later shows the same thing arranged so it is harder to get
+// wrong; this one shows what is underneath.
 import Io::{ Print, PrintLine };
+import Memory::{ Alloc, Free, Zero };
 
 func Main() -> int {
-    PrintLine("Dynamic array");
-    let count: uint = 16;
+    // A count decided while running. `sizeof` gives the size of one element,
+    // so the total is the count times that.
+    let count: uint = 8;
     let size = count * sizeof(uint);
-    var ptr = Alloc(size) as *var uint;
-    if (ptr == null) {
-        PrintLine("Failed to allocate memory");
+    PrintLine("asking for {} elements, {} bytes", count, size);
+
+    // `Alloc` hands back an address with no type attached — `*var opaque`,
+    // meaning "somewhere writable, contents unknown". The cast says what will
+    // live there. `var` is required: without it the memory could not be
+    // written, which would make the whole thing pointless.
+    var values = Alloc(size) as *var uint;
+
+    // It can fail. There is no error to catch — the answer is `null`, and a
+    // program that does not check it will fault on first use.
+    if values == null {
+        PrintLine("out of memory");
         return 1;
     }
-    PrintLine("Allocated memory {} bytes at address {}", size, ptr as uint);
-    Zero(ptr, size);
+    PrintLine("got it at address {}", values as uint);
+
+    // Fresh memory holds whatever was there before. `Zero` makes it definite;
+    // reading it first would be reading someone else's leftovers.
+    Zero(values, size);
+    Print("after Zero:   ");
     for i in 0..count {
-        Print("{}; ", ptr[i]);
+        Print("{} ", values[i]);
     }
     PrintLine();
+
+    // With a type on the pointer, it indexes like an array — the same `[i]`,
+    // and the same counting from zero.
     for i in 0..count {
-        ptr[i] = i as uint;
+        values[i] = i * i;
     }
-    PrintLine("Initialized array with values:");
+    Print("squares:      ");
     for i in 0..count {
-        Print("{}; ", ptr[i]);
+        Print("{} ", values[i]);
     }
     PrintLine();
-    var sum: uint = 0;
+
+    var total: uint = 0;
     for i in 0..count {
-        sum += ptr[i];
+        total += values[i];
     }
-    PrintLine("Sum of array values: {}", sum);
-    Free(ptr);
-    PrintLine("Freed memory at address {}", ptr as uint);
+    PrintLine("their total:  {}", total);
+
+    // Nothing reclaims this on its own. `Free` gives it back, and every path
+    // out of the function needs one — including the failure above, which
+    // returned before allocating and so had nothing to release.
+    Free(values);
+    PrintLine("freed");
+
+    // Two rules the compiler cannot enforce here, and the reason the later
+    // lessons exist. Using `values` after this point reads memory that is no
+    // longer yours, and calling `Free` on it twice corrupts the allocator.
+    // Neither is reported; both are why `Ownership` and `Allocator` are worth
+    // reading before writing much of this by hand.
     return 0;
 }
