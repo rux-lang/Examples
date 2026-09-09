@@ -1,0 +1,63 @@
+// The Memory lesson used a pointer without explaining it: `Alloc` returned an
+// address, `as *var uint` said what lived there, and `values[i]` reached it.
+// This is that piece on its own.
+//
+// A pointer is an address. `@value` produces the address of something, and
+// indexing a pointer reaches what is at it — `p[0]` is the value itself, which
+// is why an allocated block indexes like an array.
+import Core::ConvertChecked;
+import Io::PrintLine;
+
+// A `*var int` may be written through, so this changes the caller's variable
+// rather than a copy of it.
+func Bump(target: *var int) {
+    target[0] += 1;
+}
+
+func Main() -> int {
+    var value: int = 41;
+
+    // `*T` and `*var T` split the same way `let` and `var` do. A `*int` reads
+    // what it points at; a `*var int` may also write. This is the pointer
+    // equivalent of the immutability rule from the Variable lesson.
+    let reader: *int = @value;
+    PrintLine("read through *int    {}", reader[0]);
+
+    var writer: *var int = @value;
+    writer[0] = 42;
+    PrintLine("after writing        {}", value);
+
+    // Because the address was passed rather than the value, the function
+    // changed `value` itself. Nothing was returned.
+    Bump(@value);
+    PrintLine("after Bump           {}", value);
+
+    // That is what an out-parameter is, and it is how the conversion check
+    // promised back in the Convert lesson works. `as` was silent when a value
+    // did not fit; `ConvertChecked` writes the converted value through a
+    // pointer and returns whether anything was lost.
+    var narrowed: int8 = 0;
+
+    // Note carefully which way round the answer reads: the flag is true when
+    // the conversion **failed**. Every checked operation in `Core` agrees on
+    // this, and it reads backwards the first time.
+    let lost100 = ConvertChecked<int, int8>(100, @narrowed);
+    PrintLine("100 into int8  lost {}  value {}", lost100, narrowed);
+
+    let lost300 = ConvertChecked<int, int8>(300, @narrowed);
+    PrintLine("300 into int8  lost {}  value {}", lost300, narrowed);
+
+    // 300 does not fit, so the flag is true and `narrowed` holds the wrapped
+    // 44 — the same 44 that `300 as int8` produced silently. The difference is
+    // that this time the program was told.
+    if lost300 {
+        PrintLine("so the program can react instead of carrying on with 44");
+    }
+
+    // A pointer can also point at nothing, which is what `null` means and what
+    // the Memory lesson checked for after `Alloc`. Reaching through a null
+    // pointer is not caught by the compiler.
+    let nothing: *int = null;
+    PrintLine("is it null?          {}", nothing == null);
+    return 0;
+}
