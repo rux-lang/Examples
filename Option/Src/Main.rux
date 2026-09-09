@@ -1,0 +1,55 @@
+// Some questions have no answer. "Which is the first even number here?" has
+// none when every number is odd, and there is no `int` that means "there
+// wasn't one" — every value it can hold is a perfectly good answer.
+//
+// `Option<T>` is the type for that. It is a variant with two cases: `Some`
+// carrying a `T`, and `None` carrying nothing. Because the value lives inside
+// the `Some`, it cannot be read without first establishing that there is one.
+import Core::Option;
+import Io::PrintLine;
+
+// The return type says, in the signature, that this may find nothing. A caller
+// cannot miss it and cannot ignore it.
+func FirstEven(values: int[..]) -> Option<int> {
+    for i in 0..values.length {
+        if values[i] % 2 == 0 {
+            return Option::Some<int>(values[i]);
+        }
+    }
+    return Option::None<int>();
+}
+
+func Main() -> int {
+    let mixed = [ 3, 7, 8, 9 ];
+    let odds = [ 1, 3, 5, 7 ];
+
+    // Matching is the complete way to handle it: one arm has the value, the
+    // other does not, and both have to be written.
+    match FirstEven(mixed) {
+        .Some(value) => PrintLine("mixed: first even is {}", value),
+        .None => PrintLine("mixed: no even number")
+    }
+
+    match FirstEven(odds) {
+        .Some(value) => PrintLine("odds:  first even is {}", value),
+        .None => PrintLine("odds:  no even number")
+    }
+
+    // When only the presence matters, asking is shorter than matching.
+    PrintLine("mixed has one  {}", FirstEven(mixed).IsSome());
+    PrintLine("odds has one   {}", FirstEven(odds).IsNone());
+
+    // And when a sensible stand-in exists, `ValueOr` supplies it, collapsing
+    // both cases into one ordinary value.
+    PrintLine("mixed or -1    {}", FirstEven(mixed).ValueOr(-1));
+    PrintLine("odds or -1     {}", FirstEven(odds).ValueOr(-1));
+
+    // Which to reach for is a question of what absence means. `ValueOr` is
+    // right when a default is genuinely as good as an answer. When "there was
+    // nothing" needs different handling — a message, a different path — match
+    // it, so the two cases stay visibly different in the code.
+    //
+    // An `Option` says only that a value is missing, never why. When the
+    // reason matters, the next lesson's `Result` carries it.
+    return 0;
+}
