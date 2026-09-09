@@ -78,11 +78,11 @@ Read in order — every lesson builds on the previous one.
 
 **IX. Collections**
 
-42. **Vector** — a growable array that manages its own memory and capacity
-43. **Deque** — add and remove at both ends, and see where that beats a vector
-44. **HashMap** — look values up by key, and test membership with a hash set
-45. **TreeMap** — keep keys in order, and weigh the cost against hashing
-46. **Algorithm** — sort, search, and fold over the containers built so far
+42. **[Vector](Vector/)** — a growable array that manages its own memory and capacity
+43. **[Deque](Deque/)** — add and remove at both ends, and see where that beats a vector
+44. **[HashMap](HashMap/)** — look values up by key, and test membership with a hash set
+45. **[TreeMap](TreeMap/)** — keep keys in order, and weigh the cost against hashing
+46. **[Algorithm](Algorithm/)** — sort, search, and fold over the containers built so far
 
 **X. Files**
 
