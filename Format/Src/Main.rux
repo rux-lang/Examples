@@ -1,0 +1,71 @@
+// Every lesson has used `{}`. The Primitive lesson added number bases and a
+// rounded float because they were needed early. This is the rest of it.
+//
+// Everything after the colon inside a placeholder is the spec, and each piece
+// is optional:
+//
+//     {:[[fill]align][sign][#][0][width][.precision][base]}
+//
+// The spec belongs to the placeholder, not to the value, so the same value
+// renders differently in different places without being changed.
+import Io::PrintLine;
+
+func Main() -> int {
+    let value = 255;
+    let pi = 3.14159265358979;
+    let word = "Rux";
+
+    // Base. `b`, `o`, `x` and `X` choose binary, octal, and hex in either case.
+    PrintLine("plain      {}", value);
+    PrintLine("binary     {:b}", value);
+    PrintLine("octal      {:o}", value);
+    PrintLine("hex        {:x}", value);
+    PrintLine("HEX        {:X}", value);
+
+    // `#` adds the prefix that names the base.
+    PrintLine("prefixed   {:#b}   {:#o}   {:#x}", value, value, value);
+
+    // Width sets a minimum. Anything shorter is padded, and nothing is ever
+    // truncated to fit — a number too wide for its field stays intact.
+    PrintLine("width 8    [{:8}]", value);
+    PrintLine("too narrow [{:2}]", value);
+
+    // Alignment decides which side the padding goes. Numbers default to the
+    // right and text to the left, so this is worth setting when a column has
+    // to line up regardless of what is in it.
+    PrintLine("left       [{:<8}]", value);
+    PrintLine("centre     [{:^8}]", value);
+    PrintLine("right      [{:>8}]", value);
+
+    // A fill character may be given before the alignment. `0` before the width
+    // is the common case of this, and pads numbers with zeros.
+    PrintLine("dots       [{:.>8}]", value);
+    PrintLine("stars      [{:*^8}]", value);
+    PrintLine("zeros      [{:08}]", value);
+    PrintLine("zeroed hex [{:08x}]", value);
+
+    // `+` shows a sign even when the number is positive, which keeps a column
+    // of mixed signs aligned.
+    PrintLine("signed     {:+}  {:+}", 42, -42);
+
+    // Precision after a dot sets the digits kept after the point.
+    PrintLine("pi         {}", pi);
+    PrintLine("pi to 2    {:.2}", pi);
+    PrintLine("pi to 5    {:.5}", pi);
+    PrintLine("pi to 0    {:.0}", pi);
+
+    // The pieces combine, which is where the grammar earns itself. This is
+    // width and precision together, right-aligned in a ten-wide column.
+    PrintLine("combined   [{:10.4}]", pi);
+
+    // Text takes the same fill, alignment and width.
+    PrintLine("text       [{:<8}][{:^8}][{:>8}]", word, word, word);
+
+    // A small table, which is what all of this is for.
+    PrintLine("");
+    PrintLine("{:<10}{:>8}{:>12}", "item", "count", "value");
+    PrintLine("{:<10}{:>8}{:>12.2}", "widgets", 12, 4.5);
+    PrintLine("{:<10}{:>8}{:>12.2}", "sprockets", 5, 19.75);
+    PrintLine("{:<10}{:>8}{:>12.2}", "cogs", 1440, 0.125);
+    return 0;
+}
