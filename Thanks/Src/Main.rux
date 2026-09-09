@@ -1,0 +1,66 @@
+// A banner drawn as text, and a thank-you to the people who make Rux.
+//
+// The whole program is an array of lines and a loop, which is everything from
+// the Array and Range lessons and nothing more. Large letters are just rows of
+// characters printed one after another.
+import Io::{ Print, PrintLine };
+
+func Main() -> int {
+    // Each string is one row across all three letters. Read the array
+    // vertically rather than line by line and the shapes appear.
+    let banner = [
+        "  ####    ##  ##   ##   ##  ",
+        "  ##  ##  ##  ##    ## ##   ",
+        "  ##  ##  ##  ##     ###    ",
+        "  #####   ##  ##     ###    ",
+        "  ## ##   ##  ##    ## ##   ",
+        "  ##  ##   ####    ##   ##  "
+    ];
+
+    PrintLine();
+    for line in banner {
+        PrintLine(line);
+    }
+    PrintLine();
+
+    // A rule drawn by repeating one character, rather than by typing it out.
+    for i in 0..44 {
+        Print("=");
+    }
+    PrintLine();
+
+    PrintLine("            Thank you, everyone");
+    for i in 0..44 {
+        Print("=");
+    }
+    PrintLine();
+    PrintLine();
+
+    // Every kind of help that goes into a language, in no particular order —
+    // because none of them is the one that matters least.
+    let contributions = [
+        "the ideas, and the patience to explain them twice",
+        "the long discussions, and the short sharp ones",
+        "the code, the tests, and the unglamorous fixes",
+        "the critique that was right, and the kind that stung",
+        "the bug reports written carefully by strangers",
+        "the documentation nobody is thanked for",
+        "the funding that bought time to think",
+        "turning up, reading along, and asking good questions",
+        "the posts, the shares, the subscribes, the word of mouth"
+    ];
+
+    PrintLine("Rux exists because of:");
+    PrintLine();
+    for contribution in contributions {
+        PrintLine("  - {}", contribution);
+    }
+
+    PrintLine();
+    PrintLine("A language is a community that happens to have a compiler.");
+    PrintLine("Thank you for being part of this one.");
+    PrintLine();
+    PrintLine("                            -- the Rux contributors");
+    PrintLine();
+    return 0;
+}

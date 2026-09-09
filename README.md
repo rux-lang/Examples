@@ -45,12 +45,12 @@ Read in order — every lesson builds on the previous one.
 
 **V. Custom types**
 
-21. **Tuple** — group a few values without declaring a type, and return more than one result
-22. **Struct** — group related values into a struct, and give it methods and a constructor
-23. **TypeAlias** — give an existing type a second name to make a signature read clearly
-24. **Enum** — name a fixed set of cases, and give the enum an explicit underlying type
-25. **Variant** — attach data to each case, and destructure it in a `match` arm
-26. **Union** — overlay one piece of storage with several types, and why that needs care
+21. **[Tuple](Tuple/)** — group a few values without declaring a type, and return more than one result
+22. **[Struct](Struct/)** — group related values into a struct, and give it methods and a constructor
+23. **[TypeAlias](TypeAlias/)** — give an existing type a second name to make a signature read clearly
+24. **[Enum](Enum/)** — name a fixed set of cases, and give the enum an explicit underlying type
+25. **[Variant](Variant/)** — attach data to each case, and destructure it in a `match` arm
+26. **[Union](Union/)** — overlay one piece of storage with several types, and why that needs care
 27. **Interface** — implement `Display`, `Equatable`, and `Comparable` for a type of your own
 28. **Overloading** — define `==`, `+` and the other operators for your own type
 29. **Iterator** — implement `Iterator` so a type of your own can be used with `for`
@@ -118,6 +118,7 @@ Complete programs rather than feature tours, each built only from what came befo
 63. **Age** — work out someone's age from their date of birth, in years, months and days
 64. **Melody** — play a tune through the console speaker with the platform's beep
 65. **Password** — build a random password by drawing letters and digits from an alphabet
+66. **[Thanks](Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it
 
 ## Running an Example
 
