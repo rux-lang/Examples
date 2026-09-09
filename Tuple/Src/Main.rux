@@ -1,0 +1,61 @@
+// A tuple groups a few values without declaring a type for them. Its type is
+// written as the list of its members' types — `(int, bool)` — and a value is
+// written the same way, so nothing has to be declared before it is used.
+//
+// The main use is returning more than one thing from a function.
+import Io::PrintLine;
+
+// Two results from one call: the answer, and whether it means anything. There
+// is no way to divide by zero and still return a number, so this returns both.
+func Divide(numerator: int, denominator: int) -> (int, bool) {
+    if denominator == 0 {
+        return (0, false);
+    }
+    return (numerator / denominator, true);
+}
+
+// The members need not share a type.
+func Origin() -> (float64, float64, char8[..]) {
+    return (0.0, 0.0, "origin");
+}
+
+func Main() -> int {
+    // Written out in full: the type, then the value.
+    let pair: (int, float64) = (1, 2.5);
+
+    // Members are reached by position, counting from zero.
+    PrintLine("pair.0 is {} and pair.1 is {}", pair.0, pair.1);
+
+    // Or the whole tuple can be unpacked into names in one step, which reads
+    // better than using `.0` and `.1` through a long function.
+    let (count, ratio) = pair;
+    PrintLine("count {} ratio {}", count, ratio);
+
+    // Unpacking is what makes multiple return values comfortable.
+    let (result, ok) = Divide(17, 5);
+    if ok {
+        PrintLine("17 / 5 is {}", result);
+    }
+
+    // The second member is what says whether the first one means anything, so
+    // it has to be checked before the value is used.
+    let (bad, valid) = Divide(1, 0);
+    if !valid {
+        PrintLine("1 / 0 has no answer, and the value returned was {}", bad);
+    }
+
+    let (x, y, label) = Origin();
+    PrintLine("{} at {}, {}", label, x, y);
+
+    // A tuple is a value like any other: it can be passed, returned, and
+    // compared, and it may contain another tuple.
+    let nested: ((int, int), char8[..]) = ((3, 4), "point");
+    let (position, name) = nested;
+    PrintLine("{} is at {}, {}", name, position.0, position.1);
+
+    // Tuples are structural: two tuples are the same type when their members
+    // are, and nothing names them. When a group of values starts being passed
+    // around and its members deserve names, that is the point to declare a
+    // struct instead — which is the next lesson.
+    return 0;
+}
