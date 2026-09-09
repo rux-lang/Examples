@@ -7,8 +7,7 @@ Name = "Array"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Dynamic arrays in Rux"
+Description = "Fixed-size arrays and iterating over their elements"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
-Memory = { Namespace = "Rux", Version = "*" }

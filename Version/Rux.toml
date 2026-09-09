@@ -7,7 +7,7 @@ Name = "Version"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Selects code at compile time by the version of the compiler"
+Description = "Selecting code at compile time with when"
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }

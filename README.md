@@ -24,8 +24,8 @@ Read in order — every lesson builds on the previous one.
 
 7. **[Condition](Condition/)** — choose between branches at run time with `if`, `else if`, and `else`
 8. **[Loop](Loop/)** — repeat with `while`, and leave a loop early with `break` and `continue`
-9. **[Factorial](Factorial/)** — calculate and print factorial values with a loop
-10. **[Greeting](Greeting/)** — iterate over a string array and print greetings in multiple languages
+9. **[Range](Range/)** — walk a range with `for`, and tell `..` from `..=`
+10. **[Array](Array/)** — hold a fixed number of values of one type, and iterate over them
 11. **[Match](Match/)** — select a branch by value with `match`, and default with `else`
 
 **III. Functions and packages**
@@ -49,7 +49,7 @@ Read in order — every lesson builds on the previous one.
 
 **VI. Memory**
 
-22. **[Array](Array/)** — use a dynamic array with manual memory management (`Alloc`, `Zero`, `Free`)
+22. **[Memory](Memory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
 23. **Pointer** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
 24. **Ownership** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
 25. **Allocator** — allocate from an arena or a box instead of straight from the system
@@ -86,7 +86,7 @@ Read in order — every lesson builds on the previous one.
 Independent tours of a single package. Each assumes all of Track A, but none assumes another,
 so they can be read in any order.
 
-41. **[Extern](File/)** — call a platform API directly through an extern declaration and `#Link`
+41. **[Extern](Extern/)** — call a platform API directly through an extern declaration and `#Link`
 42. **Math** — roots, powers, logarithms, trigonometry, and rounding
 43. **Time** — measure elapsed time, work with durations, and format a calendar date
 44. **Random** — seed a generator, draw from a range, and sample from a sequence

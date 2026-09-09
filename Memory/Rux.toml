@@ -3,11 +3,12 @@ Version = 1
 MinRux = "0.4.0"
 
 [Package]
-Name = "Greeting"
+Name = "Memory"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Arrays and iterating over their elements"
+Description = "Allocating and freeing memory by hand"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
+Memory = { Namespace = "Rux", Version = "*" }
