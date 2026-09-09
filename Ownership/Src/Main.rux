@@ -1,0 +1,84 @@
+// The Struct lesson ended on a promise: a struct of primitives copies, and one
+// that owns something copies differently. This is that difference.
+//
+// Two questions decide how a value behaves. What happens when it is assigned
+// somewhere else, and what happens when it goes out of scope.
+import Io::PrintLine;
+
+// A plain struct. Both fields are numbers, so the compiler can copy it by
+// copying them, and does.
+struct Point {
+    x: int;
+    y: int;
+}
+
+// A value standing for something that has to be given back — a file, a
+// connection, a block of memory. Copying one of these would be wrong: two
+// copies would each try to release the same thing.
+struct Handle {
+    id: int;
+}
+
+extend Handle {
+    // This is a copy operator with no body, which prohibits copying entirely.
+    // Any type owning a resource needs this unless it can genuinely duplicate
+    // what it owns.
+    func =(self: &var Handle, other: &Handle);
+
+    func Handle(id: int) -> Handle {
+        return Handle { id: id };
+    }
+
+    // The destructor. It runs when the value's life ends, and its job is to
+    // give back whatever the value was holding. Here it just says so.
+    func ~Handle(self: &var Handle) {
+        PrintLine("    closing handle {}", self.id);
+    }
+}
+
+// A scope small enough to watch. The handle made here dies when this returns.
+func Borrowed() {
+    let temporary = Handle(1);
+    PrintLine("    made handle 1 inside Borrowed");
+}
+
+func Main() -> int {
+    // Copying. `second` is a separate point from here on, so changing one
+    // leaves the other alone. Nothing had to be written to make this happen.
+    PrintLine("copying a Point:");
+    let first = Point { x: 1, y: 2 };
+    var second = first;
+    second.x = 99;
+    PrintLine("    first.x {}   second.x {}", first.x, second.x);
+
+    // Destruction. The handle is created inside `Borrowed` and released as
+    // that function returns — the printed line arrives before the next one
+    // here, without anything asking for it.
+    PrintLine("calling Borrowed:");
+    Borrowed();
+    PrintLine("    back in Main");
+
+    // Moving. `Handle` cannot be copied, so ownership is transferred instead,
+    // and `<-` is how that is written. It is deliberately visible: a transfer
+    // is something a reader should be able to see.
+    PrintLine("moving a Handle:");
+    let owner = Handle(2);
+    let taken <- owner;
+    PrintLine("    transferred, now held as id {}", taken.id);
+
+    // Two things the compiler now enforces, both of which stop a resource
+    // being released twice:
+    //
+    //     PrintLine("{}", owner.id);
+    //         error: value 'owner' is used after it was moved
+    //
+    //     let copied = taken;
+    //         error: move-only value 'taken' requires an explicit '<-'
+    //         help: write 'let destination <- taken' to transfer ownership
+    //
+    // The first is the point of moving: the old name is finished, so its
+    // destructor will not run. Watch the output — handle 2 is closed once, at
+    // the end of `Main`, not twice.
+    PrintLine("end of Main:");
+    return 0;
+}
