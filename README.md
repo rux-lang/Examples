@@ -51,9 +51,9 @@ Read in order — every lesson builds on the previous one.
 24. **[Enum](Enum/)** — name a fixed set of cases, and give the enum an explicit underlying type
 25. **[Variant](Variant/)** — attach data to each case, and destructure it in a `match` arm
 26. **[Union](Union/)** — overlay one piece of storage with several types, and why that needs care
-27. **Interface** — implement `Display`, `Equatable`, and `Comparable` for a type of your own
-28. **Overloading** — define `==`, `+` and the other operators for your own type
-29. **Iterator** — implement `Iterator` so a type of your own can be used with `for`
+27. **[Interface](Interface/)** — implement `Display`, `Equatable`, and `Comparable` for a type of your own
+28. **[Overloading](Overloading/)** — define `==`, `+` and the other operators for your own type
+29. **[Iterator](Iterator/)** — implement `Iterator` so a type of your own can be used with `for`
 
 **VI. Errors**
 
@@ -119,6 +119,7 @@ Complete programs rather than feature tours, each built only from what came befo
 64. **Melody** — play a tune through the console speaker with the platform's beep
 65. **Password** — build a random password by drawing letters and digits from an alphabet
 66. **[Thanks](Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it
+67. **Launch** — a countdown, a launch, and some jokes at the language's expense
 
 ## Running an Example
 

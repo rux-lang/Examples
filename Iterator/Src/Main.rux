@@ -1,0 +1,82 @@
+// `for` has walked ranges and arrays since the Range lesson. It is not built
+// only for those: any type can be walked by `for` once it says how.
+//
+// Two interfaces do it. `Iterator` is the cursor — something that produces the
+// next item each time it is asked. `Iterable` is a thing that can hand out such
+// a cursor. `for` asks the second for the first, then calls `Next` until it
+// reports there is nothing left.
+import Core::{ Iterable, Iterator, Option };
+import Io::{ Print, PrintLine };
+
+// The cursor. It holds enough state to know where it is: the next two numbers
+// of the sequence, and how many remain.
+struct Fibonacci {
+    current: int64;
+    next: int64;
+    remaining: int32;
+}
+
+extend Fibonacci : Iterator {
+    // The one requirement. `Option<int64>` is how "another item" and "the end"
+    // are told apart — `Some` carries the item, `None` stops the loop.
+    //
+    // It takes `&var` because producing an item moves the cursor forward, which
+    // is a change to the iterator itself.
+    func Next(self: &var Fibonacci) -> Option<int64> {
+        if self.remaining <= 0i32 {
+            return Option::None<int64>();
+        }
+        let value = self.current;
+        let following = self.current + self.next;
+        self.current = self.next;
+        self.next = following;
+        self.remaining -= 1i32;
+        return Option::Some<int64>(value);
+    }
+}
+
+// The thing being walked. It holds no position — it only knows how to start.
+struct FirstFibonacci {
+    count: int32;
+}
+
+extend FirstFibonacci : Iterable {
+    // The other requirement: hand back a fresh cursor. Because a new one is
+    // made each time, the same value can be walked more than once.
+    func Iterate(self: &FirstFibonacci) -> Fibonacci {
+        return Fibonacci { current: 0i64, next: 1i64, remaining: self.count };
+    }
+}
+
+func Main() -> int {
+    let sequence = FirstFibonacci { count: 12i32 };
+
+    // Nothing here mentions `Next` or `Option`. `for` does that, exactly as it
+    // does for a range or an array.
+    Print("first twelve:");
+    for value in sequence {
+        Print(" {}", value);
+    }
+    PrintLine();
+
+    // Walking it again starts from the beginning, because `Iterate` built a new
+    // cursor rather than handing back the one already used.
+    var total: int64 = 0;
+    for value in sequence {
+        total += value;
+    }
+    PrintLine("their sum:    {}", total);
+
+    // The cursor can also be driven by hand, which is all `for` is doing.
+    var cursor = Fibonacci { current: 0i64, next: 1i64, remaining: 5i32 };
+    Print("by hand:      ");
+    var going = true;
+    while going {
+        match cursor.Next() {
+            .Some(value) => Print("{} ", value),
+            .None => going = false
+        }
+    }
+    PrintLine();
+    return 0;
+}
