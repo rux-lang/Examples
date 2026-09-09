@@ -1,0 +1,56 @@
+// The previous lesson wrote one function for many *counts* of argument. This
+// one writes a single function for many *types*.
+//
+// A name in angle brackets after the function name is a type parameter: it
+// stands for a type the caller supplies, and the compiler produces a separate
+// version of the function for each type actually used.
+import Io::PrintLine;
+
+// `T` is decided by the arguments. Both must be the same type, and the result
+// is that type too, so calling this with two `int` values yields an `int`.
+func Larger<T>(first: T, second: T) -> T {
+    if first > second {
+        return first;
+    }
+    return second;
+}
+
+// Nothing here depends on what `T` can do, so it works for absolutely any type.
+func Second<T>(first: T, second: T) -> T {
+    return second;
+}
+
+// A type parameter may appear anywhere a type may, including inside a slice.
+// This one function counts elements of an array of any element type.
+func CountOf<T>(values: T[..]) -> uint {
+    return values.length;
+}
+
+func Main() -> int {
+    // One function, three types. There is no cast and no shared base type:
+    // each call compiles its own version of `Larger`.
+    PrintLine("Larger(3, 9)          {}", Larger(3, 9));
+    PrintLine("Larger(2.5, 1.5)      {}", Larger(2.5, 1.5));
+    PrintLine("Larger('a', 'z')      {}", Larger('a', 'z'));
+
+    PrintLine("Second(1, 2)          {}", Second(1, 2));
+    PrintLine("Second(\"a\", \"b\")      {}", Second("a", "b"));
+
+    let numbers = [ 10, 20, 30 ];
+    let words = [ "one", "two" ];
+    PrintLine("CountOf(numbers)      {}", CountOf(numbers));
+    PrintLine("CountOf(words)        {}", CountOf(words));
+
+    // `Larger` uses `>` on a `T` it knows nothing about, and that is checked
+    // once the type is known: a type without `>` is rejected at the call, not
+    // inside the function. A type parameter can also be required up front to
+    // implement an interface — `func Sorted<T: Comparable>(...)` — which is
+    // worth more once there are types of your own to implement it with, so it
+    // waits for the Interface lesson.
+    //
+    // Note that every generic here returns its value for the caller to print.
+    // A generic function cannot print a `T` itself: passing one to `PrintLine`
+    // is refused because the placeholder list requires `Display`, and a type
+    // parameter is not accepted as one even when it is declared `<T: Display>`.
+    return 0;
+}
