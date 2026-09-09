@@ -1,0 +1,66 @@
+// The Memory lesson had a problem it did not dwell on: every way out of the
+// function needs its own `Free`. Add an early return and it is easy to leave
+// one behind, and the leak is invisible.
+//
+// `defer` fixes that by moving the cleanup next to the thing it cleans up. The
+// statement runs when the scope ends, however it ends.
+import Io::{ Print, PrintLine };
+import Memory::{ Alloc, Free, Zero };
+
+func Ordering() {
+    PrintLine("    body starts");
+    defer PrintLine("    deferred A");
+    defer PrintLine("    deferred B");
+    PrintLine("    body ends");
+}
+
+// Two exits, one `Free`. The release is written once, beside the allocation,
+// and happens on whichever path is taken.
+func SumTo(count: uint, failEarly: bool) -> uint {
+    let size = count * sizeof(uint);
+    var values = Alloc(size) as *var uint;
+    if values == null {
+        return 0;
+    }
+
+    // From here on, no matter how this function ends, the memory goes back.
+    defer Free(values);
+    defer PrintLine("    releasing the block");
+
+    Zero(values, size);
+    for i in 0..count {
+        values[i] = i + 1;
+    }
+
+    // An early exit. Without the `defer` above this line would leak, and
+    // nothing would say so.
+    if failEarly {
+        PrintLine("    leaving early");
+        return 0;
+    }
+
+    var total: uint = 0;
+    for i in 0..count {
+        total += values[i];
+    }
+    return total;
+}
+
+func Main() -> int {
+    // Deferred statements run in reverse order — last scheduled, first run.
+    // That matches how things are usually built up: the thing set up last
+    // depends on the ones before it, so it is undone first.
+    PrintLine("ordering:");
+    Ordering();
+
+    PrintLine("normal path:");
+    PrintLine("    sum of 1..5 is {}", SumTo(5, false));
+
+    PrintLine("early exit:");
+    PrintLine("    result {}", SumTo(5, true));
+
+    // The value a function returns is worked out before its deferred
+    // statements run, so cleanup cannot change the answer on its way out.
+    PrintLine("done");
+    return 0;
+}
