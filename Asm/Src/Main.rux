@@ -1,0 +1,89 @@
+// Underneath every function is machine code. Occasionally you need to write
+// that directly — for an instruction the language has no way to express, for a
+// system call, or to stop the optimizer removing something it thinks is dead.
+//
+// `asm func` is a function whose body is instructions rather than statements.
+// The compiler emits it as written and does not look inside, which is the
+// point and also the danger: nothing here is checked for you.
+import Core::{ #target, #Error };
+import Io::PrintLine;
+
+// Assembly is written for one architecture. `when #target.arch` picks the right
+// body while compiling, and the branch not taken is never assembled — the same
+// compile-time selection the Version lesson used.
+when #target.arch {
+    .X86_64 => {
+        // `#Abi` states the calling convention, which is what decides where
+        // the arguments arrive. Under Win64 the first two integers come in
+        // rcx and rdx, and the result goes back in rax.
+        #Abi(.Win64)
+        asm func Add(a: int64, b: int64) -> int64 {
+            mov rax, rcx
+            add rax, rdx
+            ret
+        }
+
+        // A loop, with a label and a conditional jump — the shapes `while` and
+        // `if` are built from.
+        #Abi(.Win64)
+        asm func SumTo(n: int64) -> int64 {
+            xor rax, rax
+            mov rdx, rcx
+        next:
+            test rdx, rdx
+            jle done
+            add rax, rdx
+            dec rdx
+            jmp next
+        done:
+            ret
+        }
+    },
+    .AArch64 => {
+        // The same two functions for the other architecture. AArch64 has one
+        // convention, so there is nothing to override: arguments arrive in x0
+        // and x1, and the result goes back in x0.
+        asm func Add(a: int64, b: int64) -> int64 {
+            add x0, x0, x1
+            ret
+        }
+
+        asm func SumTo(n: int64) -> int64 {
+            mov x1, x0
+            mov x0, xzr
+        next:
+            cmp x1, #0
+            ble done
+            add x0, x0, x1
+            sub x1, x1, #1
+            b next
+        done:
+            ret
+        }
+    },
+    else => #Error("This example supports x86-64 and AArch64")
+}
+
+func Main() -> int {
+    // Called exactly like any other function. Nothing at the call site says
+    // these are unusual.
+    PrintLine("Add(20, 22)    {}", Add(20i64, 22i64));
+    PrintLine("SumTo(10)      {}", SumTo(10i64));
+    PrintLine("SumTo(100)     {}", SumTo(100i64));
+
+    // The cost of writing one is everything the compiler stops doing for you:
+    // no type checking inside the body, no register allocation, no adapting
+    // when the calling convention differs, and a separate body for every
+    // architecture you support. That is why these are rare, and why the ones
+    // in the standard packages are a handful of instructions each.
+    //
+    // A related declaration worth knowing: `intrinsic func` names a function
+    // the compiler itself provides, with no body at all —
+    //
+    //     pub intrinsic func CheckedAdd(left: uint64, right: uint64,
+    //         result: *var uint64) -> bool;
+    //
+    // That is how `Core::Checked` reaches the processor's overflow flag, which
+    // no expression in the language can name. Declared, never defined.
+    return 0;
+}

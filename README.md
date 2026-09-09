@@ -101,7 +101,7 @@ Read in order — every lesson builds on the previous one.
 Each assumes all of Track A, but none assumes another, so they can be read in any order.
 
 53. **[Extern](Extern/)** — call a platform API directly through an extern declaration and `#Link`
-54. **Asm** — write a function body in assembly, choose its ABI, and select one per architecture
+54. **[Asm](Asm/)** — write a function body in assembly, choose its ABI, and select one per architecture
 55. **[Math](Math/)** — roots, powers, logarithms, trigonometry, and rounding
 56. **[Time](Time/)** — measure elapsed time, work with durations, and format a calendar date
 57. **[Random](Random/)** — seed a generator, draw from a range, and sample from a sequence
