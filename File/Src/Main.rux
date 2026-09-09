@@ -1,0 +1,72 @@
+// Writing something to a file and reading it back — the whole round trip,
+// with the failures that can happen at each step.
+//
+// Every operation here can fail for reasons outside the program: the disk is
+// full, the name is taken, permission is refused. So each one reports, and the
+// lesson is as much about checking as about writing.
+import Allocator::{ Allocator, SystemAllocator };
+import FileSystem::{ DeleteFile, File, OpenOptions };
+import Io::{ IoError, PrintLine };
+import Path::{ OsString, Path };
+import Text::TextError;
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+    var error = IoError::Ok();
+    var textError = TextError::None;
+
+    // A path is not a string. The operating system has its own idea of what a
+    // filename is — its own encoding, its own separator — so text is converted
+    // into an `OsString` first, and the `Path` is a view of that. The Path
+    // lesson goes into why this matters.
+    var holder = OsString::FromText(allocator, "Bin/example.txt", @textError);
+    let path = Path::FromView(holder.View());
+
+    // Opening says what is intended. `Writing` creates the file if it is not
+    // there and truncates it if it is; `Reading` requires it to exist. The
+    // intent is part of the request rather than something checked afterwards.
+    var writing = File::Open(allocator, path, OpenOptions::Writing(), @error);
+    if !writing.IsOpen() {
+        PrintLine("could not open for writing");
+        return 1;
+    }
+
+    // `Write` reports how many bytes it took, because it is allowed to take
+    // fewer than it was given. A program writing something large has to loop
+    // until everything is gone; here the count is checked instead.
+    var taken: uint = 0;
+    writing.Write("first line\nsecond line\n", @taken);
+    PrintLine("wrote     {} bytes", taken);
+
+    // Closing is where a delayed failure finally surfaces, so it reports too.
+    writing.Close();
+
+    // Reading it back. A fresh open, because the write handle was closed.
+    var reading = File::Open(allocator, path, OpenOptions::Reading(), @error);
+    if !reading.IsOpen() {
+        PrintLine("could not open for reading");
+        return 1;
+    }
+
+    // Read into a buffer of a size decided here. `filled` says how much
+    // actually arrived — which is not necessarily the buffer's size, and not
+    // necessarily the whole file either.
+    var buffer: char8[64];
+    var filled: uint = 0;
+    reading.Read(buffer[..64], @filled);
+    PrintLine("read      {} bytes", filled);
+
+    // Only the part that was filled is real. The rest of the buffer is
+    // whatever it was before, so the slice is cut to `filled` before use.
+    let text: char8[..] = buffer[..filled];
+    PrintLine("contents:");
+    PrintLine("{}", text);
+
+    reading.Close();
+
+    // Tidy up, so running this twice behaves the same as running it once.
+    DeleteFile(allocator, path);
+    PrintLine("removed the file");
+    return 0;
+}
