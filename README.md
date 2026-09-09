@@ -94,7 +94,7 @@ Read in order — every lesson builds on the previous one.
 **XI. Compile-time programming**
 
 51. **[Version](Version/)** — select code at compile time with `when` and the compiler version
-52. **Config** — read build configuration at compile time and reject an unsupported one
+52. **[Config](Config/)** — read the build's target, profile and source location at compile time
 
 ### Track B — Platform and packages
 
