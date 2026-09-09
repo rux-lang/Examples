@@ -1,0 +1,82 @@
+// Solving ax^2 + bx + c = 0, which is the classic example of a calculation
+// whose *shape* depends on its input: the discriminant decides whether there
+// are two answers, one, or none at all.
+//
+// That makes it a good exercise in reading input, checking it, and branching
+// on the result — rather than in arithmetic.
+import Allocator::{ Allocator, SystemAllocator };
+import Format::ParseFloat64;
+import Io::{ Print, PrintLine, ReadLine };
+import Math::Sqrt;
+import Text::StringBuilder;
+
+// Reading one number, with both failures handled: no input at all, and input
+// that is not a number. The out-parameter carries the value back; the return
+// value says whether there is one.
+func ReadNumber(allocator: Allocator, prompt: char8[..], value: *var float64) -> bool {
+    Print("{}", prompt);
+    var builder = StringBuilder(allocator);
+    let outcome = ReadLine(builder);
+    if outcome.IsEnd() || outcome.IsError() {
+        builder.Release();
+        return false;
+    }
+    var ok = false;
+    match ParseFloat64(builder.View()) {
+        .Success(parsed) => {
+            *value = parsed;
+            ok = true;
+        },
+        .Error(_) => ok = false
+    }
+    builder.Release();
+    return ok;
+}
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    var a = 0.0;
+    var b = 0.0;
+    var c = 0.0;
+    if !ReadNumber(allocator, "a: ", @a) { PrintLine("not a number"); return 1; }
+    if !ReadNumber(allocator, "b: ", @b) { PrintLine("not a number"); return 1; }
+    if !ReadNumber(allocator, "c: ", @c) { PrintLine("not a number"); return 1; }
+
+    // The check that is easy to forget: with a of zero this is not a quadratic
+    // at all, and the formula would divide by zero.
+    if a == 0.0 {
+        if b == 0.0 {
+            PrintLine("that is not an equation");
+            return 1;
+        }
+        PrintLine("linear, not quadratic: x = {:.4}", -c / b);
+        return 0;
+    }
+
+    // The discriminant, which decides everything that follows.
+    let discriminant = b * b - 4.0 * a * c;
+    PrintLine("discriminant {:.4}", discriminant);
+
+    if discriminant > 0.0 {
+        let root = Sqrt(discriminant);
+        PrintLine("two real roots:");
+        PrintLine("  x1 = {:.4}", (-b + root) / (2.0 * a));
+        PrintLine("  x2 = {:.4}", (-b - root) / (2.0 * a));
+    } else if discriminant == 0.0 {
+        PrintLine("one real root:");
+        PrintLine("  x  = {:.4}", -b / (2.0 * a));
+    } else {
+        // No real answer, but the complex pair is worth showing rather than
+        // giving up: the real part and the imaginary part come apart cleanly.
+        // Adding zero turns a negative zero into a plain one, which only
+        // matters because "-0.0000" reads as a mistake.
+        let real = -b / (2.0 * a) + 0.0;
+        let imaginary = Sqrt(-discriminant) / (2.0 * a);
+        PrintLine("no real roots; the complex pair is:");
+        PrintLine("  x1 = {:.4} + {:.4}i", real, imaginary);
+        PrintLine("  x2 = {:.4} - {:.4}i", real, imaginary);
+    }
+    return 0;
+}
