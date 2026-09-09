@@ -1,20 +1,56 @@
+// Reading a line the user types, and turning it into a number that can be
+// worked with — including both ways that can fail.
+//
+// Input needs somewhere to put the text before it exists as a value. A
+// `StringBuilder` provides that, and it asks an allocator for the space, which
+// is why the String and Allocator lessons come first.
+import Allocator::{ Allocator, SystemAllocator };
 import Format::ParseFloat64;
 import Io::{ Print, PrintLine, ReadLine };
 import Math::Pi;
+import Text::StringBuilder;
 
 func Main() -> int {
+    // The allocator is built as a concrete `SystemAllocator`, then named
+    // through the interface the builder asks for. The annotation on the second
+    // line is what performs that conversion.
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // `Print` rather than `PrintLine`, so the answer is typed on the same line
+    // as the question.
     Print("Circle radius: ");
-    let input = ReadLine();             // read String from stdin
-    let result = ParseFloat64(input);   // convert String to float64
-    match result {                      // test result of converting
+
+    var builder = StringBuilder(allocator);
+    let outcome = ReadLine(builder);
+
+    // The first failure: there was no line to read. `IsEnd` means the input
+    // ended with nothing before it, which is different from an empty line.
+    if outcome.IsEnd() || outcome.IsError() {
+        PrintLine("Nothing was entered");
+        builder.Release();
+        return 1;
+    }
+
+    // `View` looks at the bytes the builder is holding without taking them
+    // away from it, which is all the parser needs.
+    //
+    // The second failure: there was a line, but it does not spell a number.
+    // `ParseFloat64` reports that with a `Result`, so both outcomes have to be
+    // handled before the value can be used.
+    match ParseFloat64(builder.View()) {
         .Success(radius) => {
-            PrintLine("Circumference: {}", 2.0 * Pi * radius);
-            PrintLine("Area: {}", Pi * radius * radius);
+            PrintLine("Circumference: {:.4}", 2.0 * Pi * radius);
+            PrintLine("Area:          {:.4}", Pi * radius * radius);
         },
         .Error(_) => {
-            PrintLine("Invalid radius");
+            PrintLine("That is not a number");
+            builder.Release();
             return 1;
         }
     }
+
+    // The builder owns memory it asked the allocator for, so it hands it back.
+    builder.Release();
     return 0;
 }
