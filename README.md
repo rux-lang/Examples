@@ -46,18 +46,18 @@ Read in order — every lesson builds on the previous one.
 
 20. **Option** — represent a value that may be absent, and supply a default when it is
 21. **Result** — return either a value or an error, and pass failures up to the caller
-22. **[Circle](Circle/)** — read input from stdin, parse a string to a number, and match on the result
 
 **VI. Memory**
 
-23. **[Array](Array/)** — use a dynamic array with manual memory management (`Alloc`, `Zero`, `Free`)
-24. **Pointer** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
-25. **Ownership** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
-26. **Allocator** — allocate from an arena or a box instead of straight from the system
+22. **[Array](Array/)** — use a dynamic array with manual memory management (`Alloc`, `Zero`, `Free`)
+23. **Pointer** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
+24. **Ownership** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
+25. **Allocator** — allocate from an arena or a box instead of straight from the system
 
-**VII. Text**
+**VII. Text and input**
 
-27. **String** — build and inspect text, and tell a length in bytes from a length in characters
+26. **String** — build and inspect text, and tell a length in bytes from a length in characters
+27. **[Circle](Circle/)** — read a line from the console, parse it to a number, and match on the result
 28. **Format** — control width, alignment, precision, and number base when formatting values
 29. **Unicode** — code points, grapheme clusters, and case conversion beyond ASCII
 
