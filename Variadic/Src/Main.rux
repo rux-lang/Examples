@@ -1,0 +1,54 @@
+// Some functions cannot say in advance how many arguments they take. A
+// parameter written `name: T...` collects everything left at the call into one
+// list, so a single function serves every count.
+//
+// `PrintLine("{} and {}", a, b)` is exactly this: its last parameter is
+// `args: Display...`, which is why any number of values may follow the format.
+import Io::{ Print, PrintLine };
+import Text::Display;
+
+// `Display` is the interface for "can be rendered as text", so this accepts any
+// number of values of any type that knows how to print itself.
+func Count(values: Display...) -> uint {
+    // The list knows its own length, exactly like a slice.
+    return values.length;
+}
+
+// It is indexed like a slice too, so the body can walk what it was given.
+func Line(values: Display...) {
+    for i in 0..values.length {
+        Print("[{}]", values[i]);
+    }
+    PrintLine();
+}
+
+// A variadic parameter must be the last one, but ordinary parameters may come
+// before it — that is how a format string sits in front of its values.
+func Labelled(label: char8[..], values: Display...) {
+    Print("{}:", label);
+    for i in 0..values.length {
+        Print(" {}", values[i]);
+    }
+    PrintLine();
+}
+
+func Main() -> int {
+    // The same function, called with three arguments, then with none.
+    PrintLine("three arguments -> {}", Count(1, 2, 3));
+    PrintLine("no arguments    -> {}", Count());
+
+    // The values need not share a type. Each only has to know how to render
+    // itself, which is what the `Display` bound asks for.
+    Line(1, 2.5, true, "text");
+
+    // A fixed parameter first, then as many as you like.
+    Labelled("scores", 10, 20, 30);
+    Labelled("empty");
+
+    // Rux spells this `values: Display...`, with a type. The `C` package's
+    // bindings show the other form, `func printf(format: *char8, ...)`, which
+    // is C's untyped variadic: it carries no type information at all, and the
+    // callee has to be told what to expect. That form exists only for talking
+    // to C, and the Extern lesson is where it comes up.
+    return 0;
+}
