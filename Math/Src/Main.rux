@@ -1,0 +1,56 @@
+// The arithmetic operators cover the four operations. Everything else — roots,
+// powers, logarithms, angles, rounding — lives in the `Math` package.
+import Io::PrintLine;
+import Math::{ Abs, Ceil, Cos, E, Exp, Floor, Hypot, Log, Log2, Log10, Max, Min, Pi, Pow, Round, Sin, Sqrt, Tan, Trunc };
+
+func Main() -> int {
+    // Constants, at the precision a float64 can hold.
+    PrintLine("Pi            {}", Pi);
+    PrintLine("E             {}", E);
+    PrintLine("");
+
+    // Roots and powers.
+    PrintLine("Sqrt(2)       {:.6}", Sqrt(2.0));
+    PrintLine("Pow(2, 10)    {}", Pow(2.0, 10.0));
+    PrintLine("Pow(2, 0.5)   {:.6}", Pow(2.0, 0.5));
+    PrintLine("");
+
+    // Logarithms. `Log` is the natural one; the others say their base.
+    PrintLine("Log(E)        {}", Log(E));
+    PrintLine("Log2(1024)    {}", Log2(1024.0));
+    PrintLine("Log10(1000)   {}", Log10(1000.0));
+    PrintLine("Exp(1)        {:.6}", Exp(1.0));
+    PrintLine("");
+
+    // Trigonometry works in radians, not degrees. Pi radians is half a turn,
+    // so a quarter turn — a right angle — is Pi / 2.
+    PrintLine("Sin(Pi / 2)   {}", Sin(Pi / 2.0));
+    PrintLine("Cos(0)        {}", Cos(0.0));
+    PrintLine("Tan(Pi / 4)   {:.6}", Tan(Pi / 4.0));
+
+    // Converting from degrees is a multiplication, worth writing once.
+    let degrees = 30.0;
+    let radians = degrees * Pi / 180.0;
+    PrintLine("Sin(30 deg)   {:.6}", Sin(radians));
+    PrintLine("");
+
+    // The distance from the origin, without writing Sqrt(x*x + y*y) — which
+    // can overflow on values this form handles.
+    PrintLine("Hypot(3, 4)   {}", Hypot(3.0, 4.0));
+    PrintLine("");
+
+    // Rounding, in the several senses of the word. These differ on negatives,
+    // which is where a program usually discovers it chose the wrong one.
+    let value = -2.5;
+    PrintLine("value         {}", value);
+    PrintLine("Floor         {}   (towards minus infinity)", Floor(value));
+    PrintLine("Ceil          {}   (towards plus infinity)", Ceil(value));
+    PrintLine("Trunc         {}   (towards zero)", Trunc(value));
+    PrintLine("Round         {}   (to nearest)", Round(value));
+    PrintLine("Abs           {}", Abs(value));
+    PrintLine("");
+
+    PrintLine("Min(3, 7)     {}", Min(3.0, 7.0));
+    PrintLine("Max(3, 7)     {}", Max(3.0, 7.0));
+    return 0;
+}
