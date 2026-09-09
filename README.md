@@ -114,10 +114,10 @@ Complete programs rather than feature tours, each built only from what came befo
 59. **[Quadratic](Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides
 60. **[Prime](Prime/)** — find the primes below a limit with a sieve
 61. **[Statistics](Statistics/)** — compute the mean, spread, and extremes of a set of numbers
-62. **Guess** — a number guessing game that keeps asking until you get it
-63. **Age** — work out someone's age from their date of birth, in years, months and days
-64. **Melody** — play a tune through the console speaker with the platform's beep
-65. **Password** — build a random password by drawing letters and digits from an alphabet
+62. **[Guess](Guess/)** — a number guessing game that keeps asking until you get it
+63. **[Age](Age/)** — work out someone's age from their date of birth, in years, months and days
+64. **[Melody](Melody/)** — play a tune through the console speaker with the platform's beep
+65. **[Password](Password/)** — build a random password by drawing letters and digits from an alphabet
 66. **[Thanks](Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it
 67. **[Launch](Launch/)** — a countdown, a launch, and some jokes at the language's expense
 

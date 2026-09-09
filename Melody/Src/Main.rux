@@ -1,0 +1,76 @@
+// Playing a tune by asking the operating system to sound one note at a time.
+//
+// There is no portable way to do this, so the whole program is platform
+// specific — which makes it a small, honest example of calling a system API
+// directly, and of admitting when something does not exist everywhere.
+import Core::{ #target, #Error };
+import Io::{ Print, PrintLine };
+
+// Windows provides `Beep(frequency, duration)` in Kernel32, which is exactly
+// the shape a note needs. The `when` keeps the declaration out of a build for
+// any other system, where the symbol would not exist to link against.
+when #target.os {
+    .Windows => {
+        #Link("Kernel32.dll")
+        extern {
+            func Beep(frequency: uint32, duration: uint32) -> bool32;
+        }
+    },
+    else => #Error("Melody needs a platform beep; only Windows is wired up so far")
+}
+
+// Note frequencies in hertz, near the middle of a piano. Naming them keeps the
+// tune below readable as music rather than as numbers.
+const C4: uint32 = 262u32;
+const D4: uint32 = 294u32;
+const E4: uint32 = 330u32;
+const F4: uint32 = 349u32;
+const G4: uint32 = 392u32;
+const A4: uint32 = 440u32;
+
+func Play(name: char8[..], frequency: uint32, milliseconds: uint32) {
+    Print("{} ", name);
+    Beep(frequency, milliseconds);
+}
+
+func Main() -> int {
+    PrintLine("Ode to Joy, roughly:");
+    PrintLine("");
+
+    // The tune as two parallel arrays — the notes, and how long each is held.
+    // A struct would be tidier, but this keeps the shape of the data obvious.
+    let notes: uint32[16] = [
+        E4, E4, F4, G4, G4, F4, E4, D4,
+        C4, C4, D4, E4, E4, D4, D4, D4
+    ];
+    let names = [
+        "E", "E", "F", "G", "G", "F", "E", "D",
+        "C", "C", "D", "E", "E", "D", "D", "D"
+    ];
+    let lengths: uint32[16] = [
+        400u32, 400u32, 400u32, 400u32, 400u32, 400u32, 400u32, 400u32,
+        400u32, 400u32, 400u32, 400u32, 600u32, 200u32, 400u32, 800u32
+    ];
+
+    for i in 0..notes.length {
+        Play(names[i], notes[i], lengths[i]);
+    }
+    PrintLine();
+    PrintLine("");
+
+    // A rising scale, to hear the frequencies climb.
+    PrintLine("and a scale:");
+    let scale: uint32[6] = [ C4, D4, E4, F4, G4, A4 ];
+    let scaleNames = [ "C", "D", "E", "F", "G", "A" ];
+    for i in 0..scale.length {
+        Play(scaleNames[i], scale[i], 250u32);
+    }
+    PrintLine();
+
+    // Worth noticing what `Beep` is: a call straight into the operating
+    // system, declared here and linked from a DLL, with no Rux package in
+    // between. That is the same mechanism the Extern lesson covers, used for
+    // something the standard packages deliberately do not wrap — because a
+    // beep is not a thing every platform has.
+    return 0;
+}
