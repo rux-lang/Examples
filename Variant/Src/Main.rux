@@ -1,0 +1,61 @@
+// An enum says a value is one of a fixed list of cases. A variant says the
+// same, and lets each case carry data of its own.
+//
+// That combination is what makes it useful: the data is reachable only after
+// the case has been established, so there is no way to read a radius from
+// something that turned out to be a rectangle.
+import Io::PrintLine;
+
+// Three shapes of case. `Missing` carries nothing; `Exact` carries one unnamed
+// value; `Range` carries named fields, declared like a struct's.
+variant Reading {
+    Missing,
+    Exact(float64),
+    Range { low: float64; high: float64; }
+}
+
+// Matching tests which case is active and unpacks its data in the same step.
+// The names in the pattern are new bindings holding that case's payload.
+func Describe(reading: Reading) -> float64 {
+    return match reading {
+        .Missing => 0.0,
+        .Exact(value) => value,
+        .Range { low, high } => (low + high) / 2.0
+    };
+}
+
+func Label(reading: Reading) -> char8[..] {
+    return match reading {
+        .Missing => "no reading",
+        .Exact(value) => "exact",
+        .Range { low, high } => "a range"
+    };
+}
+
+func Main() -> int {
+    // Each case is built with its own shape: nothing, a positional value, or
+    // named fields.
+    let absent = Reading::Missing;
+    let precise = Reading::Exact(21.5);
+    let between = Reading::Range { low: 20.0, high: 24.0 };
+
+    PrintLine("{:12} -> {}", Label(absent), Describe(absent));
+    PrintLine("{:12} -> {}", Label(precise), Describe(precise));
+    PrintLine("{:12} -> {}", Label(between), Describe(between));
+
+    // Equality is structural and case-aware. Two values are equal when they
+    // hold the same case and that case's payload matches; different cases are
+    // never equal, whatever their storage happens to contain.
+    PrintLine("same case, same payload      {}",
+        Reading::Exact(21.5) == precise);
+    PrintLine("same case, different payload {}",
+        Reading::Exact(9.0) == precise);
+    PrintLine("different cases              {}",
+        Reading::Missing == precise);
+
+    // The tag recording which case is active is private: it cannot be read,
+    // assigned a number, or written to a file. When a value has to survive
+    // outside the program, encode an `enum` — whose numbers you control — and
+    // translate to and from the variant at the boundary.
+    return 0;
+}
