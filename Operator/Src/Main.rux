@@ -1,0 +1,67 @@
+// What the operators do, and the order they apply in. The bitwise section
+// prints in binary using the `{:b}` placeholder from the Primitive lesson: a
+// mask or a shift is close to unreadable in decimal.
+import Io::PrintLine;
+
+func Main() -> int {
+    // Arithmetic. Division between two integers truncates towards zero instead
+    // of producing a fraction — 17 / 5 is 3, not 3.4 — and `%` is the
+    // remainder that division left behind.
+    let a: int32 = 17;
+    let b: int32 = 5;
+    PrintLine("{} + {} = {}", a, b, a + b);
+    PrintLine("{} - {} = {}", a, b, a - b);
+    PrintLine("{} * {} = {}", a, b, a * b);
+    PrintLine("{} / {} = {}", a, b, a / b);
+    PrintLine("{} % {} = {}", a, b, a % b);
+
+    // Comparison always yields a `bool`, whatever the operands were.
+    PrintLine("{} < {}  is {}", a, b, a < b);
+    PrintLine("{} >= {} is {}", a, b, a >= b);
+    PrintLine("{} == {} is {}", a, b, a == b);
+
+    // `&&` and `||` combine bools, `!` negates one.
+    let ready = true;
+    let busy = false;
+    PrintLine("ready && !busy is {}", ready && !busy);
+    PrintLine("ready || busy  is {}", ready || busy);
+
+    // The bitwise operators work on the bits themselves rather than on the
+    // number they spell. A literal starting `0b` is written in binary too, so
+    // the operands are as readable as the results.
+    let mask: uint8 = 0b1100;
+    let bits: uint8 = 0b1010;
+    PrintLine("mask         {:08b}", mask);
+    PrintLine("bits         {:08b}", bits);
+    PrintLine("mask & bits  {:08b}", mask & bits);
+    PrintLine("mask | bits  {:08b}", mask | bits);
+    PrintLine("mask ^ bits  {:08b}", mask ^ bits);
+
+    // `~` flips every bit in the value's width, so the width matters: this is
+    // a `uint8`, and all eight bits turn over.
+    PrintLine("~mask        {:08b}", ~mask);
+
+    // Shifting slides the bits along, which doubles or halves the number once
+    // per position moved.
+    PrintLine("mask << 2    {:08b}  {} becomes {}", mask << 2, mask, mask << 2);
+    PrintLine("mask >> 2    {:08b}  {} becomes {}", mask >> 2, mask, mask >> 2);
+
+    // Each binary operator has a compound form that reads a variable and
+    // writes the result back to it.
+    var total: int32 = 10;
+    total += 5;
+    total *= 2;
+    total -= 3;
+    PrintLine("total    {}", total);
+
+    var flags: uint8 = 0b1111;
+    flags &= 0b1010;
+    flags |= 0b0001;
+    PrintLine("flags    {:08b}", flags);
+
+    // Multiplication binds tighter than addition, and parentheses override
+    // that. Where a line takes a moment to read, parenthesise it.
+    PrintLine("2 + 3 * 4   = {}", 2 + 3 * 4);
+    PrintLine("(2 + 3) * 4 = {}", (2 + 3) * 4);
+    return 0;
+}
