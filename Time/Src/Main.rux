@@ -1,0 +1,60 @@
+// Two different things get called time, and the package keeps them apart.
+//
+// A *duration* and an *instant* are about measuring: how long something took.
+// A *date* is about the calendar people use, which is a separate and much
+// messier problem — months of unequal length, leap years, and arithmetic that
+// does not simply add.
+import Io::{ Print, PrintLine };
+import Time::{ Date, DaysInMonth, Duration, Instant, IsLeapYear, SleepFor };
+
+func Main() -> int {
+    // Measuring. An instant is a reading from a clock that only moves forward,
+    // meant for comparing against another reading rather than for telling
+    // anyone the time.
+    let started = Instant::Now();
+    SleepFor(Duration::FromMilliseconds(120));
+    let waited = started.Elapsed();
+    // A duration is whole seconds plus a nanosecond remainder, so a short one
+    // is entirely in the remainder.
+    PrintLine("slept for {} s and {} ns",
+        waited.WholeSeconds(), waited.SubsecondNanoseconds());
+
+    // Durations are built from whatever unit is convenient and converted
+    // freely, because underneath they are one count.
+    let minute = Duration::FromSeconds(60);
+    PrintLine("a minute is {} seconds", minute.WholeSeconds());
+    PrintLine("");
+
+    // The calendar. A date is a year, month and day, and building one can fail
+    // — the 30th of February is not a date, so `New` returns an `Option`.
+    match Date::New(2026i32, 9u8, 10u8) {
+        .Some(today) => {
+            PrintLine("date        {}-{}-{}", today.year, today.month, today.day);
+            PrintLine("day of year {}", today.DayOfYear());
+            PrintLine("day of week {}   (0 is Sunday)", today.DayOfWeek());
+
+            // Days since a fixed point is what makes date arithmetic possible:
+            // convert to a count, do ordinary arithmetic, convert back.
+            let epochDays = today.DaysFromEpoch();
+            PrintLine("days since epoch {}", epochDays);
+            let inAWeek = Date::FromEpochDays(epochDays + 7i64);
+            PrintLine("a week later {}-{}-{}", inAWeek.year, inAWeek.month, inAWeek.day);
+        },
+        .None => PrintLine("that is not a date")
+    }
+
+    match Date::New(2026i32, 2u8, 30u8) {
+        .Some(bad) => PrintLine("30 February exists?"),
+        .None => PrintLine("30 February 2026 is correctly refused")
+    }
+    PrintLine("");
+
+    // The awkward parts of the calendar, which are why date arithmetic is not
+    // simply addition.
+    PrintLine("2024 a leap year   {}", IsLeapYear(2024i32));
+    PrintLine("1900 a leap year   {}   (divisible by 100, not by 400)", IsLeapYear(1900i32));
+    PrintLine("2000 a leap year   {}   (divisible by 400)", IsLeapYear(2000i32));
+    PrintLine("days in Feb 2024   {}", DaysInMonth(2024i32, 2u8));
+    PrintLine("days in Feb 2026   {}", DaysInMonth(2026i32, 2u8));
+    return 0;
+}
