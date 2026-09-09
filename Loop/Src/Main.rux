@@ -1,0 +1,61 @@
+// `while` repeats a block for as long as its condition holds. The condition is
+// tested before every pass, including the first, so a loop that starts out
+// false never runs at all.
+//
+// `Print` writes without ending the line, which is how the last example draws
+// several characters on one row.
+import Io::{ Print, PrintLine };
+
+func Main() -> int {
+    // The loop counts by changing a `var` that its own condition reads. Miss
+    // the `i += 1` and the condition never becomes false.
+    var i: int32 = 1;
+    while i <= 5 {
+        PrintLine("i is {}", i);
+        i += 1;
+    }
+
+    // `continue` abandons the current pass and goes back to the condition.
+    // `break` leaves the loop entirely. Note that `n` is incremented before
+    // either can run: a `continue` placed above the increment would skip it
+    // forever and the loop would never end.
+    var n: int32 = 0;
+    while n < 100 {
+        n += 1;
+        if n % 2 == 0 {
+            continue;
+        }
+        if n > 7 {
+            break;
+        }
+        PrintLine("odd {}", n);
+    }
+
+    // `loop` repeats with no condition at all and depends on `break` to stop,
+    // which suits a loop whose ending is decided in the middle of the body.
+    var countdown: int32 = 3;
+    loop {
+        PrintLine("countdown {}", countdown);
+        countdown -= 1;
+        if countdown == 0 {
+            break;
+        }
+    }
+
+    // Loops nest. `break` and `continue` always act on the nearest enclosing
+    // loop, so the `break` below ends one row rather than the whole shape.
+    var row: int32 = 1;
+    while row <= 4 {
+        var col: int32 = 1;
+        while col <= 4 {
+            if col > row {
+                break;
+            }
+            Print("*");
+            col += 1;
+        }
+        PrintLine();
+        row += 1;
+    }
+    return 0;
+}
