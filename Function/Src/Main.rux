@@ -1,0 +1,70 @@
+// A function names a piece of work so it can be run from more than one place.
+// `Main` has been one since the first lesson; these are the rest of the shape.
+import Io::PrintLine;
+
+// Parameters are typed, and so is the result. This one takes two `int` values
+// and gives one back.
+func Add(left: int, right: int) -> int {
+    return left + right;
+}
+
+// A function that returns nothing leaves the `->` off entirely. It is called
+// for what it does, not for what it produces.
+func Announce(label: char8[..]) {
+    PrintLine("-- {} --", label);
+}
+
+// Parameters are immutable inside the body, the same as a `let`. Assigning to
+// `n` here would be an error; a local `var` holds the running value instead.
+func Triple(n: int) -> int {
+    var result = n;
+    result += n;
+    result += n;
+    return result;
+}
+
+// A function may call itself. Each call gets its own parameters, so `n` here is
+// a different `n` on every level, and the `if` is what stops the descent.
+//
+// This is the factorial from the Range lesson written a second way: that one
+// repeated with a loop, this one repeats by calling inward and multiplying on
+// the way back out.
+func Factorial(n: int) -> int {
+    if n <= 1 {
+        return 1;
+    }
+    return n * Factorial(n - 1);
+}
+
+// `return` leaves immediately, so a function can answer as soon as it knows and
+// need not carry a result to the bottom.
+func Sign(value: int) -> char8[..] {
+    if value > 0 {
+        return "positive";
+    }
+    if value < 0 {
+        return "negative";
+    }
+    return "zero";
+}
+
+func Main() -> int {
+    Announce("arithmetic");
+    PrintLine("Add(2, 3)     {}", Add(2, 3));
+    PrintLine("Triple(7)     {}", Triple(7));
+
+    // The result of one call is an ordinary value, so it can go straight into
+    // the next call.
+    PrintLine("Add(Add(1,2),4) {}", Add(Add(1, 2), 4));
+
+    Announce("recursion");
+    for i in 1..=6 {
+        PrintLine("Factorial({}) {}", i, Factorial(i));
+    }
+
+    Announce("early return");
+    PrintLine("Sign(-4)      {}", Sign(-4));
+    PrintLine("Sign(0)       {}", Sign(0));
+    PrintLine("Sign(9)       {}", Sign(9));
+    return 0;
+}
