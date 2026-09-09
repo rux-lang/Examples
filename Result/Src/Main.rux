@@ -1,0 +1,65 @@
+// An `Option` says a value is missing. A `Result` says an operation failed and
+// carries what went wrong, which is what a caller needs in order to respond
+// differently to different failures.
+//
+// `Result<T, E>` has two cases: `Success` holding the answer, and `Error`
+// holding a value describing the problem. `E` is whatever type suits — often a
+// variant listing the ways this particular operation can go wrong.
+import Core::Result;
+import Io::PrintLine;
+
+// The failures this operation can have. Making it a variant rather than, say,
+// an error code means a case can carry detail: `NotExact` brings the remainder
+// with it.
+variant DivideError {
+    ByZero,
+    NotExact(int)
+}
+
+// The signature says everything: it produces an `int`, or a `DivideError`.
+func ExactDivide(numerator: int, denominator: int) -> Result<int, DivideError> {
+    if denominator == 0 {
+        return Result::Error<int, DivideError>(DivideError::ByZero);
+    }
+    let remainder = numerator % denominator;
+    if remainder != 0 {
+        return Result::Error<int, DivideError>(DivideError::NotExact(remainder));
+    }
+    return Result::Success<int, DivideError>(numerator / denominator);
+}
+
+func Report(numerator: int, denominator: int) {
+    // Patterns do not nest: writing `.Error(.ByZero)` to reach inside the error
+    // in one step is rejected. Bind the error, then match it — two steps, and
+    // each one reads plainly.
+    match ExactDivide(numerator, denominator) {
+        .Success(value) => PrintLine("{} / {} is exactly {}", numerator, denominator, value),
+        .Error(reason) => {
+            match reason {
+                .ByZero => PrintLine("{} / {} cannot be done: no dividing by zero",
+                    numerator, denominator),
+                .NotExact(remainder) => PrintLine("{} / {} is not exact: {} left over",
+                    numerator, denominator, remainder)
+            }
+        }
+    }
+}
+
+func Main() -> int {
+    Report(12, 4);
+    Report(12, 0);
+    Report(13, 4);
+
+    // Where the reason does not matter, the same shortcuts as `Option` apply.
+    PrintLine("13 / 4 or zero    {}", ExactDivide(13, 4).ValueOr(0));
+    PrintLine("12 / 4 succeeded  {}", ExactDivide(12, 4).IsSuccess());
+
+    // Worth noticing, because it differs from matching a number: a match on a
+    // variant must cover every case. Leaving out `.Error` above is a compile
+    // error — `match on 'Result<int, DivideError>' is not exhaustive`. The
+    // Match lesson's integer example fell through silently instead, because
+    // there is no way to list every `int`. Here the compiler knows the whole
+    // list, so it holds you to it, and adding a case later makes every match
+    // that has not handled it fail rather than quietly ignore it.
+    return 0;
+}
