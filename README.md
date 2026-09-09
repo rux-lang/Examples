@@ -4,8 +4,8 @@ Example projects and programming tutorials for the [Rux](https://rux-lang.dev) l
 
 ## List of Projects
 
-The list is a course: each entry assumes only what came before it, and each is one complete
-package demonstrating one idea. Linked entries exist today; the rest are planned.
+The list is a course: each entry assumes only what came before it, and each package
+demonstrates one idea and no more. Linked entries exist today; the rest are planned.
 
 ### Track A — The language
 
@@ -14,7 +14,7 @@ Read in order — every lesson builds on the previous one.
 **I. First programs**
 
 1. **[Hello](Hello/)** — print "Hello, World!", the minimal Rux application
-2. **[Primitive](Primitive/)** — declare and print all primitive types, and render an integer in binary, octal, and hex
+2. **[Primitive](Primitive/)** — declare and print every primitive type, from `int8` to `char32`
 3. **[Variable](Variable/)** — `let` and `var`, type inference, and why an immutable binding cannot be reassigned
 4. **[Operator](Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence
 5. **[Convert](Convert/)** — cast between numeric types with `as`, and see what a value that does not fit becomes
@@ -23,74 +23,90 @@ Read in order — every lesson builds on the previous one.
 **II. Control flow**
 
 7. **[Condition](Condition/)** — choose between branches at run time with `if`, `else if`, and `else`
-8. **[Loop](Loop/)** — repeat with `while`, and leave a loop early with `break` and `continue`
+8. **[Loop](Loop/)** — repeat with `while` and `loop`, and leave early with `break` and `continue`
 9. **[Range](Range/)** — walk a range with `for`, and tell `..` from `..=`
-10. **[Array](Array/)** — hold a fixed number of values of one type, and iterate over them
-11. **[Match](Match/)** — select a branch by value with `match`, and default with `else`
+10. **[Match](Match/)** — select a branch by value with `match`, and default with `else`
 
-**III. Functions and packages**
+**III. Arrays and slices**
 
-12. **Function** — declare functions with parameters and return values, and call one recursively
-13. **Module** — split a package across source files and control visibility with `pub`
+11. **[Array](Array/)** — an inline array holding a fixed number of values of one type
+12. **Slice** — view part of an array without copying it, and pass it to a function
 
-**IV. Custom types**
+**IV. Functions**
 
-14. **Struct** — group related values into a struct, and give it methods with `extend`
-15. **Enum** — name a fixed set of cases, and give the enum an explicit underlying type
-16. **Variant** — attach data to each case, and destructure it in a `match` arm
-17. **Interface** — implement `Display`, `Equatable`, and `Comparable` for a type of your own
-18. **Generic** — write one function that works for many types, and constrain it to those that fit
-19. **Iterator** — implement `Iterator` so a type of your own can be used with `for`
+13. **Function** — declare functions with parameters and return values, and call one recursively
+14. **Overload** — give several functions one name, and let the arguments choose between them
+15. **Variadic** — accept any number of arguments, the way `PrintLine` does
+16. **Generic** — write one function that works for many types, and constrain it to those that fit
+17. **Module** — split a package across source files and control visibility with `pub`
 
-**V. Errors**
+**V. Custom types**
 
-20. **Option** — represent a value that may be absent, and supply a default when it is
-21. **Result** — return either a value or an error, and pass failures up to the caller
+18. **Struct** — group related values into a struct, and give it methods and a constructor
+19. **Enum** — name a fixed set of cases, and give the enum an explicit underlying type
+20. **Variant** — attach data to each case, and destructure it in a `match` arm
+21. **Interface** — implement `Display`, `Equatable`, and `Comparable` for a type of your own
+22. **Overloading** — define `==`, `+` and the other operators for your own type
+23. **Iterator** — implement `Iterator` so a type of your own can be used with `for`
 
-**VI. Memory**
+**VI. Errors**
 
-22. **[Memory](Memory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
-23. **Pointer** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
-24. **Ownership** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
-25. **Allocator** — allocate from an arena or a box instead of straight from the system
+24. **Option** — represent a value that may be absent, and supply a default when it is
+25. **Result** — return either a value or an error, and pass failures up to the caller
 
-**VII. Text and input**
+**VII. Memory**
 
-26. **String** — build and inspect text, and tell a length in bytes from a length in characters
-27. **[Circle](Circle/)** — read a line from the console, parse it to a number, and match on the result
-28. **Format** — control width, alignment, precision, and number base when formatting values
-29. **Unicode** — code points, grapheme clusters, and case conversion beyond ASCII
+26. **[Memory](Memory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
+27. **Pointer** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
+28. **Ownership** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
+29. **Allocator** — allocate from an arena or a box instead of straight from the system
 
-**VIII. Collections**
+**VIII. Text and input**
 
-30. **Vector** — a growable array that manages its own memory and capacity
-31. **Deque** — add and remove at both ends, and see where that beats a vector
-32. **HashMap** — look values up by key, and test membership with a hash set
-33. **TreeMap** — keep keys in order, and weigh the cost against hashing
-34. **Algorithm** — sort, search, and fold over the containers built so far
+30. **String** — build and inspect text, and tell a length in bytes from a length in characters
+31. **[Circle](Circle/)** — read a line from the console, parse it to a number, and match on the result
+32. **Format** — control width, alignment, precision, and number base when formatting values
+33. **Unicode** — code points, grapheme clusters, and case conversion beyond ASCII
 
-**IX. Files**
+**IX. Collections**
 
-35. **File** — write text to a file and read it back, handling failure at every step
-36. **Binary** — read and write fixed-width values and raw bytes, including byte order
-37. **Directory** — create, list, and remove directories, and read file metadata
-38. **Path** — join and split paths, and see why a path is not a string
+34. **Vector** — a growable array that manages its own memory and capacity
+35. **Deque** — add and remove at both ends, and see where that beats a vector
+36. **HashMap** — look values up by key, and test membership with a hash set
+37. **TreeMap** — keep keys in order, and weigh the cost against hashing
+38. **Algorithm** — sort, search, and fold over the containers built so far
 
-**X. Compile-time programming**
+**X. Files**
 
-39. **[Version](Version/)** — select code at compile time with `when` and the compiler version
-40. **Config** — read build configuration at compile time and reject an unsupported one
+39. **File** — write text to a file and read it back, handling failure at every step
+40. **Binary** — read and write fixed-width values and raw bytes, including byte order
+41. **Directory** — create, list, and remove directories, and read file metadata
+42. **Path** — join and split paths, and see why a path is not a string
 
-### Track B — Standard packages
+**XI. Compile-time programming**
 
-Independent tours of a single package. Each assumes all of Track A, but none assumes another,
-so they can be read in any order.
+43. **[Version](Version/)** — select code at compile time with `when` and the compiler version
+44. **Config** — read build configuration at compile time and reject an unsupported one
 
-41. **[Extern](Extern/)** — call a platform API directly through an extern declaration and `#Link`
-42. **Math** — roots, powers, logarithms, trigonometry, and rounding
-43. **Time** — measure elapsed time, work with durations, and format a calendar date
-44. **Random** — seed a generator, draw from a range, and sample from a sequence
-45. **Json** — parse JSON into a value, walk it, and write it back out
+### Track B — Platform and packages
+
+Each assumes all of Track A, but none assumes another, so they can be read in any order.
+
+45. **[Extern](Extern/)** — call a platform API directly through an extern declaration and `#Link`
+46. **Asm** — write a function body in assembly, choose its ABI, and select one per architecture
+47. **Math** — roots, powers, logarithms, trigonometry, and rounding
+48. **Time** — measure elapsed time, work with durations, and format a calendar date
+49. **Random** — seed a generator, draw from a range, and sample from a sequence
+50. **Json** — parse JSON into a value, walk it, and write it back out
+
+### Track C — Small programs
+
+Complete programs rather than feature tours, each built only from what came before.
+
+51. **Quadratic** — solve a quadratic equation, and handle the cases the discriminant decides
+52. **Prime** — find the primes below a limit with a sieve
+53. **Statistics** — compute the mean, spread, and extremes of a set of numbers
+54. **Guess** — a number guessing game that keeps asking until you get it
 
 ## Running an Example
 
@@ -114,6 +130,12 @@ To build and type-check an example without running it:
 ```sh
 cd Hello
 rux check
+```
+
+To check every example in the repository at once, from the root:
+
+```sh
+./Check.ps1
 ```
 
 ## License
