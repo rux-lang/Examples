@@ -26,8 +26,13 @@ func Main() -> int {
     // Because it is an expression, it nests inside anything.
     PrintLine("larger of 3 and 5 is {}", 3 > 5 ? 3 : 5);
 
-    let count = 1;
-    PrintLine("{} item{}", count, count == 1 ? "" : "s");
+    // Note that this is bound to a name before being printed rather than
+    // written inside the call. That is deliberate: a conditional whose
+    // operands are text currently misbehaves when passed straight to a
+    // function, so give it a name first.
+    let count = 3;
+    let plural = count == 1 ? "" : "s";
+    PrintLine("{} item{}", count, plural);
 
     // Chaining works, and reads as a list of cases.
     let sign = n < 0 ? "negative" : n == 0 ? "zero" : "positive";
