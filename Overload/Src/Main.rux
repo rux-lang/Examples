@@ -1,0 +1,60 @@
+// Several functions may share one name as long as their parameters differ. The
+// compiler picks by the arguments at each call, so the caller writes one name
+// and gets the version that fits.
+//
+// This is not new: `PrintLine` has been an overload set since the first lesson.
+// There is one for `int`, one for `float64`, one for `bool`, one for text, one
+// taking nothing at all, and a further one taking a format string and a list of
+// values — over twenty in total. Writing `PrintLine(x)` has been choosing among
+// them all along.
+import Io::PrintLine;
+
+// Three functions, one name, told apart by the type of their argument.
+func Describe(value: int) {
+    PrintLine("an integer: {}", value);
+}
+
+func Describe(value: float64) {
+    PrintLine("a number with a fraction: {}", value);
+}
+
+func Describe(value: bool) {
+    PrintLine("a truth value: {}", value);
+}
+
+func Describe(value: char8[..]) {
+    PrintLine("some text: {}", value);
+}
+
+// Overloads may also differ in how many parameters they take. These two are
+// unambiguous because no call can match both.
+func Area(side: int) -> int {
+    return side * side;
+}
+
+func Area(width: int, height: int) -> int {
+    return width * height;
+}
+
+func Main() -> int {
+    // Nothing here says which `Describe` to run. The literal's type decides,
+    // which is why the same call spelling produces four different messages.
+    Describe(42);
+    Describe(2.5);
+    Describe(true);
+    Describe("hello");
+
+    // The count of arguments chooses just as well as their types.
+    PrintLine("square      {}", Area(4));
+    PrintLine("rectangle   {}", Area(4, 5));
+
+    // Overloading is resolved by the parameters, never by the result. Two
+    // functions differing only in return type could not be told apart at a
+    // call, so that is not allowed:
+    //
+    //     func Parse(text: char8[..]) -> int { ... }
+    //     func Parse(text: char8[..]) -> float64 { ... }
+    //
+    // Give them separate names when the difference is what comes back.
+    return 0;
+}
