@@ -1,12 +1,43 @@
-import Io::PrintLine;
+// `for` walks a range, binding each value in turn. A range written `..` stops
+// before its upper bound and one written `..=` includes it — a difference
+// worth being deliberate about every time a loop is written.
+import Io::{ Print, PrintLine };
 
 func Main() -> int {
-    PrintLine("Factorial calculation");
+    // A factorial multiplies every number from 1 up to and including n, so the
+    // inclusive form is the one that matches the definition.
     let n = 10;
     var result = 1;
     for i in 1..=n {
         result *= i;
         PrintLine("{}! = {}", i, result);
     }
+
+    // The same bounds written both ways, to make the difference concrete.
+    Print("1..5  gives ");
+    for i in 1..5 {
+        Print("{} ", i);
+    }
+    PrintLine();
+
+    Print("1..=5 gives ");
+    for i in 1..=5 {
+        Print("{} ", i);
+    }
+    PrintLine();
+
+    // The loop variable belongs to the loop. It is bound afresh on each pass
+    // and cannot be assigned to inside the body:
+    //
+    //     for i in 1..3 { i = 5; }
+    //         error: cannot modify immutable variable 'i'
+    //
+    // To count in a way the body controls, use the `while` loop from the
+    // previous lesson instead.
+
+    // Factorials outgrow their type quickly. 20! still fits in the 64 bits
+    // behind `int`, but 21! does not, and going past the top of a type wraps
+    // around silently rather than reporting anything — as the Convert lesson
+    // showed. Growth this fast is worth remembering before choosing a type.
     return 0;
 }
