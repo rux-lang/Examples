@@ -1,0 +1,61 @@
+// `match` compares one value against a series of patterns and runs the first
+// arm that fits. It says much the same as a long `if` / `else if` chain, but
+// names the value being tested once instead of repeating it in every branch.
+import Io::PrintLine;
+
+func Main() -> int {
+    // Literal patterns, and `else` for everything the arms did not name. The
+    // default arm is spelled `else`; writing `_` here is an error. The
+    // underscore has a different job — ignoring part of a value — which the
+    // Variant lesson comes to later.
+    let count: int32 = 2;
+    match count {
+        0 => PrintLine("none"),
+        1 => PrintLine("one"),
+        2 => PrintLine("a pair"),
+        else => PrintLine("several")
+    }
+
+    // An arm that needs more than one statement takes a block instead.
+    let code: int32 = 404;
+    match code {
+        200 => PrintLine("ok"),
+        404 => {
+            PrintLine("not found");
+            PrintLine("check the address");
+        },
+        else => PrintLine("something else")
+    }
+
+    // A pattern may be a range, which is where `match` starts to read better
+    // than a chain of comparisons.
+    let score: int32 = 73;
+    match score {
+        0..=59 => PrintLine("fail"),
+        60..=79 => PrintLine("pass"),
+        80..=100 => PrintLine("distinction"),
+        else => PrintLine("not a valid score")
+    }
+
+    // A `bool` matches the same way, and needs no `else`, because naming both
+    // `true` and `false` already covers every value it can hold.
+    let ready = true;
+    match ready {
+        true => PrintLine("ready"),
+        false => PrintLine("not ready")
+    }
+
+    // The caveat worth knowing before relying on `match`: a value that fits no
+    // arm is not an error and does not stop the program. Nothing happens, and
+    // the match below prints nothing at all.
+    let missed: int32 = 99;
+    match missed {
+        1 => PrintLine("one"),
+        2 => PrintLine("two")
+    }
+    PrintLine("the match above matched nothing and did nothing");
+
+    // So write the `else` arm whenever every value ought to be handled. Each
+    // arm holds exactly one pattern: there is no `1 | 2` form for grouping.
+    return 0;
+}
