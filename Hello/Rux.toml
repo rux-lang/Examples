@@ -7,7 +7,7 @@ Name = "Hello"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Simple console application"
+Description = "The minimal Rux application: print one line and exit"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
