@@ -5,7 +5,8 @@ Example projects and programming tutorials for the [Rux](https://rux-lang.dev) l
 ## List of Projects
 
 The list is a course: each entry assumes only what came before it, and each package
-demonstrates one idea and no more. Linked entries exist today; the rest are planned.
+demonstrates one idea and no more. All 67 exist and build — `./Check.ps1` from the repository
+root checks every one of them.
 
 ### Track A — The language
 
