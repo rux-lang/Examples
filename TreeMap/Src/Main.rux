@@ -1,0 +1,63 @@
+// A hash map finds an entry fast and keeps no order: its contents come back
+// arranged by whatever the hashing produced.
+//
+// A `TreeMap<K, V>` keeps its keys sorted instead. Lookups cost a little more
+// — the map is searched rather than jumped into — and in exchange the contents
+// are always in order, and questions about ranges become answerable.
+import Allocator::{ Allocator, SystemAllocator };
+import Collections::{ CompareInt32, TreeMap };
+import Io::PrintLine;
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // Where a hash map wanted a hash function and an equality test, a tree map
+    // wants one function that puts two keys in order. That is the difference
+    // between the two structures, expressed in what each has to be told.
+    var scores = TreeMap<int32, int32>(allocator, CompareInt32);
+
+    // Inserted in no particular order.
+    scores.Insert(50i32, 1i32);
+    scores.Insert(10i32, 2i32);
+    scores.Insert(40i32, 3i32);
+    scores.Insert(20i32, 4i32);
+    scores.Insert(30i32, 5i32);
+    PrintLine("entries        {}", scores.Length());
+
+    // Lookup reads the same as a hash map's — an `Option`, because the key may
+    // not be there.
+    match scores.Get(30i32) {
+        .Some(value) => PrintLine("key 30 holds   {}", value),
+        .None => PrintLine("key 30 missing")
+    }
+    match scores.Get(35i32) {
+        .Some(value) => PrintLine("key 35 holds   {}", value),
+        .None => PrintLine("key 35 missing")
+    }
+
+    PrintLine("contains 40    {}", scores.ContainsKey(40i32));
+    match scores.Remove(40i32) {
+        .Some(value) => PrintLine("removed 40, which held {}", value),
+        .None => PrintLine("40 was not there")
+    }
+    PrintLine("entries        {}", scores.Length());
+
+    // The keys were inserted as 50, 10, 40, 20, 30 and are held in sorted
+    // order, so walking the range finds them ascending regardless.
+    var key = 10i32;
+    while key <= 50i32 {
+        match scores.Get(key) {
+            .Some(value) => PrintLine("  {} -> {}", key, value),
+            .None => PrintLine("  {} -> (removed)", key)
+        }
+        key += 10i32;
+    }
+
+    // Which to choose: a hash map when only "is it there, and what is it" is
+    // ever asked, a tree map when the answer needs to come out in order, or
+    // when questions like "the smallest key above this one" matter. The hash
+    // map is faster at the single lookup; the tree map is the one that knows
+    // where its keys sit relative to each other.
+    return 0;
+}
