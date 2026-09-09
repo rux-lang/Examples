@@ -1,0 +1,79 @@
+// A guessing game: the program picks a number, you try to find it, and it says
+// higher or lower until you do.
+//
+// It is the first program here that keeps going until something happens rather
+// than running a fixed number of steps — a loop whose ending depends on the
+// person using it.
+import Allocator::{ Allocator, SystemAllocator };
+import Entropy::EntropyError;
+import Format::ParseInt64;
+import Io::{ Print, PrintLine, ReadLine };
+import Random::{ Pcg64Dxsm, PcgFromEntropy, UniformInRange };
+import Text::StringBuilder;
+
+func ReadGuess(allocator: Allocator, value: *var int64) -> bool {
+    Print("your guess: ");
+    var builder = StringBuilder(allocator);
+    let outcome = ReadLine(builder);
+    if outcome.IsEnd() || outcome.IsError() {
+        builder.Release();
+        return false;
+    }
+    var ok = false;
+    match ParseInt64(builder.View()) {
+        .Success(parsed) => {
+            *value = parsed;
+            ok = true;
+        },
+        .Error(_) => ok = false
+    }
+    builder.Release();
+    return ok;
+}
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // Seeded from entropy, so the answer differs every run. A fixed seed here
+    // would make the game the same game every time — useful for testing it,
+    // useless for playing it.
+    var entropyError = EntropyError::None;
+    var generator = PcgFromEntropy(@entropyError);
+    let secret = UniformInRange<Pcg64Dxsm>(generator, 1u64, 100u64) as int64;
+
+    PrintLine("I am thinking of a number between 1 and 100.");
+    PrintLine("You have 7 guesses, which is enough if you halve the range each time.");
+    PrintLine("");
+
+    var remaining = 7;
+    var guess: int64 = 0;
+    while remaining > 0 {
+        if !ReadGuess(allocator, @guess) {
+            PrintLine("I need a number. Stopping here.");
+            return 1;
+        }
+        remaining -= 1;
+
+        if guess == secret {
+            PrintLine("That is it — {} was the number.", secret);
+            PrintLine("You had {} guesses to spare.", remaining);
+            return 0;
+        }
+
+        // The hint is what makes seven guesses enough: each answer removes
+        // half of what is left, and seven halvings covers a hundred.
+        if guess < secret {
+            Print("higher");
+        } else {
+            Print("lower");
+        }
+        // Bound to a name rather than written inside the call — a text
+        // conditional passed directly as an argument does not survive.
+        let plural = remaining == 1 ? "" : "es";
+        PrintLine("  ({} guess{} left)", remaining, plural);
+    }
+
+    PrintLine("Out of guesses. It was {}.", secret);
+    return 0;
+}
