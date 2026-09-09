@@ -38,7 +38,7 @@ Read in order — every lesson builds on the previous one.
 14. **[Overload](Overload/)** — give several functions one name, and let the arguments choose between them
 15. **[Variadic](Variadic/)** — accept any number of arguments, the way `PrintLine` does
 16. **[Generic](Generic/)** — write one function that works for many types, and constrain it to those that fit
-17. **Module** — split a package across source files and control visibility with `pub`
+17. **[Module](Module/)** — split a package across source files and control visibility with `pub`
 
 **V. Custom types**
 

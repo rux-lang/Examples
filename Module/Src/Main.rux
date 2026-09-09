@@ -1,0 +1,37 @@
+// Every package so far has been a single `Main.rux`. A package may hold as many
+// source files as it likes, and each one declares which module its contents
+// belong to.
+//
+// This package has three files: `Geometry.rux`, `Temperature.rux`, and this
+// one. Look at either of the other two — the whole file is wrapped in a
+// `module` declaration naming where its functions live.
+//
+// The import path is the same `Package::Module::Item` shape used for `Io` and
+// `Text` all along. The only difference is that this package is the one being
+// compiled.
+import Io::PrintLine;
+import Module::Geometry::{ RectangleArea, SquareArea, Perimeter };
+import Module::Temperature::ToFahrenheit;
+
+func Main() -> int {
+    // Once imported, these are called like any other function. Nothing marks
+    // them as coming from elsewhere in the package.
+    PrintLine("rectangle 3x4 area      {}", RectangleArea(3, 4));
+    PrintLine("square 5 area           {}", SquareArea(5));
+    PrintLine("rectangle 3x4 perimeter {}", Perimeter(3, 4));
+    PrintLine("20C in Fahrenheit       {}", ToFahrenheit(20.0));
+
+    // The module is also a namespace. Two modules may each declare a function
+    // called `Convert` without clashing, because the module a name comes from
+    // is part of reaching it.
+    //
+    // Splitting a package this way is about keeping each file readable, not
+    // about hiding anything: within one package, a module may import another
+    // freely, which is why nothing in `Geometry.rux` is marked `pub`.
+    //
+    // `pub` controls what leaves the package. A function without it can be used
+    // anywhere inside this package and nowhere outside it, so a package that
+    // other people depend on marks its intended surface `pub` and keeps the
+    // rest private by saying nothing.
+    return 0;
+}

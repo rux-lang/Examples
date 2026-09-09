@@ -1,0 +1,23 @@
+// A second source file in the same package. Everything in it belongs to the
+// module named here, and the name starts with the package name.
+//
+// Files are not modules on their own: this could be called anything, and two
+// files could contribute to one module. The `module` declaration is what
+// decides where these functions live.
+module Module::Geometry {
+    // No `pub` needed. Within one package, another module may import this;
+    // `pub` is about what leaves the package, which the comment in Main covers.
+    func RectangleArea(width: int, height: int) -> int {
+        return width * height;
+    }
+
+    func SquareArea(side: int) -> int {
+        return side * side;
+    }
+
+    // A module is also a namespace, so this name cannot collide with a
+    // `Perimeter` in another module.
+    func Perimeter(width: int, height: int) -> int {
+        return 2 * (width + height);
+    }
+}
