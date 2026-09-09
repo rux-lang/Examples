@@ -34,10 +34,10 @@ Read in order — every lesson builds on the previous one.
 
 **IV. Functions**
 
-13. **Function** — declare functions with parameters and return values, and call one recursively
-14. **Overload** — give several functions one name, and let the arguments choose between them
-15. **Variadic** — accept any number of arguments, the way `PrintLine` does
-16. **Generic** — write one function that works for many types, and constrain it to those that fit
+13. **[Function](Function/)** — declare functions with parameters and return values, and call one recursively
+14. **[Overload](Overload/)** — give several functions one name, and let the arguments choose between them
+15. **[Variadic](Variadic/)** — accept any number of arguments, the way `PrintLine` does
+16. **[Generic](Generic/)** — write one function that works for many types, and constrain it to those that fit
 17. **Module** — split a package across source files and control visibility with `pub`
 
 **V. Custom types**
@@ -107,6 +107,7 @@ Complete programs rather than feature tours, each built only from what came befo
 52. **Prime** — find the primes below a limit with a sieve
 53. **Statistics** — compute the mean, spread, and extremes of a set of numbers
 54. **Guess** — a number guessing game that keeps asking until you get it
+55. **Age** — work out someone's age from their date of birth, in years, months and days
 
 ## Running an Example
 
