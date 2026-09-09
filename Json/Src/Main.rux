@@ -1,0 +1,72 @@
+// JSON is a small format with a big job: it is how programs that share nothing
+// else agree on what a value is. This is parsing a document and walking what
+// comes back — which uses most of the course at once.
+//
+// A parsed document is a tree of values, and each one is a kind: text, number,
+// boolean, null, array, or object. Reading it means asking which kind before
+// reading the value, which is the same discipline `Option` and `Result` teach.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::PrintLine;
+import Json::{ JsonKind, JsonValue, Parse };
+
+// Asking the kind, then reading accordingly. Getting this wrong is not
+// possible by accident: the accessor for a number reports whether the value
+// really was one.
+func Describe(value: *JsonValue, label: char8[..]) {
+    let kind = (*value).Kind();
+    if kind == JsonKind::Text {
+        PrintLine("  {:10} text    {}", label, (*value).AsText());
+    } else if kind == JsonKind::Number {
+        var number: int64 = 0;
+        let numberPtr = (*value).AsNumber();
+        (*numberPtr).AsInt64(@number);
+        PrintLine("  {:10} number  {}", label, number);
+    } else if kind == JsonKind::Boolean {
+        var flag = false;
+        (*value).AsBoolean(@flag);
+        PrintLine("  {:10} boolean {}", label, flag);
+    } else if kind == JsonKind::Array {
+        PrintLine("  {:10} array of {}", label, (*value).Length());
+    } else if kind == JsonKind::Object {
+        PrintLine("  {:10} object of {}", label, (*value).Length());
+    } else {
+        PrintLine("  {:10} null", label);
+    }
+}
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    let document = "{\"name\":\"Rux\",\"version\":4,\"stable\":false,\"tags\":[\"fast\",\"small\"]}";
+    PrintLine("document: {}", document);
+
+    // Parsing produces a `Result`: either a document or a reason it is not one.
+    // A refused parse hands back no value at all, so there is no way to mistake
+    // a failure for a document that happened to say `null`.
+    match Parse(allocator, document) {
+        .Success(root) => {
+            PrintLine("parsed an object with {} members", root.Length());
+            var i: uint = 0;
+            while i < root.Length() {
+                let member = root.MemberAt(i);
+                Describe(@(*member).value, (*member).name.View().Bytes());
+                i += 1;
+            }
+        },
+        .Error(reason) => PrintLine("refused at byte {}", reason.Offset())
+    }
+
+    // And a document that is not valid. The failure carries the byte it went
+    // wrong at, which is what makes it useful in a message to a person.
+    match Parse(allocator, "{\"broken\": }") {
+        .Success(root) => PrintLine("that parsed?"),
+        .Error(reason) => PrintLine("bad document refused at byte {}", reason.Offset())
+    }
+
+    // Worth noticing how much of the course this one program leans on:
+    // an allocator, a Result matched for both outcomes, a variant-like kind
+    // tested before use, out-parameters for the conversions, and slices for
+    // the text. None of it was introduced here — it is all being used.
+    return 0;
+}

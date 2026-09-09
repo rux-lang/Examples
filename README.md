@@ -102,10 +102,10 @@ Each assumes all of Track A, but none assumes another, so they can be read in an
 
 53. **[Extern](Extern/)** — call a platform API directly through an extern declaration and `#Link`
 54. **Asm** — write a function body in assembly, choose its ABI, and select one per architecture
-55. **Math** — roots, powers, logarithms, trigonometry, and rounding
-56. **Time** — measure elapsed time, work with durations, and format a calendar date
-57. **Random** — seed a generator, draw from a range, and sample from a sequence
-58. **Json** — parse JSON into a value, walk it, and write it back out
+55. **[Math](Math/)** — roots, powers, logarithms, trigonometry, and rounding
+56. **[Time](Time/)** — measure elapsed time, work with durations, and format a calendar date
+57. **[Random](Random/)** — seed a generator, draw from a range, and sample from a sequence
+58. **[Json](Json/)** — parse JSON into a value, walk it, and write it back out
 
 ### Track C — Small programs
 
