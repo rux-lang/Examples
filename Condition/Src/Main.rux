@@ -1,0 +1,56 @@
+// `if` picks a branch while the program is running. There is a second, very
+// similar-looking conditional in Rux — `when` — that picks a branch while the
+// program is being compiled; that one comes much later, in the Version lesson.
+import Io::PrintLine;
+
+func Main() -> int {
+    let temperature: int32 = 18;
+
+    // Parentheses around the condition are optional, and these two say the
+    // same thing. The examples that follow leave them out.
+    if temperature > 15 {
+        PrintLine("warm enough");
+    }
+    if (temperature > 15) {
+        PrintLine("warm enough, with parentheses");
+    }
+
+    // A chain tests each condition in turn and runs the first that holds, so
+    // at most one branch of the chain happens. A final `else` catches whatever
+    // none of the conditions matched.
+    if temperature > 30 {
+        PrintLine("hot");
+    } else if temperature > 20 {
+        PrintLine("mild");
+    } else if temperature > 10 {
+        PrintLine("cool");
+    } else {
+        PrintLine("cold");
+    }
+
+    // Because only the first match runs, the order of a chain is part of its
+    // meaning. If the `> 10` test came first, nothing below it could ever be
+    // reached: every temperature above 30 is also above 10.
+
+    // A condition is an ordinary `bool` expression, so the logical operators
+    // combine them.
+    let raining = true;
+    let windy = false;
+    if raining && !windy {
+        PrintLine("take an umbrella");
+    } else if raining && windy {
+        PrintLine("take a coat instead");
+    }
+
+    // `if` accepts a `bool` and nothing else. A number is not a shortcut for
+    // "not zero", so this is an error rather than a test against zero:
+    //
+    //     if temperature { }
+    //         error: condition for 'if' must have type 'bool', but found 'int32'
+    //
+    // Write the comparison you mean instead.
+    if temperature != 0 {
+        PrintLine("temperature is not zero");
+    }
+    return 0;
+}
