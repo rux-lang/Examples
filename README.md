@@ -119,7 +119,7 @@ Complete programs rather than feature tours, each built only from what came befo
 64. **Melody** — play a tune through the console speaker with the platform's beep
 65. **Password** — build a random password by drawing letters and digits from an alphabet
 66. **[Thanks](Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it
-67. **Launch** — a countdown, a launch, and some jokes at the language's expense
+67. **[Launch](Launch/)** — a countdown, a launch, and some jokes at the language's expense
 
 ## Running an Example
 
