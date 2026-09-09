@@ -1,0 +1,49 @@
+// Everything printed so far has gone through these two functions. `PrintLine`
+// finishes the line it writes; `Print` leaves the cursor where it is, so the
+// next call continues on the same line.
+import Io::{ Print, PrintLine };
+
+func Main() -> int {
+    // Three calls, one line, because only the last one ends it.
+    Print("one ");
+    Print("two ");
+    PrintLine("three");
+
+    // Called with nothing at all, `PrintLine` writes just the line ending,
+    // which is how a blank line is produced.
+    PrintLine();
+
+    // A value can be handed over on its own, with no surrounding text.
+    let answer = 42;
+    PrintLine(answer);
+
+    // More often the value goes inside a message. Each `{}` is filled by the
+    // next argument, in the order they are written.
+    let name = "Rux";
+    let version = 4;
+    PrintLine("{} 0.{}.0", name, version);
+
+    // The same argument list works for `Print`, which is how a line gets
+    // assembled a piece at a time — the loop below builds one row of output
+    // and only then ends it.
+    for i in 1..=5 {
+        Print("{} ", i);
+    }
+    PrintLine();
+
+    // A `{}` may also carry a format spec after a colon, which the Primitive
+    // and Operator lessons used for number bases and decimal places. Width and
+    // alignment work the same way, and the Format lesson covers the rest.
+    PrintLine("|{:>8}|", "right");
+    PrintLine("|{:<8}|", "left");
+    PrintLine("|{:^8}|", "center");
+
+    // Both functions return an `IoError` describing whether the write got
+    // through. Console output is not usually worth checking, so the examples
+    // ignore it, but the value is there when writing somewhere that can fail.
+
+    // Reading input is the other half of console work, and it needs more than
+    // this lesson has: a place to put the text and something to allocate that
+    // place. It waits for the String and Allocator lessons.
+    return 0;
+}
