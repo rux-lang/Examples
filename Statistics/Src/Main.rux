@@ -1,0 +1,81 @@
+// Summarising a set of numbers: where the middle is, and how spread out they
+// are around it.
+//
+// Two passes are needed, and that is the point of the exercise. The mean has
+// to be known before the spread can be measured against it, so the data is
+// walked twice — which is why this reads as a program rather than a formula.
+import Algorithms::{ MaxIndex, MinIndex, Sort, Sum };
+import Allocator::{ Allocator, SystemAllocator };
+import Collections::Vector;
+import Io::{ Print, PrintLine };
+import Math::Sqrt;
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    var samples = Vector::Vector<float64>(allocator);
+    let readings: float64[9] = [ 12.5, 9.0, 15.25, 11.0, 8.75, 14.0, 10.5, 13.25, 11.75 ];
+    for i in 0..readings.length {
+        samples.Push(readings[i]);
+    }
+
+    let count = samples.Length();
+    if count == 0u {
+        PrintLine("nothing to summarise");
+        return 1;
+    }
+
+    Print("readings   ");
+    let values = samples.AsSlice();
+    for i in 0..values.length {
+        Print(" {}", values[i]);
+    }
+    PrintLine();
+    PrintLine("count      {}", count);
+
+    // First pass: the total, and from it the mean.
+    let total = Sum<float64>(values, 0.0);
+    let mean = total / (count as float64);
+    PrintLine("total      {:.4}", total);
+    PrintLine("mean       {:.4}", mean);
+
+    // Second pass: how far each reading sits from that mean. The differences
+    // are squared so that above and below both count as distance rather than
+    // cancelling each other out.
+    var sumOfSquares = 0.0;
+    for i in 0..values.length {
+        let difference = values[i] - mean;
+        sumOfSquares += difference * difference;
+    }
+    let variance = sumOfSquares / (count as float64);
+    let deviation = Sqrt(variance);
+
+    // Squaring inflated the units, so the square root brings the answer back
+    // to the scale the readings are in — which is why standard deviation is
+    // quoted rather than variance.
+    PrintLine("variance   {:.4}", variance);
+    PrintLine("deviation  {:.4}", deviation);
+
+    match MinIndex<float64>(values) {
+        .Some(at) => PrintLine("smallest   {}", values[at]),
+        .None => PrintLine("smallest   none")
+    }
+    match MaxIndex<float64>(values) {
+        .Some(at) => PrintLine("largest    {}", values[at]),
+        .None => PrintLine("largest    none")
+    }
+
+    // The median needs the values in order, which means rearranging them — so
+    // it comes last, after everything that wanted them as they arrived.
+    var sortable = samples.AsMutableSlice();
+    Sort<float64>(sortable);
+    let sorted = samples.AsSlice();
+    let middle = count / 2u;
+    if count % 2u == 1u {
+        PrintLine("median     {}", sorted[middle]);
+    } else {
+        PrintLine("median     {:.4}", (sorted[middle - 1u] + sorted[middle]) / 2.0);
+    }
+    return 0;
+}

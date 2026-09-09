@@ -111,9 +111,9 @@ Each assumes all of Track A, but none assumes another, so they can be read in an
 
 Complete programs rather than feature tours, each built only from what came before.
 
-59. **Quadratic** — solve a quadratic equation, and handle the cases the discriminant decides
-60. **Prime** — find the primes below a limit with a sieve
-61. **Statistics** — compute the mean, spread, and extremes of a set of numbers
+59. **[Quadratic](Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides
+60. **[Prime](Prime/)** — find the primes below a limit with a sieve
+61. **[Statistics](Statistics/)** — compute the mean, spread, and extremes of a set of numbers
 62. **Guess** — a number guessing game that keeps asking until you get it
 63. **Age** — work out someone's age from their date of birth, in years, months and days
 64. **Melody** — play a tune through the console speaker with the platform's beep
