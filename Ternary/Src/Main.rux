@@ -1,0 +1,41 @@
+// `if` chooses which statements to run. Sometimes what is wanted is smaller
+// than that: choosing between two *values*, in the middle of an expression.
+//
+// `condition ? whenTrue : whenFalse` is that. It is an expression, so it can
+// go wherever a value goes.
+import Io::PrintLine;
+
+func Main() -> int {
+    let n = 7;
+
+    // Written with `if`, this needs a `var` and four lines, and the binding
+    // cannot be a `let` because it is assigned after being declared.
+    var labelTheLongWay = "";
+    if n % 2 == 0 {
+        labelTheLongWay = "even";
+    } else {
+        labelTheLongWay = "odd";
+    }
+
+    // Written as an expression, it is one line and the binding stays immutable
+    // — which is the real gain, not the brevity.
+    let label = n % 2 == 0 ? "even" : "odd";
+
+    PrintLine("{} is {} (and {})", n, label, labelTheLongWay);
+
+    // Because it is an expression, it nests inside anything.
+    PrintLine("larger of 3 and 5 is {}", 3 > 5 ? 3 : 5);
+
+    let count = 1;
+    PrintLine("{} item{}", count, count == 1 ? "" : "s");
+
+    // Chaining works, and reads as a list of cases.
+    let sign = n < 0 ? "negative" : n == 0 ? "zero" : "positive";
+    PrintLine("{} is {}", n, sign);
+
+    // The limit is worth knowing: both branches must produce the same type,
+    // because the whole thing is one value with one type. And a chain longer
+    // than about two is usually clearer as an `if` chain or a `match` — this
+    // is for the small choice made in passing, not for hiding a decision.
+    return 0;
+}
