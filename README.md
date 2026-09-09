@@ -30,7 +30,7 @@ Read in order — every lesson builds on the previous one.
 **III. Arrays and slices**
 
 11. **[Array](Array/)** — an inline array holding a fixed number of values of one type
-12. **Slice** — view part of an array without copying it, and pass it to a function
+12. **[Slice](Slice/)** — view part of an array without copying it, and pass it to a function
 
 **IV. Functions**
 

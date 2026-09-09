@@ -1,0 +1,49 @@
+// An array's length is part of its type: the previous lesson's array of twelve
+// greetings is a `char8[..][12]`, and a function written for it would accept
+// arrays of exactly twelve. A slice, written `T[..]`, solves that. It is a view
+// of somewhere in an array — a position and a length, no elements of its own —
+// so one function can serve arrays of any size, and no copying happens.
+import Io::PrintLine;
+
+// This takes a slice, so every call below reaches it through the same function.
+func Total(values: int[..]) -> int {
+    var sum: int = 0;
+    for i in 0..values.length {
+        sum += values[i];
+    }
+    return sum;
+}
+
+func Main() -> int {
+    // An inline array of five values. Its type is `int[5]`.
+    let numbers = [ 10, 20, 30, 40, 50 ];
+
+    // Handing it to a function that wants a slice needs no ceremony: the array
+    // converts to a view of all of itself.
+    PrintLine("all of it       {}", Total(numbers));
+
+    // Indexing with a range produces a slice of part of it. As everywhere else,
+    // `..` stops before its upper bound, so this is elements 1, 2 and 3.
+    let middle = numbers[1..4];
+    PrintLine("numbers[1..4]   {}   over {} elements", Total(middle), middle.length);
+
+    // Either end may be left out, and means "from the start" or "to the end".
+    let tail = numbers[2..];
+    let head = numbers[..2];
+    PrintLine("numbers[2..]    {}", Total(tail));
+    PrintLine("numbers[..2]    {}", Total(head));
+
+    // Nothing was copied to make those. A slice borrows the array's elements,
+    // so all four calls above read the same five numbers in place.
+
+    // A slice knows its own length, and that is the only thing distinguishing
+    // one view from another over the same array.
+    PrintLine("lengths         {} {} {} {}",
+        numbers.length, middle.length, tail.length, head.length);
+
+    // This is also what a string literal has been all along. `char8[..]` is a
+    // slice of bytes, which is why text has needed no allocation so far.
+    let greeting = "hello";
+    PrintLine("\"{}\" is {} bytes", greeting, greeting.length);
+    return 0;
+}
