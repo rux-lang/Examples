@@ -1,0 +1,89 @@
+// An interface is a list of what a type must be able to do. A type that
+// declares it implements one, and provides those functions, can then be used
+// wherever the interface is asked for — so one function can work with several
+// unrelated types without knowing which it has.
+import Core::Equatable;
+import Io::PrintLine;
+
+// The requirements. Note that these declarations carry no `self`: the interface
+// says what must exist, and each implementation supplies the receiver.
+interface Shape {
+    func Area() -> float64;
+    func Name() -> char8[..];
+}
+
+// Two structs with nothing in common but the ability to answer those two
+// questions.
+struct Circle {
+    radius: float64;
+}
+
+struct Square {
+    side: float64;
+}
+
+// `extend Type : Interface` says this type implements it, and must then define
+// every requirement. Here the `self` parameter does appear.
+extend Circle : Shape {
+    func Area(self: &Circle) -> float64 {
+        return 3.141592653589793 * self.radius * self.radius;
+    }
+
+    func Name(self: &Circle) -> char8[..] {
+        return "circle";
+    }
+}
+
+extend Square : Shape {
+    func Area(self: &Square) -> float64 {
+        return self.side * self.side;
+    }
+
+    func Name(self: &Square) -> char8[..] {
+        return "square";
+    }
+}
+
+// Interfaces from the standard packages work the same way. `Core::Equatable`
+// requires one function, `Equals`, and implementing it is what lets two values
+// of a type of your own be compared.
+extend Circle : Equatable {
+    func Equals(self: &Circle, other: &Circle) -> bool {
+        return self.radius == other.radius;
+    }
+}
+
+// The payoff: this takes any `Shape` at all. It has no idea whether it holds a
+// circle or a square, and calls through the interface.
+func Report(shape: Shape) {
+    PrintLine("a {} has area {}", shape.Name(), shape.Area());
+}
+
+func Main() -> int {
+    let round = Circle { radius: 2.0 };
+    let boxy = Square { side: 3.0 };
+
+    // A concrete value does not become an interface value on its own. It has to
+    // be named at the interface type first, and that annotation is what
+    // performs the conversion — passing `round` straight to `Report` is
+    // rejected as having no matching overload.
+    let roundShape: Shape = round;
+    let boxyShape: Shape = boxy;
+    Report(roundShape);
+    Report(boxyShape);
+
+    // A method taking `&Circle` accepts a variable directly; the reference is
+    // taken for you. It will not accept a freshly built value, which is why the
+    // second circle is given a name first.
+    let twin = Circle { radius: 2.0 };
+    let other = Circle { radius: 5.0 };
+    PrintLine("radius 2 equals radius 2  {}", round.Equals(twin));
+    PrintLine("radius 2 equals radius 5  {}", round.Equals(other));
+
+    // Interfaces are also what a generic constraint is written against —
+    // `func Largest<T: Comparable>(...)` asks for a type that can compare. The
+    // Generic lesson kept to unconstrained type parameters for a reason worth
+    // knowing: primitives implement none of these interfaces, so `int` cannot
+    // satisfy `Comparable`. Constraints are for types of your own, like these.
+    return 0;
+}
