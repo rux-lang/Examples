@@ -1,0 +1,48 @@
+// `let` names a value while the program runs. `const` names one while it is
+// being compiled: the value is worked out once, by the compiler, and every use
+// is replaced by the answer.
+//
+// It sits outside functions, which is the other half of the point — a constant
+// is available to the whole file rather than to one body.
+import Io::PrintLine;
+
+// The type is inferred here, exactly as with `let`.
+const Limit = 100;
+const Greeting = "a constant string";
+
+// Or stated, when the default would be the wrong width.
+const Pi: float64 = 3.141592653589793;
+
+// A constant may be built from other constants, because all of it is worked
+// out before the program runs. Nothing here costs anything at run time.
+const Doubled = Limit * 2;
+const Half = Limit / 2;
+
+func Describe(value: int) -> char8[..] {
+    // Constants are ordinary values wherever they are used.
+    if value > Limit {
+        return "over the limit";
+    }
+    return "within the limit";
+}
+
+func Main() -> int {
+    PrintLine("Limit     {}", Limit);
+    PrintLine("Doubled   {}", Doubled);
+    PrintLine("Half      {}", Half);
+    PrintLine("Pi        {}", Pi);
+    PrintLine("Greeting  {}", Greeting);
+
+    PrintLine("50 is     {}", Describe(50));
+    PrintLine("150 is    {}", Describe(150));
+
+    // Why bother, when a `let` at the top of `Main` would also work? Three
+    // reasons. The value is shared by every function in the file rather than
+    // one. It is computed once at compile time, so `Limit * 2` costs nothing.
+    // And naming it puts the number in one place — the reason to write `Limit`
+    // rather than `100` in three separate comparisons.
+    //
+    // Constants are also what the compile-time lessons build on: `when` needs
+    // its condition known while compiling, and a `const` is exactly that.
+    return 0;
+}
