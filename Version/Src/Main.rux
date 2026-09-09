@@ -1,8 +1,8 @@
 import Core::{ SemanticVersion, #compiler, #Error };
 import Io::PrintLine;
 
-const Rux040 = SemanticVersion::New(0, 4, 0);
-const Rux100 = SemanticVersion::New(1, 0, 0);
+const Rux040 = SemanticVersion(0, 4, 0);
+const Rux100 = SemanticVersion(1, 0, 0);
 
 // `when` picks a branch while compiling. Only the taken branch reaches the
 // binary; the others are never resolved or type-checked, so they may use
