@@ -1,0 +1,60 @@
+// A path looks like a string and is not one.
+//
+// The operating system decides what a filename may contain, and its answer is
+// not "valid text". Windows paths are sequences of 16-bit units that need not
+// form valid UTF-16; Unix paths are bytes that need not form valid UTF-8. A
+// type that insisted on being text could not name every file that exists.
+//
+// So there is `OsString`, which holds whatever the system holds, and `Path`,
+// which is a view of one with path meaning attached.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::{ Print, PrintLine };
+import Path::{ OsString, Path, PreferredSeparator };
+import Text::TextError;
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+    var textError = TextError::None;
+
+    // Text goes in through a conversion, because it is a conversion — from
+    // text into whatever this platform's names are made of.
+    var holder = OsString::FromText(allocator, "Bin/reports/summary.txt", @textError);
+    let path = Path::FromView(holder.View());
+    PrintLine("length in units  {}", path.Length());
+    PrintLine("is it empty      {}", path.IsEmpty());
+
+    // Walking the parts. A path is a sequence of components, and the separator
+    // between them is the platform's business rather than yours — which is why
+    // splitting on a hard-coded slash is a bug waiting for a different machine.
+    Print("components      ");
+    var parts = path.Components();
+    var going = true;
+    while going {
+        match parts.Next() {
+            .Some(part) => {
+                var partError = TextError::None;
+                match part.ToText(allocator, @partError) {
+                    .Some(text) => Print(" [{}]", text),
+                    .None => Print(" [?]")
+                }
+            },
+            .None => going = false
+        }
+    }
+    PrintLine();
+
+    // Comparison is by path rules rather than by text, so two spellings the
+    // system considers the same compare equal.
+    var otherHolder = OsString::FromText(allocator, "Bin/reports/summary.txt", @textError);
+    let other = Path::FromView(otherHolder.View());
+    PrintLine("equal to itself  {}", path.Equals(other));
+
+    // And the separator, if it is ever genuinely needed.
+    PrintLine("separator here   {}", PreferredSeparator() as uint32);
+
+    // The practical upshot: build paths through `Path`, not by joining strings
+    // with slashes. Text conversion happens at the edges — once on the way in,
+    // and once on the way out when something has to be shown to a person.
+    return 0;
+}

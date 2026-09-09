@@ -86,10 +86,10 @@ Read in order — every lesson builds on the previous one.
 
 **X. Files**
 
-47. **File** — write text to a file and read it back, handling failure at every step
-48. **Binary** — read and write fixed-width values and raw bytes, including byte order
-49. **Directory** — create, list, and remove directories, and read file metadata
-50. **Path** — join and split paths, and see why a path is not a string
+47. **[File](File/)** — write text to a file and read it back, handling failure at every step
+48. **[Binary](Binary/)** — read and write fixed-width values and raw bytes, including byte order
+49. **[Directory](Directory/)** — create, list, and remove directories, and read file metadata
+50. **[Path](Path/)** — join and split paths, and see why a path is not a string
 
 **XI. Compile-time programming**
 
