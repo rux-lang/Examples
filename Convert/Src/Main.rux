@@ -1,0 +1,46 @@
+// A conversion happens on its own only when nothing can be lost: widening
+// inside one family and one signedness, `int8` to `int32` or `float32` to
+// `float64`. Every other conversion has to be asked for with `as`, because
+// every other conversion can change the value.
+import Io::PrintLine;
+
+func Main() -> int {
+    // Widening needs no cast. Every `int8` is also an `int32`, so the compiler
+    // performs the conversion without being told.
+    let small: int8 = 100;
+    let widened: int32 = small;
+    PrintLine("widen       int8 {} becomes int32 {}", small, widened);
+
+    // Narrowing has to be asked for, and keeps only the low bits that fit.
+    // 300 does not fit in an `int8`, and what survives is 300 - 256.
+    let big: int32 = 300;
+    let narrowed = big as int8;
+    PrintLine("narrow      int32 {} becomes int8 {}", big, narrowed);
+
+    // Changing signedness reinterprets the same bits rather than recomputing
+    // the value: every bit of -1 is set, and eight set bits read as 255.
+    let negative: int32 = -1;
+    let reinterpreted = negative as uint8;
+    PrintLine("sign        int32 {} becomes uint8 {}   {:08b}",
+        negative, reinterpreted, reinterpreted);
+
+    // Integers and floats are different families, so crossing between them
+    // needs a cast in both directions — even widening ones. Converting to an
+    // integer truncates towards zero; it does not round.
+    let ratio: float64 = 3.9;
+    PrintLine("float->int  {} becomes {}", ratio, ratio as int32);
+
+    let count: int32 = 7;
+    PrintLine("int->float  {} becomes {}", count, count as float64);
+
+    // A character is a number underneath, and the cast shows its code point.
+    let letter: char32 = 'A';
+    PrintLine("char->uint  {} becomes {}", letter, letter as uint32);
+
+    // Notice that none of the narrowing above reported a problem. A cast that
+    // loses information is silent by design: `as` is how you say the loss is
+    // intended. Asking whether a value fits, and being told when it does not,
+    // needs a second place to put the answer — that waits for the Pointer
+    // lesson and its out-parameters.
+    return 0;
+}
