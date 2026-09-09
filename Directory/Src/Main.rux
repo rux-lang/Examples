@@ -1,0 +1,74 @@
+// Files live in directories, and those can be made, listed and removed like
+// anything else. Listing is the interesting one: the entries arrive one at a
+// time through a cursor, for the same reason `ReadLine` fills a builder — a
+// directory can hold a great many names, and returning all of them at once
+// would mean allocating for all of them at once.
+import Allocator::{ Allocator, SystemAllocator };
+import FileSystem::{ DeleteDirectory, DeleteFile, File, MakeDirectory, OpenOptions, ReadDirectory };
+import Io::{ IoError, PrintLine };
+import Path::{ OsString, Path };
+import Text::TextError;
+
+// Building a path from text takes three steps, so it is worth a helper.
+func PathOf(allocator: Allocator, text: char8[..], holder: *var OsString) -> Path {
+    var textError = TextError::None;
+    *holder = OsString::FromText(allocator, text, @textError);
+    return Path::FromView((*holder).View());
+}
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+    var error = IoError::Ok();
+
+    var dirHolder = OsString(allocator);
+    let dir = PathOf(allocator, "Bin/example", @dirHolder);
+    // Making it. If it already exists this reports so rather than failing
+    // silently, which is why the return value is worth checking in real code.
+    MakeDirectory(allocator, dir);
+    PrintLine("made Bin/example");
+
+    var oneHolder = OsString(allocator);
+    let one = PathOf(allocator, "Bin/example/first.txt", @oneHolder);
+    var twoHolder = OsString(allocator);
+    let two = PathOf(allocator, "Bin/example/second.txt", @twoHolder);
+    var taken: uint = 0;
+    var a = File::Open(allocator, one, OpenOptions::Writing(), @error);
+    a.Write("one", @taken);
+    a.Close();
+    var b = File::Open(allocator, two, OpenOptions::Writing(), @error);
+    b.Write("two", @taken);
+    b.Close();
+    PrintLine("made two files");
+
+    // Listing. `Next` fills in the next name and reports whether there was
+    // one, so the loop ends when it returns false — the same shape as the
+    // iterator lesson, driven by hand.
+    var listing = ReadDirectory(allocator, dir, @error);
+    var name = OsString(allocator);
+    var failure = IoError::Ok();
+    var count = 0;
+    while listing.Next(@name, @failure) {
+        count += 1;
+        var nameError = TextError::None;
+        match name.View().ToText(allocator, @nameError) {
+            .Some(text) => PrintLine("  {}", text),
+            .None => PrintLine("  (a name that is not text)")
+        }
+    }
+    // The cursor holds resources of its own and hands them back here.
+    listing.Release();
+    PrintLine("found {} entries", count);
+
+    // Note what the names are: an `OsString`, not text. The operating system
+    // does not promise that a filename is valid text at all, so converting one
+    // can fail — which is why `ToText` returns an `Option` and the loop above
+    // has an arm for a name that is not text.
+
+    // A directory must be empty before it can go, so the files come first.
+    DeleteFile(allocator, one);
+    DeleteFile(allocator, two);
+    DeleteDirectory(allocator, dir);
+    PrintLine("cleaned up");
+    return 0;
+}
