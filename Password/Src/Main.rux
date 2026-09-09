@@ -1,0 +1,57 @@
+// Building a password by drawing characters from an alphabet.
+//
+// The program is short. The care is all in one decision — where the randomness
+// comes from — and getting that wrong produces something that looks exactly as
+// random as the correct version and is not.
+import Entropy::EntropyError;
+import Io::{ Print, PrintLine };
+import Random::{ Pcg64Dxsm, PcgFromEntropy, UniformBelow };
+
+func Main() -> int {
+    // The characters a password may contain. Keeping them in one place makes
+    // the set easy to see and easy to change — and the count is what every
+    // draw is taken against.
+    let alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    // Note what is missing: l, I, O, 0 and 1. Characters that look like each
+    // other cost more in mistyped passwords than they add in strength.
+    PrintLine("alphabet has {} characters", alphabet.length);
+
+    // This is the decision. `PcgFromEntropy` seeds from the operating system's
+    // randomness, so each run differs. A fixed seed would produce the same
+    // password every time — and a password anyone can reproduce is not one.
+    var entropyError = EntropyError::None;
+    var generator = PcgFromEntropy(@entropyError);
+    if entropyError != EntropyError::None {
+        PrintLine("no source of randomness available; refusing to invent one");
+        return 1;
+    }
+
+    let length: uint = 16;
+    Print("password: ");
+    for i in 0..length {
+        let pick = UniformBelow<Pcg64Dxsm>(generator, alphabet.length as uint64);
+        Print("{}", alphabet[pick as uint]);
+    }
+    PrintLine();
+
+    // Two more, to show they differ.
+    for round in 0..2 {
+        Print("          ");
+        for i in 0..length {
+            let pick = UniformBelow<Pcg64Dxsm>(generator, alphabet.length as uint64);
+            Print("{}", alphabet[pick as uint]);
+        }
+        PrintLine();
+    }
+
+    // The honest caveat, which matters more than the code above. A generator
+    // like this one is built to be fast and repeatable, not unguessable: see
+    // enough of its output and the rest follows. It is seeded here from
+    // `Entropy`, which is genuinely unpredictable, and that is what carries
+    // the security — but a real password tool should take every character from
+    // `Entropy` directly rather than from a generator seeded once.
+    //
+    // The lesson worth keeping: know which of the two you are using, and why.
+    return 0;
+}
