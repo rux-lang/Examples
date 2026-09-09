@@ -57,9 +57,9 @@ Read in order — every lesson builds on the previous one.
 
 **VI. Errors**
 
-30. **Option** — represent a value that may be absent, and supply a default when it is
-31. **Result** — return either a value or an error, and pass failures up to the caller
-32. **Propagate** — hand a failure straight to the caller with `?` instead of matching it
+30. **[Option](Option/)** — represent a value that may be absent, and supply a default when it is
+31. **[Result](Result/)** — return either a value or an error, and pass failures up to the caller
+32. **[Propagate](Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 
 **VII. Memory**
 
