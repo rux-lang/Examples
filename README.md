@@ -16,7 +16,7 @@ Read in order — every lesson builds on the previous one.
 1. **[Hello](Hello/)** — print "Hello, World!", the minimal Rux application
 2. **[Primitive](Primitive/)** — declare and print every primitive type, from `int8` to `char32`
 3. **[Variable](Variable/)** — `let` and `var`, type inference, and why an immutable binding cannot be reassigned
-4. **Const** — name a value the compiler folds in, and see where it differs from `let`
+4. **[Const](Const/)** — name a value the compiler folds in, and see where it differs from `let`
 5. **[Operator](Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence
 6. **[Convert](Convert/)** — cast between numeric types with `as`, and see what a value that does not fit becomes
 7. **[Console](Console/)** — write to the console with `Print` and `PrintLine`, and fill placeholders in order
@@ -24,7 +24,7 @@ Read in order — every lesson builds on the previous one.
 **II. Control flow**
 
 8. **[Condition](Condition/)** — choose between branches at run time with `if`, `else if`, and `else`
-9. **Ternary** — pick one of two values inside an expression with `? :`
+9. **[Ternary](Ternary/)** — pick one of two values inside an expression with `? :`
 10. **[Loop](Loop/)** — repeat with `while` and `loop`, and leave early with `break` and `continue`
 11. **[Range](Range/)** — walk a range with `for`, and tell `..` from `..=`
 12. **[Match](Match/)** — select a branch by value with `match`, and default with `else`
@@ -40,7 +40,7 @@ Read in order — every lesson builds on the previous one.
 16. **[Overload](Overload/)** — give several functions one name, and let the arguments choose between them
 17. **[Variadic](Variadic/)** — accept any number of arguments, the way `PrintLine` does
 18. **[Generic](Generic/)** — write one function that works for many types
-19. **Callback** — pass a function to another function as an ordinary value
+19. **[Callback](Callback/)** — pass a function to another function as an ordinary value
 20. **[Module](Module/)** — split a package across source files and control visibility with `pub`
 
 **V. Custom types**

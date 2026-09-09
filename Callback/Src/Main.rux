@@ -1,0 +1,69 @@
+// Functions have been called by name all along. They can also be handed around
+// as values: stored in a binding, passed to another function, and called from
+// there.
+//
+// That is what lets one function be given the *part that varies*. Sorting
+// takes a comparison; a hash map takes a hash; searching takes a test. Each is
+// written once and told what to do at the point of use.
+import Io::PrintLine;
+
+func Double(value: int) -> int {
+    return value * 2;
+}
+
+func Square(value: int) -> int {
+    return value * value;
+}
+
+func IsEven(value: int) -> bool {
+    return value % 2 == 0;
+}
+
+// The parameter type is the shape of the function: what it takes, what it
+// gives back. Anything matching that shape may be passed.
+func ApplyAll(values: var int[..], operation: func(int) -> int) {
+    for i in 0..values.length {
+        values[i] = operation(values[i]);
+    }
+}
+
+// A function taking a test rather than a value can answer any question that
+// can be written as one.
+func CountWhere(values: int[..], test: func(int) -> bool) -> uint {
+    var found: uint = 0;
+    for i in 0..values.length {
+        if test(values[i]) {
+            found += 1;
+        }
+    }
+    return found;
+}
+
+func Main() -> int {
+    var numbers: int[5] = [ 1, 2, 3, 4, 5 ];
+
+    // `Double` is passed, not called — no parentheses. `ApplyAll` does the
+    // calling, once per element.
+    ApplyAll(numbers[..], Double);
+    PrintLine("doubled  {} {} {} {} {}",
+        numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]);
+
+    // The same function, given a different operation. Nothing about `ApplyAll`
+    // changed.
+    ApplyAll(numbers[..], Square);
+    PrintLine("squared  {} {} {} {} {}",
+        numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]);
+
+    PrintLine("even     {}", CountWhere(numbers[..], IsEven));
+
+    // A function value can also be held in a binding, and its type written out
+    // in full. The binding is called exactly like the function it holds.
+    let chosen: func(int) -> int = Double;
+    PrintLine("chosen   {}", chosen(21));
+
+    // This is what the collections were doing. `HashMap` was handed `HashInt32`
+    // and `EqualsInt32`, `TreeMap` was handed `CompareInt32`, and `Algorithm`
+    // handed a predicate to `IndexWhere` and a step to `Fold` — all of them
+    // ordinary functions, passed by name.
+    return 0;
+}
