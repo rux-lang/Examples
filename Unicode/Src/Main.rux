@@ -1,0 +1,64 @@
+// The String lesson found two different lengths for the same text: bytes and
+// characters. There is a third, and it is the one a reader actually means.
+//
+// Text has three levels. Bytes are how it is stored. Scalars — code points —
+// are the characters the encoding defines. Graphemes are what a person would
+// point at and call a single character, and one of those can be made of
+// several scalars.
+import Io::PrintLine;
+import Text::StringView;
+import Unicode::{ CountGraphemes, IsAlphabetic, IsNumeric, IsWhiteSpace,
+    ToLowerSimple, ToUpperSimple };
+
+func Main() -> int {
+    // Six characters, seven bytes, because ß takes two.
+    let view = StringView::FromValidated("Straße");
+    PrintLine("text        {}", view);
+    PrintLine("bytes       {}", view.Length());
+    PrintLine("characters  {}", view.ScalarCount());
+    PrintLine("");
+
+    // The third level. These three scalars are `e`, a combining acute accent,
+    // and `!`. The accent is not a character on its own — it attaches to the
+    // `e` before it, so a reader sees `é!`: two things, not three.
+    let scalars: char32[3] = [ 'e', '\u{301}', '!' ];
+    PrintLine("scalars     {}", scalars.length);
+    PrintLine("graphemes   {}", CountGraphemes(scalars));
+    PrintLine("");
+
+    // This is why "just index the string" goes wrong. Taking one byte can cut
+    // a character in half, and taking one scalar can separate a letter from
+    // the accent that belongs to it. Which level to count depends on the
+    // question: bytes for storage, scalars for encoding, graphemes for
+    // anything a person will see — a cursor, a column width, a character
+    // limit.
+
+    // Case is not a per-character table either. Most of it looks simple:
+    PrintLine("upper 'a'   {}", ToUpperSimple('a'));
+    PrintLine("upper 'é'   {}", ToUpperSimple('é'));
+    PrintLine("lower 'A'   {}", ToLowerSimple('A'));
+
+    // And then there is ß, whose uppercase is "SS" — two characters from one.
+    // A function returning a single `char32` has nowhere to put the second, so
+    // it returns the letter unchanged rather than being wrong:
+    PrintLine("upper 'ß'   {}   (unchanged)", ToUpperSimple('ß'));
+
+    // That is what "Simple" means in the name. `ToUpperFull` exists for this,
+    // and writes into a buffer precisely because the answer may be longer than
+    // one character. Uppercasing text correctly is not a loop over characters.
+    PrintLine("");
+
+    // Character properties are questions about a scalar, and they are defined
+    // for all of Unicode rather than just ASCII.
+    PrintLine("'a' alphabetic   {}", IsAlphabetic('a'));
+    PrintLine("'ß' alphabetic   {}", IsAlphabetic('ß'));
+    PrintLine("'5' alphabetic   {}", IsAlphabetic('5'));
+    PrintLine("'5' numeric      {}", IsNumeric('5'));
+    PrintLine("' ' whitespace   {}", IsWhiteSpace(' '));
+
+    // The lesson underneath all of this: text is not an array of characters,
+    // however much it looks like one. It is bytes encoding scalars that group
+    // into graphemes, and code that assumes otherwise works perfectly until it
+    // meets someone's name.
+    return 0;
+}

@@ -71,10 +71,10 @@ Read in order — every lesson builds on the previous one.
 
 **VIII. Text and input**
 
-38. **String** — build and inspect text, and tell a length in bytes from a length in characters
+38. **[String](String/)** — build and inspect text, and tell a length in bytes from a length in characters
 39. **[Circle](Circle/)** — read a line from the console, parse it to a number, and match on the result
-40. **Format** — control width, alignment, precision, and number base when formatting values
-41. **Unicode** — code points, grapheme clusters, and case conversion beyond ASCII
+40. **[Format](Format/)** — control width, alignment, precision, and number base when formatting values
+41. **[Unicode](Unicode/)** — code points, grapheme clusters, and case conversion beyond ASCII
 
 **IX. Collections**
 
