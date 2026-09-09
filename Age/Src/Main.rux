@@ -1,0 +1,91 @@
+// Working out how old someone is, which sounds like subtraction and is not.
+//
+// Ages are counted in whole years, and a year is not a fixed number of days.
+// So the answer is "how many birthdays have happened", which means comparing
+// month and day as well as year — and that comparison is the whole program.
+import Io::PrintLine;
+import Time::{ Date, DaysInMonth, IsLeapYear };
+
+// Years, months and days between two dates, counted the way people count them.
+func AgeBetween(birth: Date, today: Date, years: *var int32, months: *var int32, days: *var int32) {
+    var y = today.year - birth.year;
+    var m = (today.month as int32) - (birth.month as int32);
+    var d = (today.day as int32) - (birth.day as int32);
+
+    // If the day of the month has not come round yet, borrow a month — and the
+    // number of days borrowed is however many the *previous* month had, which
+    // is why this cannot be done with a fixed 30.
+    if d < 0i32 {
+        m -= 1i32;
+        var borrowedMonth = today.month;
+        var borrowedYear = today.year;
+        if borrowedMonth == 1u8 {
+            borrowedMonth = 12u8;
+            borrowedYear -= 1i32;
+        } else {
+            borrowedMonth -= 1u8;
+        }
+        d += DaysInMonth(borrowedYear, borrowedMonth) as int32;
+    }
+
+    // If the month has not come round yet either, borrow a year.
+    if m < 0i32 {
+        y -= 1i32;
+        m += 12i32;
+    }
+
+    *years = y;
+    *months = m;
+    *days = d;
+}
+
+func Report(label: char8[..], birth: Date, today: Date) {
+    var years: int32 = 0;
+    var months: int32 = 0;
+    var days: int32 = 0;
+    AgeBetween(birth, today, @years, @months, @days);
+    PrintLine("{:22} {} years, {} months, {} days", label, years, months, days);
+}
+
+func Main() -> int {
+    // Pretend today is a fixed date, so the example prints the same thing
+    // every time it is run. A real program would ask the clock.
+    let today = Date::New(2026i32, 9u8, 10u8).ValueOr(Date::FromEpochDays(0i64));
+    PrintLine("today is {}-{}-{}", today.year, today.month, today.day);
+    PrintLine("");
+
+    // A birthday that has already happened this year.
+    match Date::New(1990i32, 3u8, 15u8) {
+        .Some(birth) => Report("born 1990-03-15", birth, today),
+        .None => PrintLine("not a date")
+    }
+
+    // One still to come, where the year count is one less than subtracting.
+    match Date::New(1990i32, 12u8, 25u8) {
+        .Some(birth) => Report("born 1990-12-25", birth, today),
+        .None => PrintLine("not a date")
+    }
+
+    // Today's date exactly, which is a whole number of years.
+    match Date::New(2000i32, 9u8, 10u8) {
+        .Some(birth) => Report("born 2000-09-10", birth, today),
+        .None => PrintLine("not a date")
+    }
+
+    // The day after, where a month has to be borrowed.
+    match Date::New(2000i32, 9u8, 11u8) {
+        .Some(birth) => Report("born 2000-09-11", birth, today),
+        .None => PrintLine("not a date")
+    }
+
+    // The 29th of February, which only exists every fourth year. Someone born
+    // on one has a birthday most years only by agreement.
+    match Date::New(2004i32, 2u8, 29u8) {
+        .Some(birth) => Report("born 2004-02-29", birth, today),
+        .None => PrintLine("not a date")
+    }
+    PrintLine("");
+    PrintLine("2004 was a leap year: {}", IsLeapYear(2004i32));
+    PrintLine("2026 is not:          {}", IsLeapYear(2026i32));
+    return 0;
+}

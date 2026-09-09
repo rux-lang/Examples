@@ -1,0 +1,14 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "Age"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Working out an age from a date of birth"
+
+[Dependencies]
+Io = { Namespace = "Rux", Version = "*" }
+Time = { Namespace = "Rux", Version = "*" }
