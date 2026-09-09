@@ -1,0 +1,65 @@
+// A computer cannot produce randomness by arithmetic alone. What a generator
+// produces is a sequence that *looks* random but follows entirely from where
+// it started — its seed. Give it the same seed and you get the same numbers.
+//
+// That is a feature, not a shortcoming: a test that shuffles can be repeated,
+// and a bug that depended on the order can be reproduced.
+import Entropy::EntropyError;
+import Io::{ Print, PrintLine };
+import Random::{ ChooseIndex, Pcg64Dxsm, PcgFromEntropy, Shuffle,
+    UniformBelow, UniformFloatInRange, UniformInRange };
+
+func Main() -> int {
+    // A generator built from a fixed seed.
+    var generator = Pcg64Dxsm(12345u64);
+    Print("from seed 12345 ");
+    for i in 0..5 {
+        Print(" {}", UniformBelow<Pcg64Dxsm>(generator, 100u64));
+    }
+    PrintLine();
+
+    // A second generator from the same seed produces the same run, exactly.
+    var again = Pcg64Dxsm(12345u64);
+    Print("the same again  ");
+    for i in 0..5 {
+        Print(" {}", UniformBelow<Pcg64Dxsm>(again, 100u64));
+    }
+    PrintLine();
+    PrintLine("");
+
+    // Drawing within bounds. `UniformBelow` stops short of its bound, while
+    // `UniformInRange` includes both ends — the same distinction as `..` and
+    // `..=`, and worth checking before rolling a die with it.
+    PrintLine("a die roll      {}", UniformInRange<Pcg64Dxsm>(generator, 1u64, 6u64));
+    PrintLine("a fraction      {:.4}", UniformFloatInRange<Pcg64Dxsm>(generator, 0.0, 1.0));
+
+    // Uniform means every value equally likely. Getting that right is harder
+    // than it looks — taking a remainder of a random number favours the low
+    // values slightly — which is a good reason not to write it yourself.
+    PrintLine("");
+
+    var cards: int[5] = [ 1, 2, 3, 4, 5 ];
+    Shuffle<Pcg64Dxsm, int>(generator, cards[..]);
+    Print("shuffled        ");
+    for i in 0..5 {
+        Print(" {}", cards[i]);
+    }
+    PrintLine();
+
+    PrintLine("a chosen index  {}", ChooseIndex<Pcg64Dxsm>(generator, 5u));
+    PrintLine("");
+
+    // When unpredictability is the point rather than repeatability, the seed
+    // has to come from outside the program. `Entropy` is the operating
+    // system's source of genuine randomness, and seeding from it gives a
+    // different sequence on every run.
+    var entropyError = EntropyError::None;
+    var unpredictable = PcgFromEntropy(@entropyError);
+    PrintLine("seeded by entropy {}", UniformBelow<Pcg64Dxsm>(unpredictable, 100u64));
+
+    // One warning worth carrying away. This generator is built for speed and
+    // for being reproducible, not for secrecy: watch enough of its output and
+    // the rest can be predicted. Anything protecting something — a password, a
+    // key, a token — needs `Entropy` directly, not a seeded generator.
+    return 0;
+}
