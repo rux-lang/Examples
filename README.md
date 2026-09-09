@@ -64,10 +64,10 @@ Read in order — every lesson builds on the previous one.
 **VII. Memory**
 
 33. **[Memory](Memory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
-34. **Pointer** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
-35. **Ownership** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
-36. **Defer** — schedule cleanup at the point you allocate, so it cannot be forgotten
-37. **Allocator** — allocate from an arena or a box instead of straight from the system
+34. **[Pointer](Pointer/)** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
+35. **[Ownership](Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
+36. **[Defer](Defer/)** — schedule cleanup at the point you allocate, so it cannot be forgotten
+37. **[Allocator](Allocator/)** — allocate from an arena or a box instead of straight from the system
 
 **VIII. Text and input**
 

@@ -1,0 +1,65 @@
+// `Alloc` and `Free` go straight to the system, one request at a time. That is
+// not the only way to get memory, and often not the best one.
+//
+// An allocator is a thing that hands out memory, named through the `Allocator`
+// interface. Anything wanting memory takes one as a parameter, which means the
+// caller decides where the memory comes from — and different strategies become
+// interchangeable.
+import Allocator::{ AllocError, Allocator, Arena, Box, SystemAllocator };
+import Io::PrintLine;
+
+func Main() -> int {
+    // The system allocator is the one behind `Alloc` and `Free`. Note the two
+    // steps: build the concrete type, then name it at the interface type. The
+    // annotation is what performs the conversion, exactly as in Interface.
+    var system = SystemAllocator();
+    let backing: Allocator = system;
+
+    // An arena takes memory from another allocator in large blocks and hands
+    // out pieces of them. Individual pieces are never released; the whole
+    // arena is thrown away at once.
+    //
+    // That suits work with a natural end — a request, a frame, a parse. It is
+    // faster, because handing out a piece is little more than moving a marker,
+    // and nothing can be leaked or freed twice because nothing is freed
+    // individually.
+    var arena = Arena(backing, 256);
+    PrintLine("fresh arena     blocks {}  bytes used {}",
+        arena.BlockCount(), arena.BytesUsed());
+
+    // The arena is used through a handle, which is what satisfies `Allocator`.
+    var handle = arena.Handle();
+    let scratch: Allocator = handle;
+
+    // A `Box<T>` is one value living in allocated memory, owned by the box. It
+    // takes the allocator to use, so the same box works on the system
+    // allocator or the arena without knowing which it has.
+    //
+    // The last argument is an out-parameter for the failure, using the pointer
+    // form from the Pointer lesson.
+    var error = AllocError::None;
+    var first = Box::Create<int>(scratch, 10, @error);
+    var second = Box::Create<int>(scratch, 20, @error);
+
+    // One 256-byte block was taken from the system, and both boxes came out of
+    // it — one system allocation for two values.
+    PrintLine("two boxes made  blocks {}  bytes used {}",
+        arena.BlockCount(), arena.BytesUsed());
+
+    // `Get` returns a pointer to the value, reached the same way as any other.
+    PrintLine("their values    {} and {}", first.Get()[0], second.Get()[0]);
+
+    // Resetting hands everything back at once. Nothing had to be matched up,
+    // and no box needed releasing individually — which is the whole point.
+    // The block stays, ready to be used again.
+    arena.Reset();
+    PrintLine("after reset     blocks {}  bytes used {}",
+        arena.BlockCount(), arena.BytesUsed());
+
+    // The idea worth taking away is not the arena itself. It is that "where
+    // does this memory come from" became a parameter. A function written
+    // against `Allocator` can be handed the system allocator in production, an
+    // arena for work that ends all at once, or a fixed buffer in a place where
+    // allocation is not allowed at all — without changing a line of it.
+    return 0;
+}
