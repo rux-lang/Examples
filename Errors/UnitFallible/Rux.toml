@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "UnitFallible"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A fallible with no success value, where reaching the end is success"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
