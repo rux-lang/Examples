@@ -1,0 +1,56 @@
+// A pool suits many small values that come and go in no particular order: the opposite of an
+// arena, where everything ends together. It cuts large chunks into equal blocks and keeps the
+// free ones on a list. Allocating takes a block off the list, and releasing puts it straight
+// back, ready for the next request of that size.
+//
+// Requests are rounded up to a few fixed block sizes, called classes: 16, 32, 64, 128 and 256
+// bytes. Rounding is the price of speed. A 20-byte request takes a 32-byte block, and the other
+// 12 bytes sit unused until that block comes back.
+//
+// Unlike an arena, a pool expects each block back: `Deallocate` with the same layout, through
+// the pool it came from. The chunks themselves go back to the backing allocator when the pool
+// is destroyed.
+import Allocator::{ AllocError, Allocator, ClassIndexFor, Layout, Pool, SystemAllocator };
+import Io::PrintLine;
+
+struct Point {
+    x: int64;
+    y: int64;
+}
+
+func Main() -> ! AllocError {
+    var system = SystemAllocator();
+    let backing: Allocator = system;
+
+    // Each chunk is cut into eight blocks.
+    var pool = Pool(backing, 8);
+    var handle = pool.Handle();
+    let allocator: Allocator = handle;
+
+    PrintLine("block sizes: {} {} {} {} {}", pool.ClassSize(0), pool.ClassSize(1),
+        pool.ClassSize(2), pool.ClassSize(3), pool.ClassSize(4));
+    let odd = Layout::New(20, 8) ?? fail AllocError::Unsupported;
+    PrintLine("a 20-byte request uses a {}-byte block", pool.ClassSize(ClassIndexFor(odd)));
+
+    // Three 16-byte points, all out of the first chunk.
+    let layout = Layout::ForValue<Point>();
+    let first = allocator.Allocate(layout)?;
+    let second = allocator.Allocate(layout)?;
+    let third = allocator.Allocate(layout)?;
+    PrintLine("three out:   {} live blocks, {} chunk", pool.LiveBlocks(), pool.ChunkCount());
+
+    // Blocks can come back in any order. The middle one goes first.
+    allocator.Deallocate(second, layout)?;
+    PrintLine("one back:    {} live blocks", pool.LiveBlocks());
+
+    // The next request of the same size gets that very block back.
+    let fourth = allocator.Allocate(layout)?;
+    PrintLine("fourth reuses the second's block: {}", fourth == second);
+
+    allocator.Deallocate(first, layout)?;
+    allocator.Deallocate(third, layout)?;
+    allocator.Deallocate(fourth, layout)?;
+
+    // Every block is back, and the chunk stays for the next requests.
+    PrintLine("all back:    {} live blocks, {} chunk", pool.LiveBlocks(), pool.ChunkCount());
+}

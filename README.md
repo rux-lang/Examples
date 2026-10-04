@@ -226,6 +226,7 @@ Pointers, raw memory and allocators.
 - 15.10 **[Box](Memory/Box/)** — own one value allocated on the heap
 - 15.11 **[Arena](Memory/Arena/)** — allocate many values and free them all at once
 - 15.12 **[FixedBuffer](Memory/FixedBuffer/)** — allocate from a buffer you provide
+- 15.13 **[Pool](Memory/Pool/)** — reuse fixed-size blocks instead of allocating new ones
 
 ### 16. Numbers
 
