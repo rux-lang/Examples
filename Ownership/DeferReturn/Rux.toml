@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "DeferReturn"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A return value is captured before deferred code runs"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
