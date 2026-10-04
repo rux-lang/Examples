@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Assignment"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Compound assignment such as += and *=, and stepping by one with ++ and --"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
