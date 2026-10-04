@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "WordCount"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Word frequencies of a tongue twister, counted in a HashMap and sorted by a TreeMap"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
