@@ -6,20 +6,20 @@
 // is faster than testing each number for divisors because it never divides at
 // all; it only counts.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::Vector;
+import Collections::{ CollectionError, Vector };
 import Io::{ Print, PrintLine };
 
-func Main() -> int {
+func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
     let limit: uint = 100;
 
-    // One flag per number, all starting true. Index into it by the number
+    // One flag per number, none crossed out yet. Index into it by the number
     // itself, which is why it is one longer than the limit.
     var crossedOut = Vector::Vector<bool>(allocator);
     for i in 0..=limit {
-        crossedOut.Push(false);
+        crossedOut.Push(false)?;
     }
 
     var flags = crossedOut.AsMutableSlice();
@@ -53,5 +53,4 @@ func Main() -> int {
     }
     PrintLine();
     PrintLine("{} of them", found);
-    return 0;
 }
