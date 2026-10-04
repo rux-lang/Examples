@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "HashSet"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Membership: a set holds each element once and answers whether it is there"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
