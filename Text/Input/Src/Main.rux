@@ -1,0 +1,46 @@
+// Reading what a person types needs somewhere to put text that does not exist yet, and that is
+// a job for a `StringBuilder`. `ReadLine` from the Io package appends the next line to one:
+//
+//     ReadLine(builder: &var StringBuilder) -> ! IoError
+//
+// A success means a line arrived, without its line ending; an empty line is still a success.
+// Running out of input is not a special return value. It is a failure like any other, an
+// `IoError` whose `kind` is `IoErrorKind::EndOfStream`, so a reading loop handles it in the same
+// `match` as a real error, and stops.
+//
+// Interactively, end the input with Ctrl+Z and Enter on Windows, or Ctrl+D elsewhere. Piped
+// input ends by itself.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::{ IoErrorKind, PrintLine, ReadLine };
+import Text::StringBuilder;
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // One builder serves every line. `Clear` empties it but keeps its memory for the next one.
+    var builder = StringBuilder(allocator);
+    var count = 0;
+    PrintLine("Type some lines, then end the input.");
+    while true {
+        builder.Clear();
+        match ReadLine(builder) {
+            .Success(_) => {},
+            .Failure(error) if error.kind == IoErrorKind::EndOfStream => break,
+            .Failure(_) => {
+                PrintLine("the input could not be read");
+                return 1;
+            }
+        }
+
+        count += 1;
+        let line = builder.View();
+        if line.IsEmpty() {
+            PrintLine("line {} is empty", count);
+        } else {
+            PrintLine("line {} is \"{}\", {} bytes", count, line, line.Length());
+        }
+    }
+    PrintLine("end of input after {} line(s)", count);
+    return 0;
+}
