@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Notes"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A to-do list saved as JSON in a file, loaded back, and refused when damaged or missing"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
