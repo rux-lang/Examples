@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Variable"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Naming a value with let, and letting the compiler infer its type"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
