@@ -70,6 +70,7 @@ A value that may be absent: `T?`.
 - 8.1 **[Optional](Optionals/Optional/)** — a value that may be missing: `int?` and `none`
 - 8.2 **[Presence](Optionals/Presence/)** — match an optional with `value?` and `none` arms
 - 8.3 **[Coalesce](Optionals/Coalesce/)** — supply a fallback for a missing value with `??`
+- 8.4 **[CoalesceExit](Optionals/CoalesceExit/)** — leave with `?? return`, `?? continue` or `?? break` when a value is missing
 
 ### 9. Errors
 
