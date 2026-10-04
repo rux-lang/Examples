@@ -96,7 +96,7 @@ Describing behaviour that many types share.
 Strings, characters, formatting, parsing and input.
 
 - 14.4 **[String](Text/String/)** — own text that lives as long as you need it
-- 14.7 **[Unicode](Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
+- 14.7 **[Unicode](Text/Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
 - 14.9 **[Format](Format/)** — control width and alignment when formatting values
 
 ### 15. Memory
