@@ -43,7 +43,8 @@ func Main() -> int {
     PrintLine("Created is an error:  {}", Status::Created >= Status::NotFound);
 
     // The surprise: `as` does not check. `418 as Status` compiles and runs, and gives a `Status`
-    // that is none of its four cases. A `match` on it would run no arm at all. So check first.
+    // that is none of its four cases. A `match` naming all four has no arm for it, so the program
+    // stops there with `Panic: no match arm matched value of 'Status'`. So check first.
     let strange: uint16 = 418;
     PrintLine("{} is a known status: {}", received, IsKnown(received));
     PrintLine("{} is a known status: {}", strange, IsKnown(strange));
