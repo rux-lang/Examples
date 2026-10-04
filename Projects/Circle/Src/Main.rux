@@ -3,7 +3,7 @@
 // user which one happened:
 //
 //     the input ended          end of input before any line arrived (Ctrl+Z, or an empty pipe)
-//     the input failed         a real read error from the console or the pipe
+//     the input failed         a read error, or a line that is not valid UTF-8
 //     not a number             the line does not spell a number at all
 //     not a radius             a number, but negative, infinite or NaN
 //
