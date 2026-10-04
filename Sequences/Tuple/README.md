@@ -14,8 +14,8 @@ pair.0 is 3 and pair.1 is 2.5
 17 / 5 is 3
 1 / 0 has no answer
 coldest 4 at position 2
-good == expected   true
-bad == expected    false
+good == (3, true)  true
+bad == (3, true)   false
 point at 3, 4
 ```
 

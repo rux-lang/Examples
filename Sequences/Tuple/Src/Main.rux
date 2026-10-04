@@ -47,15 +47,14 @@ func Main() -> int {
     let coldest = Smallest(temperatures);
     PrintLine("coldest {} at position {}", coldest.0, coldest.1);
 
-    // Tuples of the same type compare member by member.
-    let expected: (int32, bool) = (3, true);
-    PrintLine("good == expected   {}", good == expected);
-    PrintLine("bad == expected    {}", bad == expected);
+    // Tuples of the same type compare member by member. The literal `(3, true)` takes its member
+    // types from the other side, just as a lone `3` would.
+    PrintLine("good == (3, true)  {}", good == (3, true));
+    PrintLine("bad == (3, true)   {}", bad == (3, true));
 
-    // A tuple may hold another tuple. Reach inside one step at a time: `outer.0.1` does not
-    // parse, because the lexer reads `0.1` as a number.
+    // A tuple may hold another tuple. The indexes chain, so `outer.0.1` is the second member of
+    // the first member.
     let outer: ((int32, int32), char8[..]) = ((3, 4), "point");
-    let position = outer.0;
-    PrintLine("{} at {}, {}", outer.1, position.0, position.1);
+    PrintLine("{} at {}, {}", outer.1, outer.0.0, outer.0.1);
     return 0;
 }
