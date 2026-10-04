@@ -1,0 +1,57 @@
+// A `Date` is a day on the calendar: a year, a month and a day, with no time and no time zone.
+// Unlike a duration it is not just a number, because the calendar is irregular. Months have 28
+// to 31 days, and February has a 29th only in a leap year: every fourth year, except a century
+// year, except a century divisible by 400. So 2000 was a leap year and 1900 was not.
+//
+// That makes text such as "2023-02-29" well-formed but wrong. `ParseDate` reads the ISO 8601
+// form `YYYY-MM-DD` and returns `Date ! TimeParseError`, and the error says which mistake it
+// was (a bad shape, a month that does not exist, a day the month does not have) and at which
+// byte of the text, so a program can point at the problem rather than just reject it.
+import Io::PrintLine;
+import Time::{ DaysInMonth, IsLeapYear, ParseDate, TimeParseError };
+
+func Reason(error: TimeParseError) -> char8[..] {
+    return match error {
+        .InvalidSyntax(_) => "not shaped like YYYY-MM-DD",
+        .InvalidMonth(_) => "no such month",
+        .NonexistentDay(_) => "no such day in that month",
+        .InvalidTime(_) => "time out of range",
+        .ExcessiveFraction(_) => "too many fraction digits",
+        .InvalidOffset(_) => "offset out of range"
+    };
+}
+
+func Show(text: char8[..]) {
+    match ParseDate(text) {
+        .Success(date) => PrintLine("{}  ok, day {} of the year", date, date.DayOfYear()),
+        .Failure(error) => PrintLine("{}  {}, at byte {}", text, Reason(error), error.Offset())
+    }
+}
+
+func Main() -> int {
+    Show("2024-02-29");
+    Show("2023-02-29");
+    Show("2024-13-01");
+    Show("2024/02/01");
+    Show("2024-2-1");
+    PrintLine("");
+
+    // The leap-year rule: an ordinary year, a fourth year, and the two kinds of century.
+    let years: int32[4] = [2023, 2024, 1900, 2000];
+    for year in years {
+        PrintLine("{}  leap: {}, February has {} days", year, IsLeapYear(year),
+            DaysInMonth(year, 2));
+    }
+    PrintLine("");
+
+    // Date arithmetic follows the calendar, so the day after 28 February depends on the year.
+    // `PlusDays` returns `Date?`, because a date far enough out leaves the supported range.
+    for text in ["2023-02-28", "2024-02-28"] {
+        let date = ParseDate(text) catch { else => continue };
+        match date.PlusDays(1) {
+            next? => PrintLine("the day after {} is {}", date, next),
+            none => PrintLine("the day after {} is out of range", date)
+        }
+    }
+    return 0;
+}
