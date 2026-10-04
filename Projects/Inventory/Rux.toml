@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Inventory"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A shop's stock as structs in a Vector, where every refused order is an error variant"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
