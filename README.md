@@ -79,6 +79,7 @@ Declaring types of your own.
 - 6.8 **[Enum](Types/Enum/)** — name a fixed set of cases
 - 6.9 **[EnumValue](Types/EnumValue/)** — give an enum an explicit underlying type and convert to and from it
 - 6.10 **[Variant](Types/Variant/)** — attach data to each case
+- 6.11 **[VariantMatch](Types/VariantMatch/)** — take a variant apart in a `match` arm
 - 6.12 **[TypeAlias](Types/TypeAlias/)** — give an existing type a second name to make a signature read clearly
 
 ### 8. Optionals
