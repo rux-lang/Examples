@@ -25,11 +25,7 @@ func Main() -> int {
     }
 
     // `#build.debugAssertions` answers the narrower question of whether those checks are kept.
-    when #build.debugAssertions {
-        PrintLine("Debug assertions: kept");
-    } else {
-        PrintLine("Debug assertions: removed");
-    }
+    PrintLine("Debug assertions kept: {}", #build.debugAssertions);
 
     DebugAssert(ScoresAreSorted(), "the scores must be sorted");
     PrintLine("Done");

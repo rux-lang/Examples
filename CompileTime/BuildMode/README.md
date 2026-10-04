@@ -11,7 +11,7 @@ rux run
 ```text
 Profile: Debug
 Debug build: unoptimized, with every check switched on
-Debug assertions: kept
+Debug assertions kept: true
   ...checking that the scores are sorted
 Done
 ```
@@ -23,7 +23,7 @@ rux run --release
 ```text
 Profile: Release
 Release build: optimized, with the debug checks compiled out
-Debug assertions: removed
+Debug assertions kept: false
 Done
 ```
 

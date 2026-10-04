@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "BuildMode"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Debug and release builds, and the debug checks a release build removes"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
