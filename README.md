@@ -345,6 +345,7 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 - 25.5 **[Calculator](Projects/Calculator/)** — evaluate expressions and report every way they can go wrong _(after Errors)_
 - 25.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Text)_
 - 25.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides _(after Text)_
+- 25.8 **[WordCount](Projects/WordCount/)** — count how often each word appears _(after Collections)_
 - 25.10 **[Statistics](Projects/Statistics/)** — compute the mean, spread, and extremes of a set of numbers _(after Algorithms)_
 - 25.11 **[Guess](Projects/Guess/)** — a number guessing game with seven valid guesses from 1 to 100 _(after Utilities)_
 - 25.12 **[Age](Projects/Age/)** — an age in completed years, months and days, with month-end clamping _(after Utilities)_
