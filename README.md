@@ -301,6 +301,7 @@ Time, randomness, hashing and identifiers.
 Reading and writing JSON and TOML.
 
 - 21.1 **[Json](DataFormats/Json/)** — parse JSON into a value and walk it
+- 21.2 **[JsonWrite](DataFormats/JsonWrite/)** — write a value out as JSON
 
 ### 22. Packages
 

@@ -1,0 +1,62 @@
+// Writing JSON is the parse lesson run backwards: a tree of `JsonValue`s goes in, text comes
+// out. The tree can come from `Parse` or be built by hand, and `WriteValue` writes it into any
+// `TextWriter` — a StringBuilder here, so the text can be kept and parsed again.
+//
+//     WriteValue(writer, value, style) -> ! FormatError
+//
+// `JsonStyle` chooses the layout. `Compact()` writes no whitespace at all, for a document going
+// over a wire; `Pretty()` indents by two spaces, for a person. Either way the writer escapes
+// exactly what JSON requires inside strings, and nothing more.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::PrintLine;
+import Json::{ JsonStyle, JsonValue, Parse, WriteValue };
+import Text::{ FormatError, String, StringBuilder, TextError, TextWriter };
+
+// Writes `value` in `style` and hands the text back as a String the caller owns.
+func Written(allocator: Allocator, value: &JsonValue, style: JsonStyle) -> String ! FormatError {
+    var builder = StringBuilder(allocator);
+    let sink: &var TextWriter = builder;
+    WriteValue(sink, value, style)?;
+    return builder.IntoString();
+}
+
+func Main() -> ! (TextError | FormatError) {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // Building by hand. Values are move-only: `Push` and `Insert` take ownership of what they
+    // are given, and a member's name is an owned String.
+    var tags = JsonValue::Array(allocator);
+    tags.Push(JsonValue::Text(allocator, "fast")?);
+    tags.Push(JsonValue::Number(allocator, "2.50")?);
+    var root = JsonValue::Object(allocator);
+    root.Insert(String::FromBytes(allocator, "name")?, JsonValue::Text(allocator, "Rux")?);
+    root.Insert(String::FromBytes(allocator, "quote")?,
+                JsonValue::Text(allocator, "say \"hi\"\n")?);
+    root.Insert(String::FromBytes(allocator, "tags")?, <-tags);
+    root.Insert(String::FromBytes(allocator, "license")?, JsonValue::Null(allocator));
+
+    let compact = Written(allocator, root, JsonStyle::Compact())?;
+    let pretty = Written(allocator, root, JsonStyle::Pretty())?;
+    PrintLine("compact, {} bytes:\n{}", compact.Length(), compact);
+    PrintLine("pretty, {} bytes:\n{}", pretty.Length(), pretty);
+
+    // The round trip: parse the pretty text and write it compact again. The layout was only
+    // presentation, so the same bytes come back. A number keeps the text it was written with,
+    // which is why `2.50` did not become `2.5`.
+    match Parse(allocator, pretty.View().Bytes()) {
+        .Success(again) => {
+            let rewritten = Written(allocator, again, JsonStyle::Compact())?;
+            let original = compact.View();
+            PrintLine("round trip gives the same text: {}", rewritten.View().Equals(original));
+        },
+        .Failure(reason) => PrintLine("the written text did not parse: {}", reason)
+    }
+
+    // JSON cannot spell NaN or infinity, so writing one is refused, not invented.
+    let notANumber = JsonValue::Number(allocator, "NaN")?;
+    match Written(allocator, notANumber, JsonStyle::Compact()) {
+        .Success(text) => PrintLine("wrote {}", text),
+        .Failure(error) => PrintLine("NaN refused: {}", error)
+    }
+}

@@ -1,0 +1,16 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "JsonWrite"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Build a JSON value, write it compact and pretty, and round-trip a parsed document"
+
+[Dependencies]
+Allocator = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
+Json = { Namespace = "Rux", Version = "*" }
+Text = { Namespace = "Rux", Version = "*" }
