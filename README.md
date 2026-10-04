@@ -63,6 +63,7 @@ Many values of one type, and groups of values of different types.
 - 5.5 **[WritableSlice](Sequences/WritableSlice/)** — change an array through a `var T[..]` view
 - 5.6 **[Variadic](Sequences/Variadic/)** — accept any number of arguments, the way `PrintLine` does
 - 5.7 **[Tuple](Sequences/Tuple/)** — group a few values without declaring a type, and return more than one result
+- 5.8 **[Destructure](Sequences/Destructure/)** — unpack a tuple into separate names with `let (x, y) = ...`
 
 ### 6. Types
 
