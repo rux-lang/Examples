@@ -28,7 +28,7 @@ struct Rectangle {
 type Shape = Circle | Square | Rectangle;
 
 // A subset needs no binding either: `_: Square | Rectangle` only asks the question.
-func Corners(shape: Shape) -> int {
+func Corners(shape: Shape) -> int32 {
     return match shape {
         _: Circle => 0,
         _: Square | Rectangle => 4
