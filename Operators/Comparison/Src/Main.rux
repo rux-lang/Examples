@@ -1,0 +1,39 @@
+// The six comparison operators ask a yes-or-no question about two values:
+// `==` equal, `!=` not equal, `<` less, `<=` less or equal, `>` greater and
+// `>=` greater or equal. Whatever the operands are, the answer is a `bool`, so
+// it can be printed or kept in a variable like any other value.
+import Io::PrintLine;
+
+func Main() -> int {
+    let a: int32 = 17;
+    let b: int32 = 5;
+    PrintLine("{} == {}  is {}", a, b, a == b);
+    PrintLine("{} != {}  is {}", a, b, a != b);
+    PrintLine("{} <  {}  is {}", a, b, a < b);
+    PrintLine("{} <= {}  is {}", a, b, a <= b);
+    PrintLine("{} >  {}  is {}", a, b, a > b);
+    PrintLine("{} >= {}  is {}", a, b, a >= b);
+
+    // A comparison is an ordinary expression, and its result is a value.
+    let age: int32 = 18;
+    let adult = age >= 18;
+    PrintLine("age {} is adult: {}", age, adult);
+
+    // Characters compare by code point. Every capital letter comes before every
+    // lowercase one, so 'Z' sorts ahead of 'a'.
+    let upper: char32 = 'Z';
+    let lower: char32 = 'a';
+    PrintLine("'{}' < '{}'  is {}", upper, lower, upper < lower);
+
+    // Floats are stored approximately, so a sum that looks exact on paper can
+    // miss by a hair, and `==` sees the hair: this sum lands just above 0.3. Be
+    // wary of exact `==` between floats that came out of arithmetic.
+    let sum: float64 = 0.1 + 0.2;
+    PrintLine("0.1 + 0.2 == 0.3  is {}", sum == 0.3);
+    PrintLine("0.1 + 0.2 >  0.3  is {}", sum > 0.3);
+
+    // Comparisons do not chain the way they do in maths. `1 < age < 30` would
+    // compare `1 < age`, a `bool`, against 30, and the compiler rejects that.
+    // Asking two questions at once needs `&&`, the subject of the next lesson.
+    return 0;
+}
