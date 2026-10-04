@@ -1,0 +1,16 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "TomlWrite"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Read a TOML document, change it, write it back, and see what a round trip keeps"
+
+[Dependencies]
+Allocator = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
+Text = { Namespace = "Rux", Version = "*" }
+Toml = { Namespace = "Rux", Version = "*" }

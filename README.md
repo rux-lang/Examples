@@ -304,6 +304,7 @@ Reading and writing JSON and TOML.
 - 21.2 **[JsonWrite](DataFormats/JsonWrite/)** — write a value out as JSON
 - 21.3 **[JsonStream](DataFormats/JsonStream/)** — read JSON as a stream of events
 - 21.4 **[Toml](DataFormats/Toml/)** — parse a TOML document and read its values
+- 21.5 **[TomlWrite](DataFormats/TomlWrite/)** — write a TOML document
 
 ### 22. Packages
 
