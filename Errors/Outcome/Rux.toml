@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Outcome"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Store, build and match a fallible's .Success and .Failure"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
