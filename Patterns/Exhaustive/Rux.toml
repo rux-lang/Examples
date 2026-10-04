@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Exhaustive"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Exhaustive matches: why a variant match covers every case and when else is needed"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

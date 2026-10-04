@@ -7,9 +7,14 @@
 // year, and every match that forgot it fails to compile, pointing at the exact spot to fix. A match
 // that names every case therefore has no `else`, and should not have one.
 //
-// `else` is for the values you cannot list. An integer has billions of them, so the compiler cannot
-// tell you which ones you missed, and a value that fits no arm simply matches nothing. Give every
-// integer match an `else`, and decide on purpose what the leftovers mean.
+// `else` is for the values you cannot list. An integer has billions of them, so a match that
+// produces a value from an integer must end with `else`, and deciding what the leftovers mean is
+// up to you. Delete the `else` arm in `Loudness` and the compiler stops with
+//     error: match on 'int32' is not exhaustive; its arms do not cover every value
+// A `bool` has just two values, so `true` and `false` arms cover it, and a missing one is named:
+//     error: match on 'bool8' is not exhaustive; missing false
+// A match used as a statement, producing no value, may leave integers and bools out: a value with
+// no arm simply skips it.
 import Io::PrintLine;
 
 variant Player {
@@ -40,8 +45,8 @@ func IsPlaying(player: Player) -> bool {
     };
 }
 
-// An integer match always has an `else`: the arms name a few volume levels and `else` covers the
-// rest.
+// The arms name a few volume levels, and `else` covers the rest. Even ranges that happened to reach
+// every value would not do instead: an integer match producing a value needs its `else`.
 func Loudness(volume: int32) -> char8[..] {
     return match volume {
         0 => "muted",
