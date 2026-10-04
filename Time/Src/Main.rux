@@ -12,7 +12,10 @@ func Main() -> int {
     // meant for comparing against another reading rather than for telling
     // anyone the time.
     let started = Instant::Now();
-    SleepFor(Duration::FromMilliseconds(120));
+    // Sleeping can fail — the system can refuse the wait — and a failure must
+    // be handled or deliberately ignored. Here a wait that did not happen only
+    // makes the measurement come out short, so ignoring it is the right call.
+    SleepFor(Duration::FromMilliseconds(120)) catch { else => {} };
     let waited = started.Elapsed();
     // A duration is whole seconds plus a nanosecond remainder, so a short one
     // is entirely in the remainder.
@@ -26,9 +29,9 @@ func Main() -> int {
     PrintLine("");
 
     // The calendar. A date is a year, month and day, and building one can fail
-    // — the 30th of February is not a date, so `New` returns an `Option`.
+    // — the 30th of February is not a date — so `New` returns an optional, `Date?`.
     match Date::New(2026i32, 9u8, 10u8) {
-        .Some(today) => {
+        today? => {
             PrintLine("date        {}-{}-{}", today.year, today.month, today.day);
             PrintLine("day of year {}", today.DayOfYear());
             PrintLine("day of week {}   (0 is Sunday)", today.DayOfWeek());
@@ -40,12 +43,12 @@ func Main() -> int {
             let inAWeek = Date::FromEpochDays(epochDays + 7i64);
             PrintLine("a week later {}-{}-{}", inAWeek.year, inAWeek.month, inAWeek.day);
         },
-        .None => PrintLine("that is not a date")
+        none => PrintLine("that is not a date")
     }
 
     match Date::New(2026i32, 2u8, 30u8) {
-        .Some(bad) => PrintLine("30 February exists?"),
-        .None => PrintLine("30 February 2026 is correctly refused")
+        bad? => PrintLine("30 February exists?"),
+        none => PrintLine("30 February 2026 is correctly refused")
     }
     PrintLine("");
 
