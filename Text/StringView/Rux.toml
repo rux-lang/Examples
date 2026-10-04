@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "StringView"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Borrowed text checked once to be UTF-8, trimmed, searched and split without copying"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
