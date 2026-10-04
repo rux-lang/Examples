@@ -1,0 +1,13 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "Catch"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Recover from a failure with catch and one arm per error case"
+
+[Dependencies]
+Io = { Namespace = "Rux", Version = "*" }
