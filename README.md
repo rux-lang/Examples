@@ -2,149 +2,201 @@
 
 Example projects and programming tutorials for the [Rux](https://rux-lang.dev) language.
 
-## List of Projects
+## The Course
 
-The list is a course: each entry assumes only what came before it, and each package
-demonstrates one idea and no more. All 67 exist and build — `./Check.ps1` from the repository
-root checks every one of them.
+The course is read in order: each lesson is one package that teaches one idea, and assumes
+only the lessons before it. Each lesson has a page at `https://rux-lang.dev/docs/learn/<lesson>`.
+Parts 1–17 build the language step by step; Parts 18–24 tour the standard packages and can be
+read in any order once their prerequisites are done; Part 25 holds complete small programs.
 
-### Track A — The language
+### 1. Basics
 
-Read in order — every lesson builds on the previous one.
+First programs: printing, values and their types.
 
-**I. First programs**
+- 1.1 **[Hello](Hello/)** — print "Hello, World!", the minimal Rux application
+- 1.3 **[Variable](Variable/)** — name a value with `let`, and let the compiler infer its type
+- 1.10 **[Console](Console/)** — write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
+- 1.11 **[Const](Const/)** — name a value the compiler folds in, and see where it differs from `let`
+- 1.12 **[Convert](Convert/)** — convert between numeric types with `as`, and see what a value that does not fit becomes
+- **[Primitive](Primitive/)** — declare and print every primitive type, from `int8` to `char32` _(being split into the lessons above)_
 
-1. **[Hello](Hello/)** — print "Hello, World!", the minimal Rux application
-2. **[Primitive](Primitive/)** — declare and print every primitive type, from `int8` to `char32`
-3. **[Variable](Variable/)** — `let` and `var`, type inference, and why an immutable binding cannot be reassigned
-4. **[Const](Const/)** — name a value the compiler folds in, and see where it differs from `let`
-5. **[Operator](Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence
-6. **[Convert](Convert/)** — cast between numeric types with `as`, and see what a value that does not fit becomes
-7. **[Console](Console/)** — write to the console with `Print` and `PrintLine`, and fill placeholders in order
+### 2. Operators
 
-**II. Control flow**
+Combining values into new ones.
 
-8. **[Condition](Condition/)** — choose between branches at run time with `if`, `else if`, and `else`
-9. **[Ternary](Ternary/)** — pick one of two values inside an expression with `? :`
-10. **[Loop](Loop/)** — repeat with `while` and `loop`, and leave early with `break` and `continue`
-11. **[Range](Range/)** — walk a range with `for`, and tell `..` from `..=`
-12. **[Match](Match/)** — select a branch by value with `match`, and default with `else`
+- **[Operator](Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence _(being split into the lessons above)_
 
-**III. Arrays and slices**
+### 3. Control flow
 
-13. **[Array](Array/)** — an inline array holding a fixed number of values of one type
-14. **[Slice](Slice/)** — view part of an array without copying it, and pass it to a function
+Choosing and repeating.
 
-**IV. Functions**
+- 3.1 **[Condition](Condition/)** — run code only when a condition holds, with `if` and `else`
+- 3.3 **[Ternary](Ternary/)** — pick one of two values inside an expression with `? :`
+- 3.6 **[Loop](Loop/)** — repeat forever with `loop` until a `break` leaves
+- 3.9 **[Range](Range/)** — describe a run of numbers with `..` and `..=`
+- 3.12 **[Match](Match/)** — select a branch by value with `match`, and default with `else`
 
-15. **[Function](Function/)** — declare functions with parameters and return values, and call one recursively
-16. **[Overload](Overload/)** — give several functions one name, and let the arguments choose between them
-17. **[Variadic](Variadic/)** — accept any number of arguments, the way `PrintLine` does
-18. **[Generic](Generic/)** — write one function that works for many types
-19. **[Callback](Callback/)** — pass a function to another function as an ordinary value
-20. **[Module](Module/)** — split a package across source files and control visibility with `pub`
+### 4. Functions
 
-**V. Custom types**
+Naming a piece of work and reusing it.
 
-21. **[Tuple](Tuple/)** — group a few values without declaring a type, and return more than one result
-22. **[Struct](Struct/)** — group related values into a struct, and give it methods and a constructor
-23. **[TypeAlias](TypeAlias/)** — give an existing type a second name to make a signature read clearly
-24. **[Enum](Enum/)** — name a fixed set of cases, and give the enum an explicit underlying type
-25. **[Variant](Variant/)** — attach data to each case, and destructure it in a `match` arm
-26. **[Union](Union/)** — overlay one piece of storage with several types, and why that needs care
-27. **[Interface](Interface/)** — implement `Display`, `Equatable`, and `Comparable` for a type of your own
-28. **[Overloading](Overloading/)** — define `==`, `+` and the other operators for your own type
-29. **[Iterator](Iterator/)** — implement `Iterator` so a type of your own can be used with `for`
+- 4.1 **[Function](Function/)** — declare functions with parameters and a return value, and call them
+- 4.4 **[Overload](Overload/)** — give several functions one name, and let the arguments choose between them
+- 4.6 **[Generic](Generic/)** — write one function that works for many types
+- 4.7 **[Callback](Callback/)** — pass a function to another function as an ordinary value
 
-**VI. Errors**
+### 5. Sequences
 
-30. **[Option](Option/)** — represent a value that may be absent, and supply a default when it is
-31. **[Result](Result/)** — return either a value or an error, and pass failures up to the caller
-32. **[Propagate](Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
+Many values of one type, and groups of values of different types.
 
-**VII. Memory**
+- 5.1 **[Array](Array/)** — an inline array holding a fixed number of values of one type
+- 5.4 **[Slice](Slice/)** — view part of an array without copying it, and pass it to a function
+- 5.6 **[Variadic](Variadic/)** — accept any number of arguments, the way `PrintLine` does
+- 5.7 **[Tuple](Tuple/)** — group a few values without declaring a type, and return more than one result
 
-33. **[Memory](Memory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
-34. **[Pointer](Pointer/)** — the difference between `*T` and `*var T`, and detecting overflow through an out-parameter
-35. **[Ownership](Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope
-36. **[Defer](Defer/)** — schedule cleanup at the point you allocate, so it cannot be forgotten
-37. **[Allocator](Allocator/)** — allocate from an arena or a box instead of straight from the system
+### 6. Types
 
-**VIII. Text and input**
+Declaring types of your own.
 
-38. **[String](String/)** — build and inspect text, and tell a length in bytes from a length in characters
-39. **[Circle](Circle/)** — read a line from the console, parse it to a number, and match on the result
-40. **[Format](Format/)** — control width, alignment, precision, and number base when formatting values
-41. **[Unicode](Unicode/)** — code points, grapheme clusters, and case conversion beyond ASCII
+- 6.1 **[Struct](Struct/)** — group related values into a struct with named fields
+- 6.8 **[Enum](Enum/)** — name a fixed set of cases
+- 6.10 **[Variant](Variant/)** — attach data to each case
+- 6.12 **[TypeAlias](TypeAlias/)** — give an existing type a second name to make a signature read clearly
 
-**IX. Collections**
+### 8. Optionals
 
-42. **[Vector](Vector/)** — a growable array that manages its own memory and capacity
-43. **[Deque](Deque/)** — add and remove at both ends, and see where that beats a vector
-44. **[HashMap](HashMap/)** — look values up by key, and test membership with a hash set
-45. **[TreeMap](TreeMap/)** — keep keys in order, and weigh the cost against hashing
-46. **[Algorithm](Algorithm/)** — sort, search, and fold over the containers built so far
+A value that may be absent: `T?`.
 
-**X. Files**
+- 8.1 **[Option](Option/)** — a value that may be missing: `int?` and `none`
 
-47. **[File](File/)** — write text to a file and read it back, handling failure at every step
-48. **[Binary](Binary/)** — read and write fixed-width values and raw bytes, including byte order
-49. **[Directory](Directory/)** — create, list, and remove directories, and read file metadata
-50. **[Path](Path/)** — join and split paths, and see why a path is not a string
+### 9. Errors
 
-**XI. Compile-time programming**
+Operations that can fail: `T ! E`.
 
-51. **[Version](Version/)** — select code at compile time with `when` and the compiler version
-52. **[Config](Config/)** — read the build's target, profile and source location at compile time
+- 9.1 **[Result](Result/)** — return either a value or an error with `T ! E`
+- 9.8 **[Propagate](Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 
-### Track B — Platform and packages
+### 11. Ownership
 
-Each assumes all of Track A, but none assumes another, so they can be read in any order.
+Who owns a value, and when it is cleaned up.
 
-53. **[Extern](Extern/)** — call a platform API directly through an extern declaration and `#Link`
-54. **[Asm](Asm/)** — write a function body in assembly, choose its ABI, and select one per architecture
-55. **[Math](Math/)** — roots, powers, logarithms, trigonometry, and rounding
-56. **[Time](Time/)** — measure elapsed time, work with durations, and format a calendar date
-57. **[Random](Random/)** — seed a generator, draw from a range, and sample from a sequence
-58. **[Json](Json/)** — parse JSON into a value, walk it, and write it back out
+- 11.8 **[Defer](Defer/)** — schedule cleanup at the point you start the work, so it cannot be forgotten
+- **[Ownership](Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope _(being split into the lessons above)_
 
-### Track C — Small programs
+### 12. Interfaces
 
-Complete programs rather than feature tours, each built only from what came before.
+Describing behaviour that many types share.
 
-59. **[Quadratic](Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides
-60. **[Prime](Prime/)** — find the primes below a limit with a sieve
-61. **[Statistics](Statistics/)** — compute the mean, spread, and extremes of a set of numbers
-62. **[Guess](Guess/)** — a number guessing game that keeps asking until you get it
-63. **[Age](Age/)** — work out someone's age from their date of birth, in years, months and days
-64. **[Melody](Melody/)** — play a tune through the console speaker with the platform's beep
-65. **[Password](Password/)** — build a random password by drawing letters and digits from an alphabet
-66. **[Thanks](Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it
-67. **[Launch](Launch/)** — a countdown, a launch, and some jokes at the language's expense
+- 12.1 **[Interface](Interface/)** — declare an interface and implement it for your own types
+- 12.8 **[Overloading](Overloading/)** — define `==`, `+` and the other operators for your own type
+- 12.11 **[Iterator](Iterator/)** — implement `Next` so a type of your own can be used with `for`
+
+### 14. Text
+
+Strings, characters, formatting, parsing and input.
+
+- 14.4 **[String](String/)** — own text that lives as long as you need it
+- 14.7 **[Unicode](Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
+- 14.9 **[Format](Format/)** — control width and alignment when formatting values
+
+### 15. Memory
+
+Pointers, raw memory and allocators.
+
+- 15.1 **[Pointer](Pointer/)** — the difference between `*T` and `*var T`, and taking an address with `@`
+- 15.3 **[Memory](Memory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
+- 15.8 **[Union](Union/)** — overlay one piece of storage with several types, and why that needs care
+- 15.9 **[Allocator](Allocator/)** — allocate through the `Allocator` interface instead of straight from the system
+
+### 16. Numbers
+
+Numbers in depth.
+
+- 16.11 **[Math](Math/)** — roots, powers, logarithms, trigonometry, and rounding
+
+### 17. Collections
+
+Containers from the `Collections` package.
+
+- 17.1 **[Vector](Vector/)** — a growable array that manages its own memory and capacity
+- 17.3 **[Deque](Deque/)** — add and remove at both ends, and see where that beats a vector
+- 17.4 **[HashMap](HashMap/)** — look values up by key
+- 17.6 **[TreeMap](TreeMap/)** — keep keys in order, and walk them in order
+
+### 18. Algorithms
+
+Algorithms over slices from the `Algorithms` package.
+
+- **[Algorithm](Algorithm/)** — sort, search, and fold over the containers built so far _(being split into the lessons above)_
+
+### 19. Files
+
+Paths, files and directories.
+
+- 19.1 **[Path](Path/)** — split a path into its parts, and see why a path is not a string
+- 19.4 **[File](File/)** — write text to a file and read it back, handling failure at every step
+- 19.5 **[Directory](Directory/)** — create, list, and remove directories
+- 19.7 **[Binary](Binary/)** — read and write fixed-width values and raw bytes
+
+### 20. Utilities
+
+Time, randomness, hashing and identifiers.
+
+- 20.5 **[Random](Random/)** — a reproducible random number generator
+- **[Time](Time/)** — measure elapsed time, work with durations, and format a calendar date _(being split into the lessons above)_
+
+### 21. Data formats
+
+Reading and writing JSON and TOML.
+
+- 21.1 **[Json](Json/)** — parse JSON into a value and walk it
+
+### 22. Packages
+
+Modules, packages, libraries and tools.
+
+- 22.1 **[Module](Module/)** — split a package across source files and modules
+
+### 23. Compile time
+
+Code that runs or is chosen while compiling.
+
+- 23.1 **[Version](Version/)** — select code at compile time with `when`
+- **[Config](Config/)** — read the build's target, profile and source location at compile time _(being split into the lessons above)_
+
+### 24. Platform
+
+Talking to the operating system and the machine.
+
+- 24.1 **[Extern](Extern/)** — call a platform API directly through an extern declaration and `#Link`
+- 24.4 **[Asm](Asm/)** — write a function body in assembly
+
+### 25. Projects
+
+Complete small programs. Each one needs only the parts before its checkpoint.
+
+- 25.1 **[Thanks](Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it _(after Control flow)_
+- 25.4 **[Prime](Prime/)** — find the primes below a limit with a sieve _(after Sequences)_
+- 25.6 **[Circle](Circle/)** — read a radius, check it, and print the circle's measurements _(after Text)_
+- 25.7 **[Quadratic](Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides _(after Text)_
+- 25.10 **[Statistics](Statistics/)** — compute the mean, spread, and extremes of a set of numbers _(after Algorithms)_
+- 25.11 **[Guess](Guess/)** — a number guessing game with seven tries _(after Utilities)_
+- 25.12 **[Age](Age/)** — work out someone's age from their date of birth, in years, months and days _(after Utilities)_
+- 25.13 **[Password](Password/)** — build a random password by drawing letters and digits from an alphabet _(after Utilities)_
+- 25.14 **[Launch](Launch/)** — a countdown and a launch _(after Utilities)_
+- 25.16 **[Melody](Melody/)** — play a tune through the console speaker with the platform's beep _(after Platform)_
 
 ## Running an Example
 
 Each example is a standalone Rux package with its own `Rux.toml`, and requires Rux 0.4.0 or newer.
 
 ```sh
-cd Hello
+cd Basics/Hello
 rux run
 ```
 
-If necessary, install the dependencies first:
-
-```sh
-cd Hello
-rux install
-rux run
-```
-
-To build and type-check an example without running it:
-
-```sh
-cd Hello
-rux check
-```
+If necessary, install the dependencies first with `rux install`. To type-check an example
+without running it, use `rux check`.
 
 To check every example in the repository at once, from the root:
 
