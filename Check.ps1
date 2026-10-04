@@ -23,6 +23,9 @@ $root = $PSScriptRoot
 # Packages that read standard input, so running them unattended would block.
 $needsInput = @('Circle', 'Guess', 'Quadratic', 'Launch', 'Input')
 
+# Packages that make sound, so running them unattended is a nuisance.
+$audible = @('Melody')
+
 # Packages whose run exits nonzero on purpose, with the status they are expected to return.
 $expectedStatus = @{ 'FallibleMain' = 1 }
 
@@ -51,7 +54,7 @@ foreach ($package in $packages) {
         $output = & rux check 2>&1 | Out-String
         if ($LASTEXITCODE -eq 0) {
             Write-Host ("{0,-32} check" -f $label) -NoNewline
-            if ($Run -and $needsInput -notcontains $name) {
+            if ($Run -and $needsInput -notcontains $name -and $audible -notcontains $name) {
                 $null = & rux run 2>&1 | Out-String
                 $expected = if ($expectedStatus.ContainsKey($name)) { $expectedStatus[$name] } else { 0 }
                 if ($LASTEXITCODE -eq $expected) {
@@ -61,7 +64,8 @@ foreach ($package in $packages) {
                     $failed += $label
                 }
             } elseif ($Run) {
-                Write-Host "  run skipped (reads input)" -ForegroundColor DarkGray
+                $why = if ($audible -contains $name) { 'plays sound' } else { 'reads input' }
+                Write-Host "  run skipped ($why)" -ForegroundColor DarkGray
             } else {
                 Write-Host ""
             }

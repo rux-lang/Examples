@@ -343,11 +343,11 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 - 25.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Text)_
 - 25.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides _(after Text)_
 - 25.10 **[Statistics](Projects/Statistics/)** — compute the mean, spread, and extremes of a set of numbers _(after Algorithms)_
-- 25.11 **[Guess](Projects/Guess/)** — a number guessing game with seven tries _(after Utilities)_
-- 25.12 **[Age](Projects/Age/)** — work out someone's age from their date of birth, in years, months and days _(after Utilities)_
-- 25.13 **[Password](Projects/Password/)** — build a random password by drawing letters and digits from an alphabet _(after Utilities)_
-- 25.14 **[Launch](Projects/Launch/)** — a countdown and a launch _(after Utilities)_
-- 25.16 **[Melody](Projects/Melody/)** — play a tune through the console speaker with the platform's beep _(after Platform)_
+- 25.11 **[Guess](Projects/Guess/)** — a number guessing game with seven valid guesses from 1 to 100 _(after Utilities)_
+- 25.12 **[Age](Projects/Age/)** — an age in completed years, months and days, with month-end clamping _(after Utilities)_
+- 25.13 **[Password](Projects/Password/)** — a 16-character password drawn from system entropy with rejection sampling _(after Utilities)_
+- 25.14 **[Launch](Projects/Launch/)** — a mission checklist, a bounded countdown and a launch _(after Utilities)_
+- 25.16 **[Melody](Projects/Melody/)** — play a tune through the Windows console speaker (Windows only) _(after Platform)_
 
 ## Running an Example
 
