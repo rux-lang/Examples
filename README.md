@@ -285,6 +285,7 @@ Time, randomness, hashing and identifiers.
 - 20.3 **[Date](Utilities/Date/)** — calendar dates, parsing them, and leap years
 - 20.4 **[DateTime](Utilities/DateTime/)** — a date with a time and an offset, in RFC 3339
 - 20.5 **[Random](Utilities/Random/)** — a reproducible random number generator
+- 20.6 **[Distribution](Utilities/Distribution/)** — draw from a range, shuffle, and sample a normal distribution
 
 ### 21. Data formats
 
