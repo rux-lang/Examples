@@ -1,0 +1,49 @@
+// FizzBuzz: count from 1 to 100, but say "Fizz" instead of every multiple of 3, "Buzz" instead
+// of every multiple of 5, and "FizzBuzz" instead of every multiple of both.
+//
+// It began as a children's game for practising division, and became the most famous little test
+// in programming because it is so easy to get almost right. The trap is the order of the
+// questions. Fifteen is a multiple of 3, so a program that asks about 3 first says "Fizz" and
+// never gets as far as "FizzBuzz". The multiple of both has to be checked before either one.
+//
+// Everything here comes from the first three parts: `%` gives the remainder of a division, so
+// `n % 3 == 0` means "n divides by 3 exactly"; an `if` / `else if` chain picks the first question
+// that answers yes; and a `for` loop walks the numbers.
+import Io::{ Print, PrintLine };
+
+func Main() -> int {
+    var fizzes = 0;
+    var buzzes = 0;
+    var fizzBuzzes = 0;
+
+    for n in 1..=100 {
+        // A multiple of both 3 and 5 is a multiple of 15, so one test covers it.
+        if n % 15 == 0 {
+            Print("FizzBuzz");
+            fizzBuzzes += 1;
+        } else if n % 3 == 0 {
+            Print("Fizz");
+            fizzes += 1;
+        } else if n % 5 == 0 {
+            Print("Buzz");
+            buzzes += 1;
+        } else {
+            Print("{}", n);
+        }
+
+        // Ten to a line keeps the output short: a space between entries, and a line break after
+        // every tenth one.
+        if n % 10 == 0 {
+            PrintLine();
+        } else {
+            Print(" ");
+        }
+    }
+
+    PrintLine();
+    PrintLine("Fizz      {} times", fizzes);
+    PrintLine("Buzz      {} times", buzzes);
+    PrintLine("FizzBuzz  {} times", fizzBuzzes);
+    PrintLine("numbers   {} times", 100 - fizzes - buzzes - fizzBuzzes);
+    return 0;
+}
