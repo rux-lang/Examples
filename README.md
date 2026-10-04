@@ -223,6 +223,7 @@ Pointers, raw memory and allocators.
 - 15.7 **[Layout](Memory/Layout/)** — how big a type is and how it is aligned: `sizeof` and `alignof`
 - 15.8 **[Union](Memory/Union/)** — overlay one piece of storage with several types, and why that needs care
 - 15.9 **[Allocator](Memory/Allocator/)** — allocate through the `Allocator` interface instead of straight from the system
+- 15.10 **[Box](Memory/Box/)** — own one value allocated on the heap
 
 ### 16. Numbers
 

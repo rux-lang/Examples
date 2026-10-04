@@ -1,0 +1,52 @@
+// A `Box<T>` owns one value that lives in allocated memory. `Box::Create<T>(allocator, value)`
+// asks the allocator for room, moves the value in, and hands back the box, or an `AllocError`
+// if there was no room. From then on the box is the value's one owner.
+//
+// That ownership is what the raw lessons were missing. Nobody calls `Deallocate`: when the box's
+// life ends, its destructor destroys the value and gives the memory back to the allocator it
+// came from. And a box cannot be copied, because two owners would release the memory twice.
+// Hand it on with `<-`, and the old binding can no longer be used.
+//
+// `Get()` returns a `*var T` into the box's storage. That pointer does not own anything: it is
+// valid only while the box is alive.
+import Allocator::{ AllocError, Allocator, Box, SystemAllocator };
+import Io::PrintLine;
+
+struct Tally {
+    name: char8[..];
+    count: int;
+}
+
+extend Tally {
+    func ~Tally(self: &var Tally) {
+        PrintLine("    destroying the {} tally", self.name);
+    }
+}
+
+// The box is created and dies inside this call, so its memory is returned before `Main` resumes.
+func Count(allocator: Allocator, name: char8[..]) -> ! AllocError {
+    let boxed = Box::Create<Tally>(allocator, Tally { name: name, count: 1 })?;
+    PrintLine("    counted {} {}", boxed.Get().count, boxed.Get().name);
+}
+
+func Main() -> ! AllocError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    PrintLine("a short-lived box:");
+    Count(allocator, "pears")?;
+
+    PrintLine("a box in Main:");
+    var apples = Box::Create<Tally>(allocator, Tally { name: "apples", count: 3 })?;
+    apples.Get().count += 2;
+    PrintLine("    {} {}", apples.Get().count, apples.Get().name);
+
+    // Moving the box moves the ownership. The value itself stays where it was allocated, so the
+    // new owner points at the very same storage.
+    let storage = apples.Get();
+    let owner <- apples;
+    PrintLine("    moved, same storage: {}", owner.Get() == storage);
+
+    // Using `apples` from here on is rejected: it was moved out. `owner` releases the memory, once.
+    PrintLine("end of Main:");
+}
