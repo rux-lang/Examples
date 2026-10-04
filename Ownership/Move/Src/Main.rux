@@ -37,6 +37,15 @@ func Main() -> int {
     // error: value 'baton' is used after it was moved
     //   note: 'baton' was moved at 31:15
     //   help: clone 'baton' before moving it if both uses are required
+    //
+    // A move inside a loop is checked against the next pass too. The first pass would take the
+    // baton, and the second would find nothing left to take:
+    //
+    //     for lap in 0..3 {
+    //         let runner <- first;
+    //     }
+    //
+    // error: value 'first' may have been moved on some control-flow paths
 
     // Arguments and returns. What a call returns is a fresh value that nobody else holds, so it
     // needs no arrow: `=` simply takes it.
