@@ -41,7 +41,10 @@ func Main() -> int {
     // Two arrays of the same type are equal when every element is.
     PrintLine("scores == copy  {}", scores == copy);
 
-    // Nothing stops an index past the end: `primes[7]` compiles and reads whatever memory lies
-    // beyond the array. Keep every index below `length`.
+    // Every index must be below `length`, and it is checked. A constant index past the end,
+    // `primes[7]`, does not compile:
+    //     error: index 7 is out of range for an array of 4 elements
+    // An index computed while the program runs is checked as it runs, and one past the end stops
+    // the program with `Panic: index out of range` rather than read memory beyond the array.
     return 0;
 }

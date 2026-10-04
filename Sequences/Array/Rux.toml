@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Array"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Fixed-size arrays stored inline: literals, indexing, length and copying"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
