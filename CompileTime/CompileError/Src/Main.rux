@@ -30,7 +30,7 @@ const kB: int = 1000;
 func Main() -> int {
     // Every supported target has 64-bit pointers, so this branch is never taken. Flip the
     // condition to `>= 64` and the build stops with:
-    //   Src/Main.rux:35:15: error: this program needs a 64-bit target
+    //   Src/Main.rux:35:9: error: this program needs a 64-bit target
     when #target.pointerBits < 64 {
         #Error("this program needs a 64-bit target");
     }
