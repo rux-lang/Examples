@@ -68,6 +68,7 @@ Declaring types of your own.
 A value that may be absent: `T?`.
 
 - 8.1 **[Optional](Optionals/Optional/)** — a value that may be missing: `int?` and `none`
+- 8.2 **[Presence](Optionals/Presence/)** — match an optional with `value?` and `none` arms
 
 ### 9. Errors
 
