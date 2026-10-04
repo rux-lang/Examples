@@ -7,8 +7,7 @@ Name = "Variadic"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Functions taking any number of arguments"
+Description = "Variadic functions: collecting any number of arguments, and spreading a slice"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
-Text = { Namespace = "Rux", Version = "*" }

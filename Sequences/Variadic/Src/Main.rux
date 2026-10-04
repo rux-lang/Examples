@@ -1,54 +1,52 @@
-// Some functions cannot say in advance how many arguments they take. A
-// parameter written `name: T...` collects everything left at the call into one
-// list, so a single function serves every count.
+// Some functions cannot say in advance how many arguments they take. A last parameter written
+// `args: int32...` collects every remaining argument into one slice, so a single function serves
+// any count, zero included. Inside the function, `args` is an ordinary `int32[..]`: it has a
+// length, it can be indexed, and `for` walks it.
 //
-// `PrintLine("{} and {}", a, b)` is exactly this: its last parameter is
-// `args: Display...`, which is why any number of values may follow the format.
-import Io::{ Print, PrintLine };
-import Text::Display;
+// Going the other way, `args...` at a call spreads a slice back out into separate arguments,
+// which is how one variadic function hands everything it received to another.
+import Io::PrintLine;
 
-// `Display` is the interface for "can be rendered as text", so this accepts any
-// number of values of any type that knows how to print itself.
-func Count(values: Display...) -> uint {
-    // The list knows its own length, exactly like a slice.
-    return values.length;
+func Sum(args: int32...) -> int32 {
+    var total: int32 = 0;
+    for value in args {
+        total += value;
+    }
+    return total;
 }
 
-// It is indexed like a slice too, so the body can walk what it was given.
-func Line(values: Display...) {
-    for i in 0..values.length {
-        Print("[{}]", values[i]);
+// Ordinary parameters may come first; only the last one can collect the rest.
+func Largest(first: int32, args: int32...) -> int32 {
+    var largest = first;
+    for value in args {
+        if value > largest {
+            largest = value;
+        }
     }
-    PrintLine();
+    return largest;
 }
 
-// A variadic parameter must be the last one, but ordinary parameters may come
-// before it — that is how a format string sits in front of its values.
-func Labelled(label: char8[..], values: Display...) {
-    Print("{}:", label);
-    for i in 0..values.length {
-        Print(" {}", values[i]);
+// `args...` passes what this function was given straight on to `Sum`.
+func Average(args: int32...) -> int32 {
+    if args.length == 0 {
+        return 0;
     }
-    PrintLine();
+    return Sum(args...) / (args.length as int32);
 }
 
 func Main() -> int {
-    // The same function, called with three arguments, then with none.
-    PrintLine("three arguments -> {}", Count(1, 2, 3));
-    PrintLine("no arguments    -> {}", Count());
+    // The same function with three arguments, with one, and with none at all.
+    PrintLine("Sum(1, 2, 3)            {}", Sum(1, 2, 3));
+    PrintLine("Sum(42)                 {}", Sum(42));
+    PrintLine("Sum()                   {}", Sum());
 
-    // The values need not share a type. Each only has to know how to render
-    // itself, which is what the `Display` bound asks for.
-    Line(1, 2.5, true, "text");
+    PrintLine("Largest(4, 9, 2)        {}", Largest(4, 9, 2));
+    PrintLine("Largest(7)              {}", Largest(7));
+    PrintLine("Average(2, 4, 9)        {}", Average(2, 4, 9));
 
-    // A fixed parameter first, then as many as you like.
-    Labelled("scores", 10, 20, 30);
-    Labelled("empty");
-
-    // Rux spells this `values: Display...`, with a type. The `C` package's
-    // bindings show the other form, `func printf(format: *char8, ...)`, which
-    // is C's untyped variadic: it carries no type information at all, and the
-    // callee has to be told what to expect. That form exists only for talking
-    // to C, and the Extern lesson is where it comes up.
+    // Any slice can be spread, including a view of an array. The spread wants a slice, so an
+    // array is written `scores[..]...`; `scores...` on its own is rejected.
+    let scores: int32[4] = [70, 85, 90, 95];
+    PrintLine("Average(scores[..]...)  {}", Average(scores[..]...));
     return 0;
 }
