@@ -54,10 +54,10 @@ func Main() -> int {
     shape = door;
     PrintLine("holding a {} with area {}", shape.Name(), shape.Area());
 
-    // A circle and a rectangle cannot share an array, but two Shapes can.
-    let first: Shape = wheel;
-    let second: Shape = door;
-    let shapes: Shape[2] = [first, second];
+    // A circle and a rectangle cannot share an array: `let shapes = [wheel, door];` is refused
+    // with "array element 2 has type 'Rectangle', but element 1 established element type
+    // 'Circle'". Two Shapes can, and the annotation makes each element a Shape, as it did above.
+    let shapes: Shape[2] = [wheel, door];
     var total = 0.0;
     for each in shapes {
         total += each.Area();

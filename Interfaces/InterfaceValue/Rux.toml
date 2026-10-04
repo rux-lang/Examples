@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "InterfaceValue"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Holding any implementing type in one interface value, with dynamic dispatch"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
