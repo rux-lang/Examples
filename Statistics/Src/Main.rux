@@ -6,24 +6,24 @@
 // walked twice — which is why this reads as a program rather than a formula.
 import Algorithms::{ MaxIndex, MinIndex, Sort, Sum };
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::Vector;
+import Collections::{ CollectionError, Vector };
 import Io::{ Print, PrintLine };
 import Math::Sqrt;
 
-func Main() -> int {
+func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
     var samples = Vector::Vector<float64>(allocator);
     let readings: float64[9] = [ 12.5, 9.0, 15.25, 11.0, 8.75, 14.0, 10.5, 13.25, 11.75 ];
     for i in 0..readings.length {
-        samples.Push(readings[i]);
+        samples.Push(readings[i])?;
     }
 
     let count = samples.Length();
     if count == 0u {
         PrintLine("nothing to summarise");
-        return 1;
+        return;
     }
 
     Print("readings   ");
@@ -58,12 +58,12 @@ func Main() -> int {
     PrintLine("deviation  {:.4}", deviation);
 
     match MinIndex<float64>(values) {
-        .Some(at) => PrintLine("smallest   {}", values[at]),
-        .None => PrintLine("smallest   none")
+        at? => PrintLine("smallest   {}", values[at]),
+        none => PrintLine("smallest   none")
     }
     match MaxIndex<float64>(values) {
-        .Some(at) => PrintLine("largest    {}", values[at]),
-        .None => PrintLine("largest    none")
+        at? => PrintLine("largest    {}", values[at]),
+        none => PrintLine("largest    none")
     }
 
     // The median needs the values in order, which means rearranging them — so
@@ -77,5 +77,4 @@ func Main() -> int {
     } else {
         PrintLine("median     {:.4}", (sorted[middle - 1u] + sorted[middle]) / 2.0);
     }
-    return 0;
 }
