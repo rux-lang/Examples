@@ -207,6 +207,7 @@ Strings, characters, formatting, parsing and input.
 - 14.9 **[Format](Text/Format/)** — control width and alignment when formatting values
 - 14.10 **[FormatNumber](Text/FormatNumber/)** — control precision and number base when formatting numbers
 - 14.11 **[Render](Text/Render/)** — format values into a `String` instead of the console
+- 14.12 **[Parse](Text/Parse/)** — turn text into a number, and handle text that is not one
 
 ### 15. Memory
 
