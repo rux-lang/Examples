@@ -6,9 +6,11 @@
 // ordinary `int[..]`, so `for`, `.length` and every function that takes a slice work on it.
 // A view of a `*var int` is writable, just as a view of a `var` array is.
 //
-// The length is yours to get right. The compiler takes `n` on trust: a view longer than the
-// block is accepted, and reading the extra elements reads someone else's memory. Build the view
-// once, from the count you allocated, and pass the view around instead of the pointer.
+// Indexing a view is checked against its length, as for any slice: `all[6]` below would stop the
+// program with `Panic: index out of range`. But the length itself is yours to get right. A pointer
+// cannot say how big its block is, so `n` is taken on trust: a view longer than the block is
+// accepted, and its extra elements are someone else's memory. Build the view once, from the count
+// you allocated, and pass the view around instead of the pointer.
 import Io::{ Print, PrintLine };
 import Memory::{ Alloc, Free };
 
