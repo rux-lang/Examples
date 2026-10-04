@@ -18,6 +18,6 @@ rux run
 100.0 C = 212.0 F
 ```
 
-From the root, `rux lint` visits every member, and `rux --manifest App/Rux.toml run` runs the program without changing directory. Rux 0.4.0 resolves registry dependencies at a workspace root only from its members, so `rux check` there rejects `App`'s `Io`; check each member from its own directory.
+From the root, `rux check`, `rux build` and `rux lint` work on every member. `rux run` there stops, because the workspace "has nothing to run", and suggests `rux --manifest App/Rux.toml run`, which runs the program without changing directory.
 
 Read the lesson: https://rux-lang.dev/docs/learn/workspace

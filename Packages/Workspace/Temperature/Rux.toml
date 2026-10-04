@@ -6,5 +6,5 @@ MinRux = "0.4.0"
 Name = "Temperature"
 Version = "0.1.0"
 Type = "SourceLibrary"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "The library member of the Workspace lesson"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
