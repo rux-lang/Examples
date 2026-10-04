@@ -18,12 +18,16 @@ extend float64 {
     pub intrinsic const Infinity: float64;
 }
 
-// A compile-time value. The provider declares only the field it wants to expose.
+// A compile-time value. The provider declares only the fields it wants to expose, and only ones
+// the compiler fills in: a `wordSize` field is refused as "not one the compiler supplies for
+// '#target'".
 pub struct Target {
     pub pointerBits: uint;
 }
 
 pub intrinsic #target: Target;
 
-// A function the compiler emits inline. The signature must be the one the compiler expects.
+// A function the compiler emits inline. The signature must be the one the compiler expects:
+// declared with `condition: int`, it is refused with "intrinsic 'Assert' must be declared as
+// 'func Assert(condition: bool, message: char8[..])'".
 pub intrinsic func Assert(condition: bool, message: char8[..]);
