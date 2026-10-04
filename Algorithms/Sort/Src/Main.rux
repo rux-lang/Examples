@@ -1,0 +1,60 @@
+// Sorting puts a sequence in order, smallest first. `Sort`, from the Algorithms package, sorts in
+// place: it rearranges the elements where they already are instead of building a sorted copy, so
+// nothing is allocated and the array itself comes out in order.
+//
+// That is why it asks for a writable slice, `var T[..]`, the kind the WritableSlice lesson
+// introduced. Because it takes a slice rather than an array, the same function sorts an array of
+// any length, a part of one, or the contents of a vector.
+//
+// `Sort` uses the element's own `<`. `SortBy` takes the order as a function instead: given two
+// elements it answers `Less`, `Equal` or `Greater`, the `Ordering` from the Comparable lesson.
+// Neither sort is stable, so elements the order calls equal may end up in either order.
+import Algorithms::{ Sort, SortBy, SortDescending };
+import Core::Ordering;
+import Io::{ Print, PrintLine };
+
+func Show(label: char8[..], items: int[..]) {
+    Print("{}", label);
+    for item in items {
+        Print(" {}", item);
+    }
+    PrintLine();
+}
+
+func Magnitude(value: int) -> int {
+    return value < 0 ? -value : value;
+}
+
+// A custom order: closest to zero first, whatever the sign.
+func ByMagnitude(left: int, right: int) -> Ordering {
+    if Magnitude(left) < Magnitude(right) {
+        return Ordering::Less;
+    }
+    if Magnitude(right) < Magnitude(left) {
+        return Ordering::Greater;
+    }
+    return Ordering::Equal;
+}
+
+func Main() -> int {
+    var numbers: int[7] = [5, -8, 3, -1, 6, 0, -4];
+    Show("start       ", numbers);
+
+    // `numbers[..]` asks for a writable view of the whole array. Writing just `Sort(numbers)` is
+    // rejected: an array becomes a slice on its own, but only a read-only one.
+    Sort(numbers[..]);
+    Show("sorted      ", numbers);
+
+    SortDescending(numbers[..]);
+    Show("descending  ", numbers);
+
+    // The function is passed by name, not called. `SortBy` calls it whenever it compares a pair.
+    SortBy(numbers[..], ByMagnitude);
+    Show("by magnitude", numbers);
+
+    // A range sorts just that part. The two ends are left where they were.
+    var part: int[7] = [9, 7, 5, 3, 1, 8, 6];
+    Sort(part[1..6]);
+    Show("middle only ", part);
+    return 0;
+}

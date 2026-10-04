@@ -220,6 +220,7 @@ Containers from the `Collections` package.
 
 Algorithms over slices from the `Algorithms` package.
 
+- 18.1 **[Sort](Algorithms/Sort/)** — sort a slice in place
 - **[Algorithm](Algorithms/Algorithm/)** — sort, search, and fold over the containers built so far _(being split into the lessons above)_
 
 ### 19. Files
