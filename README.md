@@ -100,6 +100,7 @@ Everything a `match` arm can say.
 
 - 7.1 **[Guard](Patterns/Guard/)** — add an `if` condition to a match arm
 - 7.2 **[RangePattern](Patterns/RangePattern/)** — match a whole range of numbers in one arm
+- 7.3 **[TuplePattern](Patterns/TuplePattern/)** — match several values at once as a tuple
 - 7.4 **[StructPattern](Patterns/StructPattern/)** — take a struct-shaped variant case apart by field name
 - 7.5 **[CharacterPattern](Patterns/CharacterPattern/)** — match single characters
 - 7.6 **[Exhaustive](Patterns/Exhaustive/)** — why a match on a variant must cover every case, and when `else` is needed
