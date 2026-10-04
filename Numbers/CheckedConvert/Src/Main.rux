@@ -1,0 +1,62 @@
+// `as` always produces a value of the new type, and says nothing when the old value did not fit:
+// 300 as a `uint8` is quietly 44, and -1 is quietly 255. That is fine where the value is known to
+// fit, and a hidden bug everywhere else. `Core::ConvertChecked` converts the same way and also
+// tells you whether anything was lost.
+//
+// It follows the out-parameter shape of the checked arithmetic: the converted value is written
+// through a pointer, which also names the destination type, and the `bool` it returns is `true`
+// when the value did not survive. "Did not survive" covers every way a conversion can go wrong:
+// too large, negative into an unsigned type, a fraction cut off a float, and a NaN or infinity.
+//
+// Two relatives decide what to do with a value that does not fit, without reporting it.
+// `ConvertWrapping` is `as` with a name that says the loss is intended, and `ConvertSaturating`
+// clamps to the nearest value the destination can hold.
+import Core::{ ConvertChecked, ConvertSaturating, float64 };
+import Io::PrintLine;
+
+// Turns a count into a byte, or `none` when it does not fit in one.
+func ToByte(count: int32) -> uint8? {
+    var result: uint8 = 0;
+    let lost = ConvertChecked(count, @result);
+    if lost {
+        return none;
+    }
+    return result;
+}
+
+func Main() -> int {
+    var small: uint8 = 0;
+
+    // Each source value, converted to `uint8` and checked.
+    let fits = ConvertChecked(200, @small);
+    PrintLine("200  -> uint8  lost {:5}  value {}", fits, small);
+    let tooLarge = ConvertChecked(300, @small);
+    PrintLine("300  -> uint8  lost {:5}  value {}", tooLarge, small);
+    let negative = ConvertChecked(-1, @small);
+    PrintLine("-1   -> uint8  lost {:5}  value {}", negative, small);
+
+    // From a float, the fraction counts as part of the value.
+    var whole: int32 = 0;
+    let exact = ConvertChecked(42.0, @whole);
+    PrintLine("42.0 -> int32  lost {:5}  value {}", exact, whole);
+    let fraction = ConvertChecked(42.7, @whole);
+    PrintLine("42.7 -> int32  lost {:5}  value {}", fraction, whole);
+    let nan = ConvertChecked(float64::NaN, @whole);
+    PrintLine("NaN  -> int32  lost {}", nan);
+    PrintLine("");
+
+    // Saturating keeps the nearest value instead.
+    ConvertSaturating(300, @small);
+    PrintLine("300 saturated  {}", small);
+    ConvertSaturating(-1, @small);
+    PrintLine("-1 saturated   {}", small);
+    PrintLine("");
+
+    // A checking function turns the report into a type.
+    PrintLine("ToByte(99)     {}", ToByte(99) ?? 0);
+    match ToByte(999) {
+        value? => PrintLine("ToByte(999)    {}", value),
+        none => PrintLine("ToByte(999)    does not fit")
+    }
+    return 0;
+}

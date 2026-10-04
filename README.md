@@ -230,6 +230,7 @@ Numbers in depth.
 - 16.5 **[Shift](Numbers/Shift/)** — move bits left and right with `<<`, `>>` and `>>>`
 - 16.6 **[CheckedArithmetic](Numbers/CheckedArithmetic/)** — detect overflow instead of getting a wrong answer
 - 16.7 **[WrappingArithmetic](Numbers/WrappingArithmetic/)** — arithmetic that wraps around or saturates on purpose
+- 16.8 **[CheckedConvert](Numbers/CheckedConvert/)** — convert between number types and detect values that do not fit
 - 16.11 **[Math](Numbers/Math/)** — roots, powers, logarithms, trigonometry, and rounding
 
 ### 17. Collections
