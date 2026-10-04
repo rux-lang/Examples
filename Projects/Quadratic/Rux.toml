@@ -7,10 +7,11 @@ Name = "Quadratic"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Solving a quadratic equation"
+Description = "Solve a x^2 + b x + c = 0 from typed coefficients, including linear and degenerate cases"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
+Core = { Namespace = "Rux", Version = "*" }
 Format = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Math = { Namespace = "Rux", Version = "*" }
