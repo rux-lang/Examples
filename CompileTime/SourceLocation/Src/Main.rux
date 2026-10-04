@@ -1,0 +1,34 @@
+// `#source` tells a program where it is in its own source code: the file, the line, and the
+// function around it. Like `#target`, the compiler fills it in while compiling, so a read
+// costs nothing at run time — it is just a constant.
+//
+// The surprise is *which* place it describes. Every read of `#source` describes the expression
+// that reads it, wherever that is written. A helper that reads `#source.line` inside its own body
+// therefore reports its own line, every time, no matter who called it. To report where a call
+// came from, the caller has to read `#source.line` itself and pass the value in.
+import Core::{ #source };
+import Io::PrintLine;
+
+// Reads `#source` in its own body, so it always describes this function.
+func LogHere(message: char8[..]) {
+    PrintLine("  {}:{} in {}: {}", #source.fileName, #source.line, #source.function, message);
+}
+
+// Is handed the location by its caller, so it describes the call.
+func LogAt(line: uint, message: char8[..]) {
+    PrintLine("  line {}: {}", line, message);
+}
+
+func Main() -> int {
+    PrintLine("This read is at line {} of {}, in {}",
+        #source.line, #source.fileName, #source.function);
+
+    PrintLine("A helper that reads #source itself:");
+    LogHere("first call");
+    LogHere("second call");
+
+    PrintLine("A helper that is passed #source.line:");
+    LogAt(#source.line, "first call");
+    LogAt(#source.line, "second call");
+    return 0;
+}
