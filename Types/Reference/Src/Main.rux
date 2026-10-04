@@ -1,0 +1,58 @@
+// Passing a struct to a function, as the Struct lesson did, hands the function a copy. For two
+// numbers that costs nothing, but a struct can be large, and copying it only so a function can
+// read it is wasted work.
+//
+// A reference, written `&T`, borrows the caller's value instead. The function reads the original
+// through the reference and nothing is copied. A plain `&` is read-only: the function may look at
+// the value but not change it, so the caller can lend it out without worrying.
+//
+// Two things keep references light to use. The call site writes nothing extra: `Area(kitchen)`
+// borrows `kitchen` because the parameter asks for a `&Room`. And a reference is followed
+// automatically, so `room.width` reads the field of the borrowed room.
+import Io::PrintLine;
+
+struct Room {
+    name: char8[..];
+    width: float64;
+    length: float64;
+}
+
+func Area(room: &Room) -> float64 {
+    return room.width * room.length;
+}
+
+// A reference can be passed on: `Describe` lends the room it borrowed to `Area`. Assigning through
+// it is another matter, and `room.width = 0.0;` here would be rejected.
+func Describe(room: &Room) {
+    PrintLine("{}: {} by {} metres, {} square metres", room.name, room.width, room.length,
+        Area(room));
+}
+
+// Any type can be borrowed, an array included.
+func Widest(widths: &float64[3]) -> float64 {
+    var widest = widths[0];
+    for i in 1..3 {
+        if widths[i] > widest {
+            widest = widths[i];
+        }
+    }
+    return widest;
+}
+
+func Main() -> int {
+    let kitchen = Room { name: "kitchen", width: 3.5, length: 4.0 };
+    let hall = Room { name: "hall", width: 1.5, length: 6.0 };
+    Describe(kitchen);
+    Describe(hall);
+
+    // A reference can also be a local: a second name for a value that already exists.
+    let chosen: &Room = kitchen;
+    PrintLine("chosen: the {}", chosen.name);
+
+    let widths: float64[3] = [3.5, 1.5, 2.75];
+    PrintLine("widest: {} metres", Widest(widths));
+
+    // A borrow needs something to borrow from. `Area(Room { ... })` is rejected, because a
+    // struct built on the spot has no name to lend: bind it with `let` first, as above.
+    return 0;
+}
