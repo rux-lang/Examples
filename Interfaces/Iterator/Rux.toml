@@ -7,7 +7,7 @@ Name = "Iterator"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Making your own type work with for"
+Description = "The iterator protocol: a Next method returning T? drives a for loop"
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }

@@ -1,87 +1,52 @@
-// `for` has walked ranges and arrays since the Range lesson. It is not built
-// only for those: any type can be walked by `for` once it says how.
+// `for` has walked ranges and arrays since the Control flow part. It can walk a type of your own
+// too, once that type has one method:
+//     func Next(self: &var T) -> Item?
+// Each call hands out the next item, or `none` when there are no more. `for` calls `Next` again
+// and again, runs the loop body with every item it gets, and stops at the first `none`. The item
+// type is whatever the optional carries: `int32` here.
 //
-// Two methods do it. `Next` belongs to the cursor — something that produces
-// the next item each time it is asked. `Iterate` belongs to a thing that can
-// hand out such a cursor. `for` asks the second for the first, then calls
-// `Next` until it reports there is nothing left.
-//
-// `for` goes by the methods alone. The `Iterator` and `Iterable` interfaces
-// from `Core` add nothing to call; naming one in `extend` just tells a reader
-// which role a type plays.
-import Core::{ Iterable, Iterator };
+// A type with such a `Next` is called an iterator. `extend Countdown : Iterator` names that role
+// for a reader, but Core's `Iterator` interface lists no methods, because an interface cannot
+// spell out an item type that each iterator chooses for itself. `for` goes by `Next` alone.
+import Core::Iterator;
 import Io::{ Print, PrintLine };
 
-// The cursor. It holds enough state to know where it is: the next two numbers
-// of the sequence, and how many remain.
-struct Fibonacci {
-    current: int64;
-    next: int64;
+// Counts down from a starting number to 1.
+struct Countdown {
     remaining: int32;
 }
 
-extend Fibonacci : Iterator {
-    // All a cursor needs. Returning `int64?` is how "another item" and "the
-    // end" are told apart — a present value is the item, `none` stops the
-    // loop. Whatever the optional carries is the type the loop hands out.
-    //
-    // It takes `&var` because producing an item moves the cursor forward, which
-    // is a change to the iterator itself.
-    func Next(self: &var Fibonacci) -> int64? {
-        if self.remaining <= 0 {
+extend Countdown : Iterator {
+    // `&var`, because handing out an item moves the countdown along.
+    func Next(self: &var Countdown) -> int32? {
+        if self.remaining == 0 {
             return none;
         }
-        let value = self.current;
-        let following = self.current + self.next;
-        self.current = self.next;
-        self.next = following;
+        let current = self.remaining;
         self.remaining -= 1;
-        return value;
-    }
-}
-
-// The thing being walked. It holds no position — it only knows how to start.
-struct FirstFibonacci {
-    count: int32;
-}
-
-extend FirstFibonacci : Iterable {
-    // All a walkable thing needs: hand back a fresh cursor. Because a new one is
-    // made each time, the same value can be walked more than once.
-    func Iterate(self: &FirstFibonacci) -> Fibonacci {
-        return Fibonacci { current: 0, next: 1, remaining: self.count };
+        return current;
     }
 }
 
 func Main() -> int {
-    let sequence = FirstFibonacci { count: 12 };
-
-    // Nothing here mentions `Next` or `none`. `for` does that, exactly as it
-    // does for a range or an array.
-    Print("first twelve:");
-    for value in sequence {
-        Print(" {}", value);
+    // `for` calls `Next` until it sees `none`. The parentheses keep the struct's braces apart
+    // from the loop body's.
+    Print("for:    ");
+    for second in (Countdown { remaining: 5 }) {
+        Print(" {}", second);
     }
-    PrintLine();
+    PrintLine(" liftoff");
 
-    // Walking it again starts from the beginning, because `Iterate` built a new
-    // cursor rather than handing back the one already used.
-    var total: int64 = 0;
-    for value in sequence {
-        total += value;
+    // The same walk by hand. This is all that `for` does.
+    var countdown = Countdown { remaining: 5 };
+    Print("by hand:");
+    loop {
+        let second = countdown.Next() ?? break;
+        Print(" {}", second);
     }
-    PrintLine("their sum:    {}", total);
+    PrintLine(" liftoff");
 
-    // The cursor can also be driven by hand, which is all `for` is doing.
-    var cursor = Fibonacci { current: 0, next: 1, remaining: 5 };
-    Print("by hand:      ");
-    var going = true;
-    while going {
-        match cursor.Next() {
-            value? => Print("{} ", value),
-            none => going = false
-        }
-    }
-    PrintLine();
+    // An iterator is used up as it goes. Once it has said `none`, it keeps saying `none`.
+    PrintLine("anything left? {}", countdown.Next() is int32);
     return 0;
 }
