@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Abi"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Symbol names with #Link's second argument, and calling conventions with #Abi"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 C = { Namespace = "Rux", Version = "*" }
