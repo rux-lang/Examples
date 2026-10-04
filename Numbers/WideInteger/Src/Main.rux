@@ -5,10 +5,9 @@
 // arithmetic inside cryptography.
 //
 // Everything you know about integers still applies: the same operators, the same `Min` and `Max`,
-// the same wrap-around at the edges. Two things are worth knowing. A literal bigger than 64 bits
-// needs a wide type to land in, given by an annotation or a suffix such as `u128` or `i256`. And a
-// narrower integer never becomes a wide one by itself: `int32` widens to `int64` silently, but
-// `int64` to `int128` must be written with `as`.
+// the same wrap-around at the edges, and the same widening. An `int64` becomes an `int128` as
+// silently as an `int32` becomes an `int64`, and an unsuffixed literal takes the type of the other
+// operand, however wide. Only the way back, from wide to narrow, has to be written with `as`.
 import Core::{ int128, int64, uint128, uint256, uint512, uint64 };
 import Io::PrintLine;
 
@@ -18,28 +17,35 @@ func Main() -> int {
     let next: uint128 = 18446744073709551616;
     PrintLine("one more     {}", next);
 
-    // A suffix types the literal on the spot, and hex digits and `_` separators work at any width.
-    let avogadro = 602214076000000000000000u128;
-    let mask = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFFu128;
+    // Hex digits and `_` separators work at any width.
+    let avogadro: uint128 = 602214076000000000000000;
+    let mask: uint128 = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF;
     PrintLine("avogadro     {}", avogadro);
     PrintLine("mask is max  {}", mask == uint128::Max);
 
-    // A `uint64` can hold 20! but not 21!. A `uint128` reaches 34!.
+    // A `uint64` can hold 20! but not 21!. A `uint128` reaches 34!. The range starts at a
+    // `uint128`, so `n` counts in `uint128` as well.
     var factorial: uint128 = 1;
-    for n in 1..=34 {
-        factorial *= n as uint128;
+    let first: uint128 = 1;
+    for n in first..=34 {
+        factorial *= n;
     }
     PrintLine("34!          {}", factorial);
 
     // The left side of a shift decides its type, so it carries the suffix. A plain `1 << 200`
-    // would be an `int`, which has no bit 200.
+    // would be an `int`, which has no bit 200: it prints 256.
     let power = 1u256 << 200;
     PrintLine("2^200        {}", power);
 
-    // Crossing into a wide type is explicit, even when nothing can be lost.
+    // Widening needs nothing written, and the literal grows to the width of `wide`.
     let balance: int64 = -42;
-    let wide = balance as int128;
-    PrintLine("widened      {}", wide * 1_000_000_000_000_000_000_000i128);
+    let wide: int128 = balance;
+    let large = wide * 1_000_000_000_000_000_000_000;
+    PrintLine("widened      {}", large);
+
+    // Narrowing can lose bits, so it is never silent: `let back: int64 = large;` is refused with
+    // "cannot assign 'int128' to 'int64'". `as` keeps the low 64 bits, whatever they mean.
+    PrintLine("narrowed     {}", large as int64);
 
     // The edges behave like every other integer's: one past the maximum wraps to the minimum.
     PrintLine("int128 max   {}", int128::Max);
