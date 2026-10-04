@@ -1,0 +1,43 @@
+// A plain `break` or `continue` acts on the innermost loop around it. With nested loops, that is
+// sometimes the wrong one: a search through a grid wants to stop the *whole* search once it finds
+// a match, not just the current row.
+//
+// A label names a loop. Write it before the loop with a colon, `search: for ...`, and then
+// `break search;` leaves that loop and every loop inside it, while `continue search;` abandons
+// the inner loops and starts the next pass of the labeled one. Labels work on `while`, `do` and
+// `loop` too.
+//
+// A label is checked like any other name, so a misspelling is caught:
+//
+//     error: 'break' refers to unknown loop label 'serach'
+import Io::PrintLine;
+
+func Main() -> int {
+    // Find two numbers below 10 whose squares add up to 100. Without the label, `break` would
+    // end only the inner loop, and the outer one would go on searching after the answer was found.
+    var checks: int32 = 0;
+    search: for a in 1..10 {
+        for b in a..10 {
+            checks += 1;
+            if a * a + b * b == 100 {
+                PrintLine("{}^2 + {}^2 = 100", a, b);
+                break search;
+            }
+        }
+    }
+    PrintLine("found after {} checks", checks);
+
+    // For each row of a times table, report the first product above 10 and move on to the next
+    // row. `continue rows` skips the rest of the row, including the line after the inner loop,
+    // which therefore prints only for a row where nothing was found.
+    rows: for row in 1..=4 {
+        for column in 1..=9 {
+            if row * column > 10 {
+                PrintLine("row {}: {} x {} = {}", row, row, column, row * column);
+                continue rows;
+            }
+        }
+        PrintLine("row {}: no product above 10", row);
+    }
+    return 0;
+}
