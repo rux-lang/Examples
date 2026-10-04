@@ -44,9 +44,9 @@ func Main() -> int {
     PrintLine("Largest(7)              {}", Largest(7));
     PrintLine("Average(2, 4, 9)        {}", Average(2, 4, 9));
 
-    // Any slice can be spread, including a view of an array. The spread wants a slice, so an
-    // array is written `scores[..]...`; `scores...` on its own is rejected.
+    // An array can be spread too: it becomes a slice of all its elements, just as it does when
+    // passed to a slice parameter.
     let scores: int32[4] = [70, 85, 90, 95];
-    PrintLine("Average(scores[..]...)  {}", Average(scores[..]...));
+    PrintLine("Average(scores...)      {}", Average(scores...));
     return 0;
 }

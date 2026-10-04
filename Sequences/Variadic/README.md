@@ -16,7 +16,7 @@ Sum()                   0
 Largest(4, 9, 2)        9
 Largest(7)              7
 Average(2, 4, 9)        5
-Average(scores[..]...)  85
+Average(scores...)      85
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/variadic

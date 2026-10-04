@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Variadic"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Variadic functions: collecting any number of arguments, and spreading a slice"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
