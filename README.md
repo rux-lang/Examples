@@ -161,6 +161,7 @@ Describing behaviour that many types share.
 Types and functions that work for many types.
 
 - 13.1 **[GenericType](Generics/GenericType/)** — a struct with a type parameter: `Pair<T>`
+- 13.2 **[GenericMethod](Generics/GenericMethod/)** — methods on a generic type, and methods with type parameters of their own
 
 ### 14. Text
 
