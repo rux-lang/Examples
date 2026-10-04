@@ -42,6 +42,10 @@ func Main() -> int {
     let window = first..first + width;
     PrintLine("window: start {}, end {}", window.start, window.end);
 
+    // An annotation picks another integer type for the bounds, and literal bounds take it.
+    let hours: uint8..uint8 = 0..24;
+    PrintLine("hours:  start {}, end {}", hours.start, hours.end);
+
     // Walking a range by hand: start at `.start`, step by one, stop according to the kind of end.
     Print("faces:");
     var face = die.start;

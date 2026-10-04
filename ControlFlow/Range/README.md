@@ -16,6 +16,7 @@ die:    start 1, end 6 (included)
 7 is a digit: true, a face: false
 5..5 holds 0 values, 5..=5 holds 1
 window: start 3, end 7
+hours:  start 0, end 24
 faces: 1 2 3 4 5 6
 ```
 
