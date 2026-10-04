@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Union"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Share one piece of storage between members, and keep track of the active one"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
