@@ -6,5 +6,5 @@ MinRux = "0.4.0"
 Name = "Calendar"
 Version = "0.1.0"
 Type = "SourceLibrary"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Leap years and month lengths, the code under test in the Tooling lesson"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]

@@ -1,24 +1,22 @@
 // A test is an executable package below `Tests/`. `rux test` builds and runs each one, and a test
-// passes when its `Main` returns 0. Any other status fails it, so each check returns its own
-// number, and a failure says which check it was.
+// passes when its `Main` returns 0.
 //
-// `rux test` resolves a test's dependencies from local paths only, never from the registry, so a
-// test package depends on the code under test by path and checks it with plain conditions.
+// `Assert` from `Core` does the checking. When its condition is false it prints its message and
+// ends the program with a failing status, so a failed test says which check it was. A test is an
+// ordinary package, so it depends on the code under test by path and on `Core` from the registry.
 import Calendar::{ DaysInMonth, IsLeapYear };
+import Core::Assert;
 
 func Main() -> int {
-    if !IsLeapYear(2024) {
-        return 1;
-    }
-    if IsLeapYear(2023) {
-        return 2;
-    }
+    Assert(IsLeapYear(2024), "2024 is a leap year");
+    Assert(!IsLeapYear(2023), "2023 is not a leap year");
+
     // A century is not a leap year, unless it divides by 400.
-    if IsLeapYear(1900) || !IsLeapYear(2000) {
-        return 3;
-    }
-    if DaysInMonth(2024, 2) != 29 || DaysInMonth(2023, 2) != 28 || DaysInMonth(2023, 4) != 30 {
-        return 4;
-    }
+    Assert(!IsLeapYear(1900), "1900 is not a leap year");
+    Assert(IsLeapYear(2000), "2000 is a leap year");
+
+    Assert(DaysInMonth(2024, 2) == 29, "February 2024 has 29 days");
+    Assert(DaysInMonth(2023, 2) == 28, "February 2023 has 28 days");
+    Assert(DaysInMonth(2023, 4) == 30, "April has 30 days");
     return 0;
 }

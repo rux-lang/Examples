@@ -6,8 +6,9 @@ MinRux = "0.4.0"
 Name = "LeapYear"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Tests for the leap year rules in Calendar"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Calendar = { Path = "../../Calendar" }
+Core = { Namespace = "Rux", Version = "*" }
