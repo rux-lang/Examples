@@ -1,0 +1,54 @@
+// Often absence has an obvious stand-in. With no reading there is no frost,
+// so report zero. A whole `match` for that is a lot of code, and `??` says it
+// in one line:
+//
+//     optional ?? fallback
+//
+// When the optional is present you get what is inside it. When it is `none`
+// you get the fallback. Either way the result is a plain `int`, so the rest of
+// the program never has to think about absence again.
+import Io::PrintLine;
+
+// The first temperature below zero, or `none` on a mild day.
+func FirstFrost(readings: int[..]) -> int? {
+    for reading in readings {
+        if reading < 0 {
+            return reading;
+        }
+    }
+    return none;
+}
+
+// A slow fallback, which prints so that you can see when it runs.
+func Forecast() -> int {
+    PrintLine("  (asking the forecast)");
+    return -2;
+}
+
+func Main() -> int {
+    let monday = [ 3, 1, -4, -1 ];
+    let tuesday = [ 5, 6, 4, 2 ];
+
+    PrintLine("monday:  {}", FirstFrost(monday) ?? 0);
+    PrintLine("tuesday: {}", FirstFrost(tuesday) ?? 0);
+
+    // The fallback is lazy: it is evaluated only when it is needed. Monday has
+    // a frost, so the forecast is never asked. Tuesday has none, so it is.
+    PrintLine("monday or forecast:");
+    PrintLine("  {}", FirstFrost(monday) ?? Forecast());
+    PrintLine("tuesday or forecast:");
+    PrintLine("  {}", FirstFrost(tuesday) ?? Forecast());
+
+    // `??` chains. The optionals are tried from left to right, the first
+    // present one wins, and the last fallback covers the case where every one
+    // is absent.
+    let either = FirstFrost(tuesday) ?? FirstFrost(monday) ?? 0;
+    PrintLine("first frost this week: {}", either);
+
+    // Watch out: `==` binds more tightly than `??`. Without the parentheses,
+    // `FirstFrost(tuesday) ?? 0 == 0` would mean `FirstFrost(tuesday) ?? (0 == 0)`,
+    // which mixes an `int` with a `bool` and does not compile.
+    let mild = (FirstFrost(tuesday) ?? 0) == 0;
+    PrintLine("tuesday was mild: {}", mild);
+    return 0;
+}
