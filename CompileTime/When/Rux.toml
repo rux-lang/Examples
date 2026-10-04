@@ -7,11 +7,8 @@ Name = "When"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Selecting code at compile time with when"
+Description = "Choosing code while compiling with when, and branches that are never resolved"
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
-
-[Build]
-Output = "Bin"
