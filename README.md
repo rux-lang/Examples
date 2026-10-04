@@ -79,6 +79,7 @@ Operations that can fail: `T ! E`.
 - 9.4 **[Outcome](Errors/Outcome/)** — match a result as `.Success` or `.Failure`
 - 9.5 **[Discard](Errors/Discard/)** — why the compiler refuses to let a result be ignored, and how to discard one on purpose
 - 9.6 **[Catch](Errors/Catch/)** — handle the ways an operation can fail with `catch`
+- 9.7 **[CatchFallback](Errors/CatchFallback/)** — turn any failure into a default value with `catch { else => ... }`
 - 9.8 **[Propagate](Errors/Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 
 ### 11. Ownership
