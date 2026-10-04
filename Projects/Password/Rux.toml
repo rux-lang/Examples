@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Password"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A 16-character password drawn from system entropy with rejection sampling"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Entropy = { Namespace = "Rux", Version = "*" }

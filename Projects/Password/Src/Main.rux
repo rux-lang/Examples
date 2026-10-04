@@ -62,9 +62,8 @@ func Main() -> int {
         password[i] = Alphabet[index];
     }
 
-    // `password[..]` is a writable view, because the array is `var`. Printing wants a plain
-    // read-only one, so the view is named at that type first.
-    let text: char8[..] = password[..];
-    PrintLine("password  {}", text);
+    // `PrintLine` prints text views, not fixed-size arrays, so `password[..]` views the whole
+    // array. The view is writable, because the array is `var`, and it prints just the same.
+    PrintLine("password  {}", password[..]);
     return 0;
 }
