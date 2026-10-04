@@ -2,8 +2,13 @@
 // *values*, in the middle of an expression. `condition ? whenTrue : whenFalse` makes that choice.
 // It is an expression, so it goes anywhere a value goes.
 //
-// The whole conditional is one value with one type, so both sides must have the same type.
-// `ready ? "yes" : 0` is a mistake; give both sides text, or both numbers.
+// The whole conditional is one value with one type, so both sides must have the same type:
+//
+//     let answer = ready ? "yes" : 0;
+//         error: conditional branch type mismatch: expected 'char8[..]', found 'int'
+//         help: make both branches produce the same type
+//
+// Give both sides text, or both numbers.
 import Io::PrintLine;
 
 func Main() -> int {
