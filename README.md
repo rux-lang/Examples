@@ -330,6 +330,7 @@ Talking to the operating system and the machine.
 
 - 24.1 **[Extern](Platform/Extern/)** — call a platform API directly through an extern declaration and `#Link`
 - 24.2 **[CInterop](Platform/CInterop/)** — C-compatible types, pointers and handles
+- 24.3 **[Abi](Platform/Abi/)** — choose a calling convention with `#Abi`
 - 24.4 **[Asm](Platform/Asm/)** — write a function body in assembly
 
 ### 25. Projects
