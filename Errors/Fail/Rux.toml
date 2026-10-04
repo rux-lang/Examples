@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Fail"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Leave a fallible function through its failure channel with fail"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
