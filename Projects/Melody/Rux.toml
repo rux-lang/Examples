@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Melody"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Play a tune through the console speaker with the Windows Beep function"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
