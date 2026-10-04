@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Quadratic"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Solve a x^2 + b x + c = 0 from typed coefficients, including linear and degenerate cases"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
