@@ -8,8 +8,11 @@ import Io::{ Print, PrintLine, ReadLine };
 import Text::StringBuilder;
 import Time::{ Duration, SleepFor };
 
+// A sleep can fail, and a failure has to be dealt with somehow. Here a pause
+// that did not happen only makes the countdown quicker, so it is ignored on
+// purpose.
 func Pause(milliseconds: int64) {
-    SleepFor(Duration::FromMilliseconds(milliseconds));
+    SleepFor(Duration::FromMilliseconds(milliseconds)) catch { else => {} };
 }
 
 func Main() -> int {
@@ -41,11 +44,20 @@ func Main() -> int {
     Print("Press Enter to launch  \u{1F447}  ");
 
     // The same input idiom as Circle: a builder on the system allocator, filled
-    // by ReadLine. Nothing is done with the text — it is the Enter that counts.
+    // by ReadLine. Nothing is done with the text — it is the Enter that counts,
+    // so when the input ends before any Enter arrives, there is no launch.
     var system = SystemAllocator();
     let allocator: Allocator = system;
     var builder = StringBuilder(allocator);
-    ReadLine(builder);
+    match ReadLine(builder) {
+        .Success(_) => {},
+        .Failure(_) => {
+            PrintLine();
+            PrintLine("No Enter, no launch. Mission scrubbed.  \u{1F6D1}");
+            builder.Release();
+            return 1;
+        }
+    }
     builder.Release();
 
     PrintLine();
