@@ -104,7 +104,7 @@ Strings, characters, formatting, parsing and input.
 Pointers, raw memory and allocators.
 
 - 15.1 **[Pointer](Memory/Pointer/)** — the difference between `*T` and `*var T`, and taking an address with `@`
-- 15.3 **[Memory](Memory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
+- 15.3 **[RawMemory](Memory/RawMemory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
 - 15.8 **[Union](Union/)** — overlay one piece of storage with several types, and why that needs care
 - 15.9 **[Allocator](Allocator/)** — allocate through the `Allocator` interface instead of straight from the system
 
