@@ -91,6 +91,7 @@ A value that is one of several types: `A | B`.
 - 10.2 **[TypedPattern](SumTypes/TypedPattern/)** — match a sum by the type it holds
 - 10.3 **[SubsetPattern](SumTypes/SubsetPattern/)** — match several members of a sum in one arm
 - 10.4 **[Is](SumTypes/Is/)** — ask which type a sum holds with `is`
+- 10.5 **[SumWidening](SumTypes/SumWidening/)** — pass a smaller sum where a larger one is expected
 
 ### 11. Ownership
 
