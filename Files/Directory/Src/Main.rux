@@ -1,79 +1,73 @@
-// Files live in directories, and those can be made, listed and removed like
-// anything else. Listing is the interesting one: the entries arrive one at a
-// time through a cursor, for the same reason `ReadLine` fills a builder — a
-// directory can hold a great many names, and returning all of them at once
-// would mean allocating for all of them at once.
+// A directory is made, listed and removed through the `FileSystem` package, and this program does
+// all three to a scratch directory it owns: `Bin/scratch`, inside this package's build folder.
 //
-// Every step can fail, so `Main` is fallible and passes a failure on with `?`,
-// ending the program with exit status 1. As in the File lesson, the failure is
-// an `IoError` from the file system or a `TextError` from turning text into a
-// filename.
+// Listing is the interesting part. `ReadDirectory` returns a cursor, and its `Next` hands out one
+// name at a time, because a directory can hold a great many and returning them all at once would
+// mean holding them all at once. `Next` has the nested shape from the Errors part:
+//
+//     func Next(self: &var DirectoryIterator) -> OsString? ! IoError
+//
+// The outer failure means the directory could not be read. A success holds the next name, or
+// `none` once every name has been handed out. So `listing.Next()? ?? break` passes a failure on,
+// stops at the end, and otherwise binds a name. The names are `OsString`s, not text, for the
+// reason the Path lesson gave; `.` and `..` are skipped. The order is whatever the filesystem
+// keeps, so do not rely on it.
+//
+// Removal is strict. `MakeDirectory` fails if the name is taken, and `DeleteDirectory` refuses a
+// directory that still has anything in it, so the files go first.
 import Allocator::{ Allocator, SystemAllocator };
 import FileSystem::{ DeleteDirectory, DeleteFile, File, MakeDirectory, OpenOptions, ReadDirectory };
-import Io::{ IoError, PrintLine };
-import Path::{ OsString, Path };
+import Io::{ IoError, PrintLine, WriteAll };
+import Path::{ Join, OsString, Path };
 import Text::TextError;
 
-// Building a path from text takes three steps, so it is worth a helper.
-func PathOf(allocator: Allocator, text: char8[..], holder: *var OsString) -> Path ! TextError {
-    *holder = OsString::FromText(allocator, text)?;
-    return Path::FromView((*holder).View());
+// Writes a small file called `name` inside `directory`.
+func MakeFile(allocator: Allocator, directory: Path, name: char8[..]) -> ! IoError | TextError {
+    var holder = OsString::FromText(allocator, name)?;
+    let path = Join(allocator, directory, holder.View())?;
+    var file = File::Open(allocator, path.AsPath(), OpenOptions::Writing())?;
+    WriteAll(file, name)?;
+    file.Close()?;
+}
+
+// Deletes the file called `name` inside `directory`.
+func RemoveFile(allocator: Allocator, directory: Path, name: char8[..]) -> ! IoError | TextError {
+    var holder = OsString::FromText(allocator, name)?;
+    let path = Join(allocator, directory, holder.View())?;
+    DeleteFile(allocator, path.AsPath())?;
 }
 
 func Main() -> ! IoError | TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    var dirHolder = OsString(allocator);
-    let dir = PathOf(allocator, "Bin/example", @dirHolder)?;
-    // Making it. If it already exists this fails rather than carrying on
-    // silently, and `?` passes that failure on like any other.
-    MakeDirectory(allocator, dir)?;
-    PrintLine("made Bin/example");
+    var holder = OsString::FromText(allocator, "Bin/scratch")?;
+    let directory = Path::FromView(holder.View());
+    MakeDirectory(allocator, directory)?;
+    MakeFile(allocator, directory, "first.txt")?;
+    MakeFile(allocator, directory, "second.txt")?;
+    PrintLine("made {} with two files", directory);
 
-    var oneHolder = OsString(allocator);
-    let one = PathOf(allocator, "Bin/example/first.txt", @oneHolder)?;
-    var twoHolder = OsString(allocator);
-    let two = PathOf(allocator, "Bin/example/second.txt", @twoHolder)?;
-    var a = File::Open(allocator, one, OpenOptions::Writing())?;
-    a.Write("one")?;
-    a.Close()?;
-    var b = File::Open(allocator, two, OpenOptions::Writing())?;
-    b.Write("two")?;
-    b.Close()?;
-    PrintLine("made two files");
-
-    // Listing. `Next` returns a fallible optional: a failure if the directory
-    // could not be read, otherwise the next name — or no name at all once the
-    // listing is used up, which is what ends the loop.
-    var listing = ReadDirectory(allocator, dir)?;
+    var listing = ReadDirectory(allocator, directory)?;
     var count = 0;
-    while true {
-        match listing.Next()? {
-            name? => {
-                count += 1;
-                match name.View().ToText(allocator) {
-                    .Success(text) => PrintLine("  {}", text),
-                    .Failure(_) => PrintLine("  (a name that is not text)")
-                }
-            },
-            none => {
-                break;
-            }
-        }
+    loop {
+        let name = listing.Next()? ?? break;
+        PrintLine("  {}", name);
+        count += 1;
     }
-    // The cursor holds resources of its own and hands them back here.
+    // The cursor holds a system handle; `Release` gives it back now rather than at scope end.
     listing.Release();
-    PrintLine("found {} entries", count);
+    PrintLine("listed {} entries", count);
 
-    // Note what the names are: an `OsString`, not text. The operating system
-    // does not promise that a filename is valid text at all, so converting one
-    // can fail — which is why `ToText` returns a fallible and the loop above
-    // has an arm for a name that is not text.
+    // Removing it too early is refused, and this failure is handled rather than passed on.
+    DeleteDirectory(allocator, directory) catch {
+        else => {
+            PrintLine("refused: the directory is not empty");
+        }
+    };
 
-    // A directory must be empty before it can go, so the files come first.
-    DeleteFile(allocator, one)?;
-    DeleteFile(allocator, two)?;
-    DeleteDirectory(allocator, dir)?;
-    PrintLine("cleaned up");
+    RemoveFile(allocator, directory, "first.txt")?;
+    RemoveFile(allocator, directory, "second.txt")?;
+    DeleteDirectory(allocator, directory)?;
+    PrintLine("removed {}", directory);
 }
