@@ -5,12 +5,18 @@
 // Written with `&`, the parameter borrows, exactly as `&T` did in the Reference lesson: nothing is
 // copied, and the function sees the caller's value as it is right now. Written with `&var`, the
 // borrow is writable, so a change made through the interface lands on the caller's own variable.
+//
+// The interface has to say which of its requirements write. A requirement with no `self` only
+// reads the value; one that changes it declares `self: &var Self`, where `Self` stands for
+// whichever type implements the interface. Leave that out and every `Adjust` below is refused:
+// "method 'Adjust' of 'Thermostat' writes through its receiver, but requirement 'Adjust' of
+// interface 'Gauge' only reads it".
 import Io::PrintLine;
 
 interface Gauge {
     func Label() -> char8[..];
     func Read() -> int32;
-    func Adjust(amount: int32);
+    func Adjust(self: &var Self, amount: int32);
 }
 
 struct Thermostat {
@@ -59,7 +65,9 @@ func Show(gauge: &Gauge) {
     PrintLine("the {} reads {}", gauge.Label(), gauge.Read());
 }
 
-// Calls `Adjust`, which changes the value, so the borrow must be writable too.
+// Calls `Adjust`, which changes the value, so the borrow must be writable too. Written as
+// `gauge: &Gauge`, the call below is refused: "cannot call 'Adjust' through immutable reference
+// '&Gauge'".
 func TurnUp(gauge: &var Gauge, amount: int32) {
     gauge.Adjust(amount);
 }

@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "InterfaceParameter"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Borrowing a value through an interface parameter"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
