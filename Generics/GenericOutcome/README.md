@@ -17,6 +17,7 @@ SuccessOf    3
 ErrorOf      cannot divide 7 by zero
 Both         80 x 24
 Both         complete: false
+CountPresent 2 of 4
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/generic-outcome
