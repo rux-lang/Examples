@@ -1,0 +1,40 @@
+// The five arithmetic operators: `+`, `-`, `*`, `/` and `%`. They work on
+// integers and floats alike, but division means something different for each:
+// two integers give a whole-number answer and throw the fraction away, while two
+// floats keep it.
+import Io::PrintLine;
+
+func Main() -> int {
+    let a: int32 = 17;
+    let b: int32 = 5;
+    PrintLine("{} + {} = {}", a, b, a + b);
+    PrintLine("{} - {} = {}", a, b, a - b);
+    PrintLine("{} * {} = {}", a, b, a * b);
+
+    // Integer division truncates: 17 / 5 is 3, not 3.4. The `%` operator gives
+    // back the part that division dropped, the remainder.
+    PrintLine("{} / {} = {}", a, b, a / b);
+    PrintLine("{} % {} = {}", a, b, a % b);
+
+    // Truncation goes towards zero, so -3.4 becomes -3 rather than -4, and the
+    // remainder keeps the sign of the number being divided.
+    PrintLine("{} / {} = {}", -a, b, -a / b);
+    PrintLine("{} % {} = {}", -a, b, -a % b);
+
+    // Floats keep the fraction. `%` works on them too.
+    let x: float64 = 17.0;
+    let y: float64 = 5.0;
+    PrintLine("{} / {} = {}", x, y, x / y);
+    PrintLine("{} % {} = {}", x, y, x % y);
+
+    // Both operands must have the same type: `a / y` is rejected, an `int32`
+    // divided by a `float64`. To divide integers and keep the fraction, convert
+    // them first with `as`.
+    PrintLine("{} / {} as floats = {}", a, b, (a as float64) / (b as float64));
+
+    // An integer that outgrows its type wraps around without any warning. A
+    // `uint8` holds 0 to 255, so 250 + 10 lands on 4.
+    let level: uint8 = 250;
+    PrintLine("uint8 {} + 10 = {}", level, level + 10);
+    return 0;
+}

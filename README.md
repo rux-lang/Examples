@@ -24,6 +24,7 @@ First programs: printing, values and their types.
 
 Combining values into new ones.
 
+- 2.1 **[Arithmetic](Operators/Arithmetic/)** — add, subtract, multiply, divide and take the remainder
 - **[Operator](Operators/Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence _(being split into the lessons above)_
 
 ### 3. Control flow
