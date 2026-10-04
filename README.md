@@ -276,6 +276,7 @@ Paths, files and directories.
 - 19.3 **[PathNormalize](Files/PathNormalize/)** — tidy a path by removing `.` and `..`
 - 19.4 **[File](Files/File/)** — write text to a file and read it back, handling failure at every step
 - 19.5 **[Directory](Files/Directory/)** — create, list, and remove directories
+- 19.6 **[Metadata](Files/Metadata/)** — ask a file for its size and kind
 - 19.7 **[Binary](Files/Binary/)** — read and write fixed-width values and raw bytes
 
 ### 20. Utilities

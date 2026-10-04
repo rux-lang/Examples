@@ -1,0 +1,65 @@
+// Metadata is what the filesystem knows about a name without reading the contents: what kind of
+// thing it is, how long it is, who may write it and when it last changed. One call asks:
+//
+//     func MetadataOf(allocator, path: Path, followLinks: bool) -> Metadata ! IoError
+//
+// `followLinks` decides what a symbolic link at the end of the path means: `true` describes the
+// file the link points to, `false` the link itself. An open `File` answers the same question
+// through its `Metadata` method, about the file it holds even if the name has since moved.
+//
+// The answer is a plain struct. `kind` is a `FileKind` enum, `size` is in bytes (and zero for a
+// directory, where it means nothing portable), `permissions` says whether the owner may write,
+// and `modified` is a `Timestamp` from the `Time` package, which has its own lesson later on.
+//
+// Asking about a name that is not there is not a crash and not a zero-filled struct: it is a
+// failure whose kind is `NotFound`, which makes `MetadataOf` the way to ask "does this exist?".
+import Allocator::{ Allocator, SystemAllocator };
+import FileSystem::{ DeleteFile, File, FileKind, MetadataOf, OpenOptions };
+import Io::{ IoError, IoErrorKind, PrintLine, WriteAll };
+import Path::{ OsString, Path };
+import Text::TextError;
+import Time::Timestamp;
+
+func KindName(kind: FileKind) -> char8[..] {
+    return match kind {
+        FileKind::File => "file",
+        FileKind::Directory => "directory",
+        FileKind::SymbolicLink => "symbolic link",
+        FileKind::Other => "other"
+    };
+}
+
+func Describe(allocator: Allocator, text: char8[..]) -> ! IoError | TextError {
+    var holder = OsString::FromText(allocator, text)?;
+    let path = Path::FromView(holder.View());
+    match MetadataOf(allocator, path, true) {
+        .Success(info) => {
+            PrintLine("{}", path);
+            PrintLine("  kind         {}", KindName(info.kind));
+            PrintLine("  size         {} bytes", info.size);
+            PrintLine("  writable     {}", info.permissions.IsWritable());
+            // The seconds since the last change differ on every run, so only whether that was
+            // within the last minute is shown.
+            let age = Timestamp::Now().UnixSeconds() - info.modified.UnixSeconds();
+            PrintLine("  recent       {}", age < 60);
+        },
+        .Failure(error) if error.kind == IoErrorKind::NotFound => PrintLine("{}: not found", path),
+        .Failure(error) => fail error
+    }
+}
+
+func Main() -> ! IoError | TextError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    var holder = OsString::FromText(allocator, "Bin/sample.txt")?;
+    let path = Path::FromView(holder.View());
+    var file = File::Open(allocator, path, OpenOptions::Writing())?;
+    WriteAll(file, "0123456789")?;
+    file.Close()?;
+
+    Describe(allocator, "Bin/sample.txt")?;
+    Describe(allocator, "Bin")?;
+    DeleteFile(allocator, path)?;
+    Describe(allocator, "Bin/sample.txt")?;
+}
