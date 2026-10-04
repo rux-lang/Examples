@@ -1,74 +1,52 @@
-// A vector answers "what is at position 3". A hash map answers "what is stored
-// under this key", where the key is whatever suits — a number, a name, an id.
+// A vector answers "what is at position 3". A hash map answers "what is stored under this key",
+// where the key is whatever suits — a number, an id, a name.
 //
-// It finds an entry by computing a number from the key and going straight to
-// where that number points, so a lookup costs about the same whether the map
-// holds ten entries or ten million.
+// It finds an entry by computing a number from the key, its hash, and going straight to the slot
+// that number points at. So a lookup costs about the same whether the map holds ten entries or
+// ten million.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, EqualsInt32, HashInt32, HashMap, HashSet };
+import Collections::{ CollectionError, EqualsSlice, HashMap, HashSlice };
 import Io::PrintLine;
 
 func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    // Two functions are handed over along with the allocator: one to hash a
-    // key, and one to compare two keys for equality. Hashing finds the likely
-    // place; equality confirms the key found there is really the one wanted,
-    // since two different keys can hash to the same number.
-    //
-    // Passing functions as values like this is the Callback lesson's subject.
-    var ages = HashMap<int32, int32>(allocator, HashInt32, EqualsInt32);
+    // Along with the allocator come two functions: one to hash a key, one to tell whether two
+    // keys are equal. Hashing finds the likely slot; equality confirms that the key found there
+    // really is the one wanted, since two different keys can hash to the same number. The
+    // package provides both for text keys.
+    var stock = HashMap<char8[..], int32>(allocator, HashSlice, EqualsSlice);
 
-    // Inserting may need more room, and so can fail; `?` hands that failure on.
-    ages.Insert(101i32, 34i32)?;
-    ages.Insert(102i32, 28i32)?;
-    ages.Insert(103i32, 45i32)?;
-    PrintLine("entries        {}", ages.Length());
+    // Inserting may need more room, and so can fail; `?` hands that failure to `Main`.
+    stock.Insert("apples", 12)?;
+    stock.Insert("pears", 4)?;
+    stock.Insert("plums", 30)?;
+    PrintLine("entries        {}", stock.Length());
 
-    // `Get` returns an optional, `int32?`, because a key may not be there —
-    // the same shape as indexing a vector out of range.
-    match ages.Get(102i32) {
-        age? => PrintLine("id 102 is      {}", age),
-        none => PrintLine("id 102 unknown")
+    // `Get` returns an optional, `int32?`, because the key may not be there.
+    match stock.Get("pears") {
+        count? => PrintLine("pears          {}", count),
+        none => PrintLine("pears          not stocked")
     }
-    match ages.Get(999i32) {
-        age? => PrintLine("id 999 is      {}", age),
-        none => PrintLine("id 999 unknown")
+    match stock.Get("kiwis") {
+        count? => PrintLine("kiwis          {}", count),
+        none => PrintLine("kiwis          not stocked")
     }
 
-    // Inserting an existing key replaces its value rather than adding a second
-    // entry: a key appears at most once.
-    ages.Insert(101i32, 35i32)?;
-    PrintLine("after replace  {} entries", ages.Length());
-    match ages.Get(101i32) {
-        age? => PrintLine("id 101 is now  {}", age),
-        none => PrintLine("id 101 unknown")
-    }
+    // A key appears at most once. Inserting it again replaces its value, and the map does not
+    // grow. `Replace` does the same and also hands back the value it displaced.
+    stock.Insert("apples", 15)?;
+    let previous = stock.Replace("apples", 20)?;
+    PrintLine("apples         {} (was {}), {} entries", stock.Get("apples") ?? 0, previous ?? 0,
+        stock.Length());
 
-    PrintLine("contains 103   {}", ages.ContainsKey(103i32));
-    match ages.Remove(103i32) {
-        age? => PrintLine("removed 103, who was {}", age),
-        none => PrintLine("103 was not there")
-    }
-    PrintLine("contains 103   {}", ages.ContainsKey(103i32));
+    // `Remove` takes the entry out and returns its value, or `none` if there was no such key.
+    PrintLine("removed plums  {}", stock.Remove("plums") ?? 0);
+    PrintLine("has plums      {}", stock.ContainsKey("plums"));
+    PrintLine("entries        {}", stock.Length());
 
-    // A set is the same structure with the values left out: it answers only
-    // "is this one here", which is the question often actually being asked.
-    var seen = HashSet<int32>(allocator, HashInt32, EqualsInt32);
-    // Its `Insert` answers whether the value was new.
-    var added = seen.Insert(1i32)?;
-    PrintLine("adding 1       new? {}", added);
-    added = seen.Insert(2i32)?;
-    PrintLine("adding 2       new? {}", added);
-    added = seen.Insert(1i32)?;
-    PrintLine("adding 1 again new? {}", added);
-    PrintLine("set size       {}", seen.Length());
-    PrintLine("set has 2      {}", seen.Contains(2i32));
-    PrintLine("set has 7      {}", seen.Contains(7i32));
-
-    // One thing a hash map does not give: order. Entries come back in whatever
-    // arrangement the hashing produced, which has nothing to do with the order
-    // they were inserted or the order of the keys. When order matters, the
-    // next lesson's tree map keeps it.
+    // What a hash map does not keep is order. A `for` loop over it visits the entries in
+    // whatever arrangement the hashing produced, which may differ from one run to the next.
+    // When order matters, the TreeMap lesson's map keeps it.
 }

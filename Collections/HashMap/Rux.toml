@@ -7,10 +7,9 @@ Name = "HashMap"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Looking values up by key"
+Description = "Looking values up by key: Get, replacement and removal"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
 Collections = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
