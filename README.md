@@ -165,6 +165,7 @@ Types and functions that work for many types.
 - 13.3 **[GenericBound](Generics/GenericBound/)** — require a type parameter to implement an interface
 - 13.4 **[MultipleBounds](Generics/MultipleBounds/)** — require several interfaces at once with `A + B`
 - 13.5 **[GenericOutcome](Generics/GenericOutcome/)** — write helpers that work for any optional or result
+- 13.6 **[GenericSum](Generics/GenericSum/)** — generic sums, and what happens when both members are the same type
 
 ### 14. Text
 
