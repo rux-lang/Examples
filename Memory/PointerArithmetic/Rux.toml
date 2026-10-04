@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "PointerArithmetic"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Move a pointer by whole elements, and walk an array up to an end pointer"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
