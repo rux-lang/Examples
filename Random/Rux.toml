@@ -10,6 +10,5 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Generating random numbers and sampling"
 
 [Dependencies]
-Entropy = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Random = { Namespace = "Rux", Version = "*" }

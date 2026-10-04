@@ -4,7 +4,6 @@
 //
 // That is a feature, not a shortcoming: a test that shuffles can be repeated,
 // and a bug that depended on the order can be reproduced.
-import Entropy::EntropyError;
 import Io::{ Print, PrintLine };
 import Random::{ ChooseIndex, Pcg64Dxsm, PcgFromEntropy, Shuffle,
     UniformBelow, UniformFloatInRange, UniformInRange };
@@ -52,10 +51,16 @@ func Main() -> int {
     // When unpredictability is the point rather than repeatability, the seed
     // has to come from outside the program. `Entropy` is the operating
     // system's source of genuine randomness, and seeding from it gives a
-    // different sequence on every run.
-    var entropyError = EntropyError::None;
-    var unpredictable = PcgFromEntropy(@entropyError);
-    PrintLine("seeded by entropy {}", UniformBelow<Pcg64Dxsm>(unpredictable, 100u64));
+    // different sequence on every run. Asking the system can fail, so
+    // `PcgFromEntropy` returns `Pcg64Dxsm ! EntropyError` and both outcomes
+    // are handled.
+    match PcgFromEntropy() {
+        .Success(seeded) => {
+            var unpredictable = seeded;
+            PrintLine("seeded by entropy {}", UniformBelow<Pcg64Dxsm>(unpredictable, 100u64));
+        },
+        .Failure(_) => PrintLine("seeded by entropy (no entropy available)")
+    }
 
     // One warning worth carrying away. This generator is built for speed and
     // for being reproducible, not for secrecy: watch enough of its output and
