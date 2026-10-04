@@ -6,6 +6,7 @@
 //     {:#x}     ... with the prefix that names the base: 0x, 0o, 0b
 //     {:08}     padded to 8 with zeros instead of spaces
 //     {:+}      a sign even when the number is positive
+//     {:e}      scientific notation, 1.5e+03; `E` for a capital mark
 //
 // None of this changes the number. It only decides how the number is spelled.
 import Io::PrintLine;
@@ -28,6 +29,10 @@ func Main() -> int {
 
     // Precision combines with the width and alignment from the Format lesson.
     PrintLine("money       [{:>10.2}]", 1234.5);
+
+    // Scientific notation puts one digit before the point and moves the rest into the exponent.
+    // It is the readable way to print very large or very small values, and takes a precision too.
+    PrintLine("scientific  {:e} {:E} {:.2e}", 6.02214076e23, 0.00025, 1234.5678);
 
     // Bases. The same 255 in four spellings, then with their prefixes.
     let value = 255;

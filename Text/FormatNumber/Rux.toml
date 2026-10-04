@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "FormatNumber"
 Version = "0.1.0"
 Type = "Executable"
+Description = "Precision, rounding, scientific notation, bases, zero padding and signs in a placeholder"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Precision, rounding, number bases, zero padding and signs in a placeholder"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
