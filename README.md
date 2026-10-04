@@ -183,7 +183,7 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 - 25.11 **[Guess](Projects/Guess/)** — a number guessing game with seven tries _(after Utilities)_
 - 25.12 **[Age](Projects/Age/)** — work out someone's age from their date of birth, in years, months and days _(after Utilities)_
 - 25.13 **[Password](Projects/Password/)** — build a random password by drawing letters and digits from an alphabet _(after Utilities)_
-- 25.14 **[Launch](Launch/)** — a countdown and a launch _(after Utilities)_
+- 25.14 **[Launch](Projects/Launch/)** — a countdown and a launch _(after Utilities)_
 - 25.16 **[Melody](Melody/)** — play a tune through the console speaker with the platform's beep _(after Platform)_
 
 ## Running an Example
