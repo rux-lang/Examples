@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Input"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Read lines from standard input with ReadLine, where end of input is an IoError kind"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
