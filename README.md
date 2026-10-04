@@ -30,7 +30,7 @@ Combining values into new ones.
 
 Choosing and repeating.
 
-- 3.1 **[Condition](Condition/)** — run code only when a condition holds, with `if` and `else`
+- 3.1 **[If](ControlFlow/If/)** — run code only when a condition holds, with `if` and `else`
 - 3.3 **[Ternary](Ternary/)** — pick one of two values inside an expression with `? :`
 - 3.6 **[Loop](Loop/)** — repeat forever with `loop` until a `break` leaves
 - 3.9 **[Range](Range/)** — describe a run of numbers with `..` and `..=`
