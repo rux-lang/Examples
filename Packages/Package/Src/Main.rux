@@ -1,0 +1,43 @@
+// Every lesson so far has had a `Rux.toml` beside its `Src/` directory. That file is the package
+// manifest, and this lesson reads it section by section.
+//
+// - `[Manifest]` describes the file itself. `Version = 1` is the manifest schema, and `MinRux` is
+//   the oldest compiler allowed to build the package.
+// - `[Package]` describes the package. `Name` is also the first segment of every import path into
+//   it. `Version` is the package's own version, unrelated to the schema version above. `Type`
+//   decides what `rux build` produces.
+// - `[Dependencies]` lists the packages this one imports, one line per import name.
+//
+// `Type` is required, and it is one of four:
+//
+//     Executable      a program with a `Main`; `rux run` builds it and starts it
+//     SourceLibrary   source compiled into every package that depends on it
+//     StaticLibrary   a native archive: `.lib` on Windows, `.a` elsewhere
+//     SharedLibrary   a native library loaded at run time: `.dll`, `.so` or `.dylib`
+//
+// The program asks the compiler what it is building. `#build` and `#compiler` are values the
+// compiler fills in while it compiles, imported from `Core` like any other item. The Compile time
+// part covers them properly; here they let the program report on its own manifest.
+import Core::{ #build, #compiler, OutputKind, SemanticVersion };
+import Io::PrintLine;
+
+func Main() -> int {
+    // `outputKind` is `[Package].Type`, seen from inside the program.
+    let kind = match #build.outputKind {
+        .Executable => "Executable",
+        .SourceLibrary => "SourceLibrary",
+        .StaticLibrary => "StaticLibrary",
+        .SharedLibrary => "SharedLibrary"
+    };
+    PrintLine("Type     {}", kind);
+
+    // A compiler older than `MinRux` refuses the package before compiling anything, so a program
+    // that runs at all always finds this true.
+    let minimum = SemanticVersion(0, 4, 0);
+    PrintLine("MinRux   0.4.0 met: {}", #compiler.version.Compare(minimum) >= 0);
+
+    // `rux run` builds the Debug profile, into `Bin/Debug/<OS>/<Arch>/Package.exe` on Windows.
+    // The file name comes from `[Package].Name`.
+    PrintLine("Profile  {}", #build.profile);
+    return 0;
+}

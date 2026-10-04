@@ -312,6 +312,7 @@ Modules, packages, libraries and tools.
 
 - 22.1 **[Module](Packages/Module/)** — split a package across source files and modules
 - 22.2 **[Visibility](Packages/Visibility/)** — choose what a package shows to others with `pub`
+- 22.3 **[Package](Packages/Package/)** — what a manifest says about a package
 
 ### 23. Compile time
 
