@@ -205,6 +205,7 @@ Strings, characters, formatting, parsing and input.
 - 14.7 **[Unicode](Text/Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
 - 14.8 **[UnicodeCase](Text/UnicodeCase/)** — change case beyond ASCII, where one letter can become two
 - 14.9 **[Format](Text/Format/)** — control width and alignment when formatting values
+- 14.10 **[FormatNumber](Text/FormatNumber/)** — control precision and number base when formatting numbers
 
 ### 15. Memory
 

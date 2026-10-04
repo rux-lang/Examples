@@ -1,0 +1,43 @@
+// The Format lesson gave a value room and a place in it. Numbers have a few more choices of
+// their own, written in the same spec after the colon:
+//
+//     {:.2}     two digits after the decimal point
+//     {:x}      hexadecimal; `X` for capitals, `o` octal, `b` binary
+//     {:#x}     ... with the prefix that names the base: 0x, 0o, 0b
+//     {:08}     padded to 8 with zeros instead of spaces
+//     {:+}      a sign even when the number is positive
+//
+// None of this changes the number. It only decides how the number is spelled.
+import Io::PrintLine;
+
+func Main() -> int {
+    let pi = 3.14159265358979;
+
+    // A float prints with as few digits as it takes to read back as the same value. A
+    // precision fixes the number of digits after the point instead, rounding the rest.
+    PrintLine("pi          {}", pi);
+    PrintLine("pi .2       {:.2}", pi);
+    PrintLine("pi .0       {:.0}", pi);
+    PrintLine("0.1         {}", 0.1);
+
+    // Rounding can carry all the way up: 9.99 to one digit is 10.0, not 9.10.
+    PrintLine("9.99 .1     {:.1}", 9.99);
+
+    // Exact halves round to the even digit, so 0.125 becomes 0.12 and 0.375 becomes 0.38.
+    PrintLine("halves .2   {:.2} {:.2}", 0.125, 0.375);
+
+    // Precision combines with the width and alignment from the Format lesson.
+    PrintLine("money       [{:>10.2}]", 1234.5);
+
+    // Bases. The same 255 in four spellings, then with their prefixes.
+    let value = 255;
+    PrintLine("bases       {} {:x} {:X} {:o} {:b}", value, value, value, value, value);
+    PrintLine("prefixed    {:#x} {:#o} {:#b}", value, value, value);
+
+    // Zeros pad between the sign or prefix and the digits, where spaces would look wrong.
+    PrintLine("zeros       {:06} {:06} {:#06x}", 42, -42, value);
+
+    // `+` keeps a column of mixed signs aligned.
+    PrintLine("signs       {:+} {:+} {:+.1}", 7, -7, 0.25);
+    return 0;
+}
