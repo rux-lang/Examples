@@ -52,7 +52,7 @@ Many values of one type, and groups of values of different types.
 - 5.1 **[Array](Sequences/Array/)** — an inline array holding a fixed number of values of one type
 - 5.4 **[Slice](Sequences/Slice/)** — view part of an array without copying it, and pass it to a function
 - 5.6 **[Variadic](Sequences/Variadic/)** — accept any number of arguments, the way `PrintLine` does
-- 5.7 **[Tuple](Tuple/)** — group a few values without declaring a type, and return more than one result
+- 5.7 **[Tuple](Sequences/Tuple/)** — group a few values without declaring a type, and return more than one result
 
 ### 6. Types
 
