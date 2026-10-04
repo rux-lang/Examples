@@ -215,6 +215,7 @@ Containers from the `Collections` package.
 - 17.2 **[DynamicArray](Collections/DynamicArray/)** — `Collections::Array`, and how it differs from an inline array
 - 17.3 **[Deque](Collections/Deque/)** — add and remove at both ends, and see where that beats a vector
 - 17.4 **[HashMap](Collections/HashMap/)** — look values up by key
+- 17.5 **[HashSet](Collections/HashSet/)** — test membership with a hash set
 - 17.6 **[TreeMap](Collections/TreeMap/)** — keep keys in order, and walk them in order
 
 ### 18. Algorithms
