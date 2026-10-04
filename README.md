@@ -19,6 +19,7 @@ First programs: printing, values and their types.
 - 1.4 **[Mutable](Basics/Mutable/)** — declare a binding with `var` so it can be reassigned
 - 1.5 **[Integer](Basics/Integer/)** — whole numbers: signed and unsigned widths, `int` and `uint`
 - 1.6 **[Float](Basics/Float/)** — fractional numbers: `float32`, `float64`, and why `0.1 + 0.2` is not `0.3`
+- 1.7 **[Boolean](Basics/Boolean/)** — `true`, `false` and the `bool` type
 - 1.10 **[Console](Basics/Console/)** — write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
 - 1.11 **[Const](Basics/Const/)** — name a value the compiler folds in, and see where it differs from `let`
 - 1.12 **[Convert](Basics/Convert/)** — convert between numeric types with `as`, and see what a value that does not fit becomes

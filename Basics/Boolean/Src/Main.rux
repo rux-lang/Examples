@@ -1,0 +1,41 @@
+// A boolean holds one of exactly two values, `true` or `false`. It is the answer to a yes-or-no
+// question — is the file open, has the player won — and later parts lean on it constantly: a
+// comparison produces one, and `if` and `while` choose what to run by one.
+//
+// `bool` is the everyday spelling. It is another name for `bool8`, a boolean stored in one byte.
+// `bool16`, `bool32` and `bool64` hold the same two values in two, four and eight bytes. They
+// exist for talking to code written in other languages: the Windows API, for one, uses a
+// four-byte boolean, which is a `bool32` here.
+import Io::PrintLine;
+
+func Main() -> int {
+    // `true` and `false` are the only boolean literals, and either one makes a `bool`.
+    let ready = true;
+    let finished = false;
+    PrintLine("ready     {}", ready);
+    PrintLine("finished  {}", finished);
+
+    // The type can be written out, as with any variable.
+    let visible: bool = true;
+    PrintLine("visible   {}", visible);
+
+    // The wider types print the same way. Only their size differs.
+    let flag8: bool8 = true;
+    let flag16: bool16 = false;
+    let flag32: bool32 = true;
+    let flag64: bool64 = false;
+    PrintLine("bool8     {}", flag8);
+    PrintLine("bool16    {}", flag16);
+    PrintLine("bool32    {}", flag32);
+    PrintLine("bool64    {}", flag64);
+
+    // A boolean is not a number. Some languages treat 0 as false and 1 as true; Rux does not mix
+    // them up on its own:
+    //
+    //     let on: bool = 1;
+    //         error: cannot assign 'int' to 'bool8'
+    //
+    // The message names `bool8` because that is what `bool` is. Turning a number into a boolean,
+    // or back, is a conversion you ask for, and the Convert lesson shows how.
+    return 0;
+}
