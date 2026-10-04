@@ -41,9 +41,11 @@ func Main() -> ! CollectionError {
     copy.Set(0, 99)?;
     PrintLine("copy[0]         {}, primes[0] still {}", copy.Get(0) ?? -1, primes[0]);
 
-    // Indexing an inline array with `[]` is not checked while the program runs: a wrong index
-    // reads whatever memory sits past the end. A dynamic array's `Get` and `Set` check, and say
-    // so in their types: `Get` returns `none`, and `Set` fails with `IndexOutOfRange`.
+    // Both kinds check an index, but they differ in what a wrong one costs. On an inline array,
+    // a constant index past the end does not build, `primes[7]` being "index 7 is out of range
+    // for an array of 4 elements", and a computed one stops the program with "Panic: index out
+    // of range". A dynamic array's `Get` and `Set` report it in their types instead: `Get`
+    // returns `none`, and `Set` fails with `IndexOutOfRange`, so the program decides what to do.
     PrintLine("copy[9]         {}", copy.Get(9) ?? -1);
     copy.Set(9, 1) catch {
         e => { PrintLine("copy.Set(9)     failed: {}", e); }
