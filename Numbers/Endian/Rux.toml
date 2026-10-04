@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Endian"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Byte order: storing and loading integers as big- or little-endian bytes"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
