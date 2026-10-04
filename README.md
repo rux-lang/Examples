@@ -217,6 +217,7 @@ Containers from the `Collections` package.
 - 17.4 **[HashMap](Collections/HashMap/)** — look values up by key
 - 17.5 **[HashSet](Collections/HashSet/)** — test membership with a hash set
 - 17.6 **[TreeMap](Collections/TreeMap/)** — keep keys in order, and walk them in order
+- 17.7 **[TreeSet](Collections/TreeSet/)** — keep a set of values in order
 
 ### 18. Algorithms
 
