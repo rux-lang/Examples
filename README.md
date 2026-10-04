@@ -81,6 +81,7 @@ Declaring types of your own.
 - 6.10 **[Variant](Types/Variant/)** — attach data to each case
 - 6.11 **[VariantMatch](Types/VariantMatch/)** — take a variant apart in a `match` arm
 - 6.12 **[TypeAlias](Types/TypeAlias/)** — give an existing type a second name to make a signature read clearly
+- 6.13 **[FunctionField](Types/FunctionField/)** — store a function in a struct field and call it later
 
 ### 8. Optionals
 

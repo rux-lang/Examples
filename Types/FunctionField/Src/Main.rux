@@ -1,0 +1,61 @@
+// The Callback lesson passed a function as an argument and held one in a local. A struct field
+// can hold one too. A value then carries its behaviour with it: an operation knows its symbol and
+// also how to compute, and code that loops over operations needs to know neither in advance.
+//
+// The field's type is a function type, exactly as for a parameter: `func(int, int) -> int`.
+import Io::PrintLine;
+
+func Add(a: int, b: int) -> int {
+    return a + b;
+}
+
+func Subtract(a: int, b: int) -> int {
+    return a - b;
+}
+
+func Multiply(a: int, b: int) -> int {
+    return a * b;
+}
+
+func Larger(a: int, b: int) -> int {
+    return a > b ? a : b;
+}
+
+struct Operation {
+    symbol: char8[..];
+    apply: func(int, int) -> int;
+}
+
+extend Operation {
+    // Calling a field looks like calling a method, but `apply` is data: whatever function was
+    // stored in it is what runs.
+    func Show(self: &Operation, a: int, b: int) {
+        PrintLine("{} {} {} = {}", a, self.symbol, b, self.apply(a, b));
+    }
+}
+
+func Main() -> int {
+    // A function is stored by name, without parentheses, as when passing one.
+    let operations: Operation[4] = [
+        Operation { symbol: "+", apply: Add },
+        Operation { symbol: "-", apply: Subtract },
+        Operation { symbol: "*", apply: Multiply },
+        Operation { symbol: "max", apply: Larger }
+    ];
+
+    // One loop, four behaviours. Nothing in it names any of the four functions.
+    for operation in operations {
+        operation.Show(7, 3);
+    }
+
+    // The field is called directly from outside a method too.
+    let first = operations[0];
+    PrintLine("through the field: {}", first.apply(20, 22));
+
+    // A function field is assigned like any other field, which changes what the value does.
+    var changing = Operation { symbol: "?", apply: Add };
+    changing.Show(6, 4);
+    changing.apply = Multiply;
+    changing.Show(6, 4);
+    return 0;
+}
