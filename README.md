@@ -340,6 +340,7 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 
 - 25.1 **[Thanks](Projects/Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it _(after Control flow)_
 - 25.2 **[FizzBuzz](Projects/FizzBuzz/)** — the classic counting game _(after Control flow)_
+- 25.3 **[Temperature](Projects/Temperature/)** — a table of Celsius and Fahrenheit temperatures _(after Functions)_
 - 25.4 **[Prime](Projects/Prime/)** — find the primes below a limit with a sieve _(after Sequences)_
 - 25.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Text)_
 - 25.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides _(after Text)_
