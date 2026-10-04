@@ -72,6 +72,7 @@ A value that may be absent: `T?`.
 - 8.3 **[Coalesce](Optionals/Coalesce/)** — supply a fallback for a missing value with `??`
 - 8.4 **[CoalesceExit](Optionals/CoalesceExit/)** — leave with `?? return`, `?? continue` or `?? break` when a value is missing
 - 8.5 **[OptionalPropagate](Optionals/OptionalPropagate/)** — pass absence to the caller with `?`
+- 8.6 **[NestedOptional](Optionals/NestedOptional/)** — `int??`: telling "nothing found" from "found nothing"
 
 ### 9. Errors
 
