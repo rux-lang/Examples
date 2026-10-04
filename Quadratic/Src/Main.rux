@@ -16,18 +16,20 @@ import Text::StringBuilder;
 func ReadNumber(allocator: Allocator, prompt: char8[..], value: *var float64) -> bool {
     Print("{}", prompt);
     var builder = StringBuilder(allocator);
-    let outcome = ReadLine(builder);
-    if outcome.IsEnd() || outcome.IsError() {
-        builder.Release();
-        return false;
-    }
     var ok = false;
+    match ReadLine(builder) {
+        .Success(_) => {},
+        .Failure(_) => {
+            builder.Release();
+            return false;
+        }
+    }
     match ParseFloat64(builder.View()) {
         .Success(parsed) => {
             *value = parsed;
             ok = true;
         },
-        .Error(_) => ok = false
+        .Failure(_) => ok = false
     }
     builder.Release();
     return ok;
