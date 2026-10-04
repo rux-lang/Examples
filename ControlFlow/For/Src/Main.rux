@@ -1,0 +1,64 @@
+// `for name in range { ... }` runs its body once for every value in the range, in order, binding
+// the value to `name` on each pass. It is the walk the Range lesson wrote by hand with `while`,
+// with the counter, the test and the step all handled by the loop, so none of them can be
+// forgotten or got wrong.
+//
+// The loop variable is a fresh, immutable binding on every pass, so the body cannot move the loop
+// along by assigning to it:
+//
+//     for i in 1..4 { i = 10; }
+//         error: cannot modify immutable variable 'i'
+//
+// When the body needs to control the stepping, use `while`.
+import Io::{ Print, PrintLine };
+
+func Main() -> int {
+    // The end of `..` is excluded, the end of `..=` is included.
+    Print("1..5: ");
+    for i in 1..5 {
+        Print(" {}", i);
+    }
+    PrintLine();
+
+    Print("1..=5:");
+    for i in 1..=5 {
+        Print(" {}", i);
+    }
+    PrintLine();
+
+    // A range stored in a binding works the same as one written in place.
+    let die = 1..=6;
+    var total: int32 = 0;
+    for face in die {
+        total += face;
+    }
+    PrintLine("the faces of a die add up to {}", total);
+
+    // Bounds are evaluated once, before the first pass. A factorial multiplies every number from
+    // 1 up to and including n, so the inclusive form matches its definition.
+    let n = 10;
+    var factorial = 1;
+    for i in 2..=n {
+        factorial *= i;
+    }
+    PrintLine("{}! = {}", n, factorial);
+
+    // An empty range gives the body nothing to run for.
+    var passes: int32 = 0;
+    for i in 3..3 {
+        passes += 1;
+    }
+    PrintLine("3..3 ran the body {} times", passes);
+
+    // `break` and `continue` work in `for` as in every other loop. `continue` moves straight on to
+    // the next value, with no step to forget.
+    Print("odd numbers below 10:");
+    for i in 0..10 {
+        if i % 2 == 0 {
+            continue;
+        }
+        Print(" {}", i);
+    }
+    PrintLine();
+    return 0;
+}
