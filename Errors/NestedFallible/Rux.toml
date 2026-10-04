@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "NestedFallible"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Nested outcomes: an optional inside a fallible, and a fallible inside a fallible"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
