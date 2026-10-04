@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Duration"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A span of time, built from any unit, with arithmetic that refuses to overflow"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
