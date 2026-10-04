@@ -69,8 +69,7 @@ func Main() -> int {
             PrintLine("Yes, {}! Found in {} of {} guesses.", secret, used, Guesses);
             return 0;
         }
-        let hint = guess < secret ? "higher" : "lower";
-        PrintLine("{}", hint);
+        PrintLine("{}", guess < secret ? "higher" : "lower");
     }
     PrintLine("Out of guesses. It was {}.", secret);
     return 0;
