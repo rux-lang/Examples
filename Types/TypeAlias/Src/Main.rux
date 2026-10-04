@@ -43,7 +43,8 @@ func Main() -> int {
     PrintLine("this compiles and is wrong: {}F treated as Celsius is {}F",
         mistake, ToFahrenheit(mistake));
 
-    // When two things must not be mixed up, they need to be different types,
-    // and that means a struct — as the previous lesson built.
+    // When two things must not be mixed up, they need to be different types.
+    // A struct with a single field, `struct Celsius { degrees: float64; }`, is
+    // one: two such structs are never the same type, whatever their fields.
     return 0;
 }
