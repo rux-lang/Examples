@@ -224,6 +224,7 @@ Pointers, raw memory and allocators.
 - 15.8 **[Union](Memory/Union/)** — overlay one piece of storage with several types, and why that needs care
 - 15.9 **[Allocator](Memory/Allocator/)** — allocate through the `Allocator` interface instead of straight from the system
 - 15.10 **[Box](Memory/Box/)** — own one value allocated on the heap
+- 15.11 **[Arena](Memory/Arena/)** — allocate many values and free them all at once
 
 ### 16. Numbers
 
