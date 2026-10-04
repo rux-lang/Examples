@@ -1,0 +1,26 @@
+// `Type = "SourceLibrary"` is the usual kind of library in Rux, and every standard package such as
+// `Io` is one. Its source is compiled into each package that depends on it, as if its files were
+// part of that package, while `pub` still guards the boundary between the two.
+//
+// So a source library produces nothing by itself. In `Stats/`, `rux check` works, but the commands
+// that would make an artifact refuse:
+//
+//     rux build
+//     error: package 'Stats' has Type = "SourceLibrary" and is compiled into dependent packages;
+//            it cannot be built or run as a top-level target
+//
+// The program is where it all comes together. Building this package compiles `Stats` with it, and
+// that is what lets a generic library function serve types the library never heard of: `Largest`
+// is compiled here for `int32` and again for `float64`, because those are what this program
+// passes it.
+import Io::PrintLine;
+import Stats::Largest;
+
+func Main() -> int {
+    let scores: int32[5] = [72, 95, 88, 61, 90];
+    let prices: float64[3] = [4.25, 19.99, 7.5];
+
+    PrintLine("highest score {}", Largest(scores));
+    PrintLine("highest price {}", Largest(prices));
+    return 0;
+}
