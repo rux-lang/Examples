@@ -1,70 +1,44 @@
-// A computer cannot produce randomness by arithmetic alone. What a generator
-// produces is a sequence that *looks* random but follows entirely from where
-// it started — its seed. Give it the same seed and you get the same numbers.
+// Arithmetic alone cannot produce randomness. What a random number generator produces is a
+// sequence that *looks* random but follows entirely from where it started, its seed. Give it
+// the same seed and you get the same numbers, in the same order, on every machine, every run.
 //
-// That is a feature, not a shortcoming: a test that shuffles can be repeated,
-// and a bug that depended on the order can be reproduced.
+// That is a feature. A simulation can be rerun exactly, a test that draws random data can be
+// repeated, and a bug that depended on the draw can be reproduced, all by remembering one number.
+//
+// The Random package's general-purpose generator is `Pcg64Dxsm`. `Pcg64Dxsm(seed)` builds one,
+// and `UniformBelow<Pcg64Dxsm>(generator, bound)` draws a number from 0 up to, not including,
+// `bound`. The generator is an ordinary struct whose fields are its state: each draw advances
+// it, which is why it is passed as `&var`. And like any struct, copying it copies the state,
+// so a copy replays exactly what the original is about to produce.
 import Io::{ Print, PrintLine };
-import Random::{ ChooseIndex, Pcg64Dxsm, PcgFromEntropy, Shuffle,
-    UniformBelow, UniformFloatInRange, UniformInRange };
+import Random::{ Pcg64Dxsm, UniformBelow };
+
+func Draw(label: char8[..], generator: &var Pcg64Dxsm) {
+    Print("{}", label);
+    for i in 0..6 {
+        Print(" {:2}", UniformBelow<Pcg64Dxsm>(generator, 100));
+    }
+    PrintLine();
+}
 
 func Main() -> int {
-    // A generator built from a fixed seed.
-    var generator = Pcg64Dxsm(12345u64);
-    Print("from seed 12345 ");
-    for i in 0..5 {
-        Print(" {}", UniformBelow<Pcg64Dxsm>(generator, 100u64));
-    }
-    PrintLine();
+    var first = Pcg64Dxsm(2026);
+    Draw("seed 2026      ", first);
 
-    // A second generator from the same seed produces the same run, exactly.
-    var again = Pcg64Dxsm(12345u64);
-    Print("the same again  ");
-    for i in 0..5 {
-        Print(" {}", UniformBelow<Pcg64Dxsm>(again, 100u64));
-    }
-    PrintLine();
-    PrintLine("");
+    // A second generator from the same seed: the same run, exactly.
+    var second = Pcg64Dxsm(2026);
+    Draw("seed 2026 again", second);
 
-    // Drawing within bounds. `UniformBelow` stops short of its bound, while
-    // `UniformInRange` includes both ends — the same distinction as `..` and
-    // `..=`, and worth checking before rolling a die with it.
-    PrintLine("a die roll      {}", UniformInRange<Pcg64Dxsm>(generator, 1u64, 6u64));
-    PrintLine("a fraction      {:.4}", UniformFloatInRange<Pcg64Dxsm>(generator, 0.0, 1.0));
+    // A neighbouring seed gives an unrelated run. Seeds are labels, not starting values.
+    var other = Pcg64Dxsm(2027);
+    Draw("seed 2027      ", other);
 
-    // Uniform means every value equally likely. Getting that right is harder
-    // than it looks — taking a remainder of a random number favours the low
-    // values slightly — which is a good reason not to write it yourself.
-    PrintLine("");
+    // Drawing again continues where the generator stopped; it does not start over.
+    Draw("2026 continued ", first);
 
-    var cards: int[5] = [ 1, 2, 3, 4, 5 ];
-    Shuffle<Pcg64Dxsm, int>(generator, cards[..]);
-    Print("shuffled        ");
-    for i in 0..5 {
-        Print(" {}", cards[i]);
-    }
-    PrintLine();
-
-    PrintLine("a chosen index  {}", ChooseIndex<Pcg64Dxsm>(generator, 5u));
-    PrintLine("");
-
-    // When unpredictability is the point rather than repeatability, the seed
-    // has to come from outside the program. `Entropy` is the operating
-    // system's source of genuine randomness, and seeding from it gives a
-    // different sequence on every run. Asking the system can fail, so
-    // `PcgFromEntropy` returns `Pcg64Dxsm ! EntropyError` and both outcomes
-    // are handled.
-    match PcgFromEntropy() {
-        .Success(seeded) => {
-            var unpredictable = seeded;
-            PrintLine("seeded by entropy {}", UniformBelow<Pcg64Dxsm>(unpredictable, 100u64));
-        },
-        .Failure(_) => PrintLine("seeded by entropy (no entropy available)")
-    }
-
-    // One warning worth carrying away. This generator is built for speed and
-    // for being reproducible, not for secrecy: watch enough of its output and
-    // the rest can be predicted. Anything protecting something — a password, a
-    // key, a token — needs `Entropy` directly, not a seeded generator.
+    // A copy holds the same state, so it produces the same next numbers as the original.
+    var copy = first;
+    Draw("2026 continued ", first);
+    Draw("its copy       ", copy);
     return 0;
 }
