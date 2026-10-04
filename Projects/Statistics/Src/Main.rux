@@ -1,80 +1,98 @@
-// Summarising a set of numbers: where the middle is, and how spread out they
-// are around it.
+// Summarising a set of numbers: where the middle is, and how spread out the numbers are around it.
 //
-// Two passes are needed, and that is the point of the exercise. The mean has
-// to be known before the spread can be measured against it, so the data is
-// walked twice — which is why this reads as a program rather than a formula.
+// The mean is the total divided by the count. The variance is the average squared distance from
+// the mean, and the standard deviation is its square root, which brings the answer back to the
+// units of the data. There are two conventions for that average, and a summary should say which
+// one it uses:
+//
+//     population variance   divide by n       the data is everything there is
+//     sample variance       divide by n - 1   the data is a sample of something larger
+//
+// Dividing by n - 1 corrects for the sample's mean being computed from the sample itself. With one
+// value there is nothing to correct with, so the sample variance is undefined rather than zero.
+//
+// The median is the middle value once the data is sorted, or the average of the two middle values
+// when the count is even. `Sort` works in place, so `Summarize` takes a writable slice and leaves
+// the caller's data in order.
 import Algorithms::{ MaxIndex, MinIndex, Sort, Sum };
-import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, Vector };
 import Io::{ Print, PrintLine };
 import Math::Sqrt;
 
-func Main() -> ! CollectionError {
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
+func Summarize(label: char8[..], values: var float64[..]) {
+    PrintLine("{}", label);
+    Print("  values    ");
+    for value in values {
+        Print(" {}", value);
+    }
+    PrintLine();
+    let count = values.length;
+    PrintLine("  count      {}", count);
 
-    var samples = Vector::Vector<float64>(allocator);
-    let readings: float64[9] = [ 12.5, 9.0, 15.25, 11.0, 8.75, 14.0, 10.5, 13.25, 11.75 ];
-    for i in 0..readings.length {
-        samples.Push(readings[i])?;
+    // The extremes answer with an optional index, so an empty slice is handled right here.
+    match MinIndex(values) {
+        at? => PrintLine("  smallest   {}", values[at]),
+        none => PrintLine("  smallest   none")
+    }
+    match MaxIndex(values) {
+        at? => PrintLine("  largest    {}", values[at]),
+        none => PrintLine("  largest    none")
     }
 
-    let count = samples.Length();
-    if count == 0u {
-        PrintLine("nothing to summarise");
+    // Everything else divides by the count, and there is no mean of nothing.
+    if count == 0 {
+        PrintLine("  mean, variance and median need at least one value");
+        PrintLine();
         return;
     }
 
-    Print("readings   ");
-    let values = samples.AsSlice();
-    for i in 0..values.length {
-        Print(" {}", values[i]);
+    // Two passes: the mean has to be known before the distances from it can be measured. The
+    // distances are squared so that values above and below both count, instead of cancelling.
+    // `Sum` is the fold of `+` from the Fold lesson, already written.
+    let n = count as float64;
+    let mean = Sum(values, 0.0) / n;
+    var squares = 0.0;
+    for value in values {
+        let distance = value - mean;
+        squares += distance * distance;
+    }
+    PrintLine("  mean       {:.4}", mean);
+
+    let population = squares / n;
+    PrintLine("  population variance {:.4}, deviation {:.4}", population, Sqrt(population));
+    if count > 1 {
+        let sample = squares / (n - 1.0);
+        PrintLine("  sample     variance {:.4}, deviation {:.4}", sample, Sqrt(sample));
+    } else {
+        PrintLine("  sample     variance undefined for one value");
+    }
+
+    // The median needs the values in order, so it comes last.
+    Sort(values);
+    let middle = count / 2;
+    if count % 2 == 1 {
+        PrintLine("  median     {} (the middle value)", values[middle]);
+    } else {
+        let low = values[middle - 1];
+        let high = values[middle];
+        PrintLine("  median     {} (between {} and {})", (low + high) / 2.0, low, high);
     }
     PrintLine();
-    PrintLine("count      {}", count);
+}
 
-    // First pass: the total, and from it the mean.
-    let total = Sum<float64>(values, 0.0);
-    let mean = total / (count as float64);
-    PrintLine("total      {:.4}", total);
-    PrintLine("mean       {:.4}", mean);
+func Main() -> int {
+    // An odd count: one value sits exactly in the middle.
+    var readings: float64[9] = [12.5, 9.0, 15.25, 11.0, 8.75, 14.0, 10.5, 13.25, 11.75];
+    Summarize("nine readings", readings[..]);
 
-    // Second pass: how far each reading sits from that mean. The differences
-    // are squared so that above and below both count as distance rather than
-    // cancelling each other out.
-    var sumOfSquares = 0.0;
-    for i in 0..values.length {
-        let difference = values[i] - mean;
-        sumOfSquares += difference * difference;
-    }
-    let variance = sumOfSquares / (count as float64);
-    let deviation = Sqrt(variance);
+    // An even count with repeated values. Duplicates are ordinary data: each one counts.
+    var scores: float64[6] = [4.0, 7.0, 4.0, 1.0, 7.0, 7.0];
+    Summarize("six scores with repeats", scores[..]);
 
-    // Squaring inflated the units, so the square root brings the answer back
-    // to the scale the readings are in — which is why standard deviation is
-    // quoted rather than variance.
-    PrintLine("variance   {:.4}", variance);
-    PrintLine("deviation  {:.4}", deviation);
+    // One value: no spread at all, and no sample variance.
+    var single: float64[1] = [42.0];
+    Summarize("a single value", single[..]);
 
-    match MinIndex<float64>(values) {
-        at? => PrintLine("smallest   {}", values[at]),
-        none => PrintLine("smallest   none")
-    }
-    match MaxIndex<float64>(values) {
-        at? => PrintLine("largest    {}", values[at]),
-        none => PrintLine("largest    none")
-    }
-
-    // The median needs the values in order, which means rearranging them — so
-    // it comes last, after everything that wanted them as they arrived.
-    var sortable = samples.AsMutableSlice();
-    Sort<float64>(sortable);
-    let sorted = samples.AsSlice();
-    let middle = count / 2u;
-    if count % 2u == 1u {
-        PrintLine("median     {}", sorted[middle]);
-    } else {
-        PrintLine("median     {:.4}", (sorted[middle - 1u] + sorted[middle]) / 2.0);
-    }
+    // An empty view of an array, so there is nothing to summarise.
+    Summarize("no values", readings[..0]);
+    return 0;
 }

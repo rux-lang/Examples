@@ -7,11 +7,9 @@ Name = "Statistics"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Mean, spread and extremes of a set of numbers"
+Description = "Count, extremes, mean, variance and median of a slice, including empty and single-value input"
 
 [Dependencies]
 Algorithms = { Namespace = "Rux", Version = "*" }
-Allocator = { Namespace = "Rux", Version = "*" }
-Collections = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Math = { Namespace = "Rux", Version = "*" }
