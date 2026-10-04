@@ -1,12 +1,12 @@
-// The operators from the Operator lesson are not reserved for the primitive
-// types. A type of your own can say what `+`, `==` and `<` mean for it, by
-// declaring functions named after the operator.
+// The operators from the Operators part are not reserved for numbers. A type of your own can say
+// what `+`, `==` or `<` mean for it, by declaring a function whose name is the operator.
 //
-// The point is not cleverness. Money adds to money, and `rent + food` says that
-// plainly where `Money { cents: rent.cents + food.cents }` buries it.
+// The point is not cleverness. Money adds to money, and `rent + food` says that plainly where
+// `Money { cents: rent.cents + food.cents }` buries it. A declared `==` also replaces the
+// field-by-field comparison from the previous lesson, so a type decides what "equal" means.
 import Io::PrintLine;
 
-// Money as a whole number of cents, so no fraction ever goes missing.
+// Money as a whole number of cents, so no fraction of a cent ever goes missing.
 struct Money {
     cents: int64;
 }
@@ -16,8 +16,9 @@ extend Money {
         return Money { cents: cents };
     }
 
-    // An operator is a function whose name is the operator. `self` is the left
-    // operand; the second parameter is the right one, taken by value.
+    // `self` is the left operand and the second parameter is the right one. Taking the right
+    // operand by value lets it be a value built on the spot, as in `rent == Money(120000)`.
+    // `other: &Money` works as well, but a borrow needs a named value on the right.
     func +(self: &Money, other: Money) -> Money {
         return Money { cents: self.cents + other.cents };
     }
@@ -26,13 +27,13 @@ extend Money {
         return Money { cents: self.cents - other.cents };
     }
 
-    // The two sides need not be the same type. Multiplying money by a count
-    // makes sense; multiplying money by money does not, so only this exists.
-    func *(self: &Money, factor: int64) -> Money {
-        return Money { cents: self.cents * factor };
+    // The two sides need not have the same type. Money times a count makes sense; money times
+    // money does not, so only this one exists.
+    func *(self: &Money, count: int64) -> Money {
+        return Money { cents: self.cents * count };
     }
 
-    // Comparisons return `bool` rather than the type itself.
+    // Comparisons answer with `bool`, not with Money.
     func ==(self: &Money, other: Money) -> bool {
         return self.cents == other.cents;
     }
@@ -42,40 +43,22 @@ extend Money {
     }
 }
 
-// Money prints as its parts until it implements Display, so this tidies the
-// output. Note the operand here *is* a reference — that is fine for an ordinary
-// function, and only operators are fussy about it.
-func Show(label: char8[..], amount: &Money) {
-    PrintLine("{:11}{:>9} cents", label, amount.cents);
-}
-
 func Main() -> int {
     let rent = Money(120000);
     let food = Money(35050);
 
-    // Each of these calls one of the functions above.
+    // Each operator below calls one of the functions above.
     let total = rent + food;
-    let extra = rent - food;
-    let quarterly = rent * 3;
+    let left = rent - food;
+    let quarter = rent * 3;
+    PrintLine("rent + food = {} cents", total.cents);
+    PrintLine("rent - food = {} cents", left.cents);
+    PrintLine("rent * 3    = {} cents", quarter.cents);
 
-    Show("rent", rent);
-    Show("food", food);
-    Show("total", total);
-    Show("difference", extra);
-    Show("3 rents", quarterly);
+    PrintLine("rent == 120000 cents: {}", rent == Money(120000));
+    PrintLine("food < rent:          {}", food < rent);
 
-    PrintLine("rent == 120000c  {}", rent == Money(120000));
-    PrintLine("food < rent      {}", food < rent);
-
-    // One thing worth copying rather than improving on: each operator above
-    // takes its right-hand operand *by value*, written `other: Money` and not
-    // `other: &Money`. Taking it by reference looks tidier for a large type and
-    // is how the standard packages spell an ordinary method — but for an
-    // operator it currently compiles and then fails when called. By value is
-    // also what `Core`'s own `SemanticVersion` operators do.
-
-    // Only the operators that make sense need defining. `Money` has no `/` and
-    // no `>`, and using either is an error rather than something invented on
-    // the type's behalf.
+    // Only the operators declared exist. Money has no `/`, so `rent / 2` is an error rather
+    // than something invented on Money's behalf.
     return 0;
 }
