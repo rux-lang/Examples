@@ -37,7 +37,7 @@ Rux exists because of:
 A language is a community that happens to have a compiler.
 Thank you for being part of this one.
 
-                            -- the Rux contributors
+    -- Ivan Muzyka, creator of Rux
 
 ```
 
