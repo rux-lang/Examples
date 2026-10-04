@@ -1,0 +1,13 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "PartialMove"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Why one field cannot be moved out, and taking a value apart instead"
+
+[Dependencies]
+Io = { Namespace = "Rux", Version = "*" }
