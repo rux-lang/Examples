@@ -8,8 +8,14 @@
 //     let label = match day { 6 => "weekend", else => 0 };
 //         error: match arm type mismatch: expected 'char8[..]', found 'int'
 //
-// And because a value has to come out whatever the input, give a match over numbers an `else`
-// arm. (A `bool` match that names both `true` and `false` already covers every input.)
+// And a value has to come out whatever the input, so the arms must cover every value. A match
+// over numbers cannot name them all, so it needs an `else` arm, and the compiler checks:
+//
+//     let kind = match day { 6 => "weekend", 7 => "weekend" };
+//         error: match on 'int32' is not exhaustive; its arms do not cover every value
+//         help: add an 'else' arm
+//
+// A `bool` match that names both `true` and `false` already covers every input.
 import Io::PrintLine;
 
 func Main() -> int {
