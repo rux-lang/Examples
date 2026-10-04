@@ -1,0 +1,52 @@
+// A copy leaves two values behind. A move leaves one: the value is handed to its new owner and
+// the old name is finished. Rux writes a move as `<-`, the arrow pointing the way the value goes,
+// and it works in the same three places a copy happens.
+//
+//     let taken <- value;      a binding
+//     Run(<-value)             an argument
+//     return <-value;          a return
+//
+// A relay baton is the picture to keep in mind. One runner holds it at a time, and once it has
+// been handed on, the runner who passed it no longer has it. The compiler enforces exactly that:
+// any later use of a moved-from name is an error.
+import Io::PrintLine;
+
+struct Baton {
+    laps: int32;
+}
+
+// Takes the baton, runs one lap with it, and hands it back. A parameter cannot be changed, so
+// `var held <- baton` moves it into a mutable local: still one baton, just under a new name.
+func Run(baton: Baton, runner: char8[..]) -> Baton {
+    var held <- baton;
+    held.laps += 1;
+    PrintLine("{} runs lap {}", runner, held.laps);
+    return <-held;
+}
+
+func Main() -> int {
+    let baton = Baton { laps: 0 };
+
+    // A binding takes the baton over.
+    let first <- baton;
+
+    // From here on, `baton` cannot be used:
+    //
+    //     PrintLine("{}", baton.laps);
+    //
+    // error: value 'baton' is used after it was moved
+    //   note: 'baton' was moved at 31:15
+    //   help: clone 'baton' before moving it if both uses are required
+
+    // Arguments and returns. What a call returns is a fresh value that nobody else holds, so it
+    // needs no arrow: `=` simply takes it.
+    let second = Run(<-first, "Ana");
+    let third = Run(<-second, "Ben");
+    let last = Run(<-third, "Cleo");
+    PrintLine("laps run: {}", last.laps);
+
+    // The same is true of any value made on the spot. There is no old name to give up.
+    let spare = Run(Baton { laps: 0 }, "Dev");
+    PrintLine("spare laps: {}", spare.laps);
+    return 0;
+}

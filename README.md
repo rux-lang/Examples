@@ -155,6 +155,7 @@ Who owns a value, and when it is cleaned up.
 
 - 11.1 **[Exclusivity](Ownership/Exclusivity/)** — one writer at a time: the rule that keeps borrows safe
 - 11.2 **[Copy](Ownership/Copy/)** — assignment copies a value, and the copies are independent
+- 11.3 **[Move](Ownership/Move/)** — hand a value over with `<-` instead of copying it
 - 11.8 **[Defer](Ownership/Defer/)** — schedule cleanup at the point you start the work, so it cannot be forgotten
 - **[Ownership](Ownership/Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope _(being split into the lessons above)_
 
