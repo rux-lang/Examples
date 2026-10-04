@@ -1,81 +1,88 @@
-// A small program that waits for you, counts down, and launches something.
+// Mission control: run the checklist, ask how long a countdown you want, count down, and launch.
 //
-// Nothing new is introduced here. It is console input from Circle, an array
-// from Array, a loop from Loop, and a pause from the Time package — put
-// together into something that does one whole thing.
+// Every part of this has appeared before. The checklist is an array of text, the countdown is a
+// loop with a pause from the Time package between steps, and the question is the line reading
+// from the Input lesson, with the number checked the way the Parse lesson checks it.
+//
+// What makes it a whole program is that the input is handled in every way it can arrive. A
+// number from 1 to 10 sets the countdown and an empty line takes the default of 10, so the
+// countdown is always bounded. Anything else is asked again. And if the input ends before an
+// answer arrives (Ctrl+Z and Enter on Windows, Ctrl+D elsewhere, or the end of piped input),
+// nobody gave the go, so the mission is scrubbed.
 import Allocator::{ Allocator, SystemAllocator };
-import Io::{ Print, PrintLine, ReadLine };
+import Format::ParseInt32;
+import Io::{ IoErrorKind, Print, PrintLine, ReadLine };
 import Text::StringBuilder;
 import Time::{ Duration, SleepFor };
 
-// A sleep can fail, and a failure has to be dealt with somehow. Here a pause
-// that did not happen only makes the countdown quicker, so it is ignored on
-// purpose.
+// A pause that does not happen only makes the countdown quicker, so a failed sleep is ignored
+// on purpose rather than by accident.
 func Pause(milliseconds: int64) {
     SleepFor(Duration::FromMilliseconds(milliseconds)) catch { else => {} };
 }
 
 func Main() -> int {
-    let jokes = [
-        "Rux has no garbage collector. It has a borrow checker, which is",
-        "  a garbage collector that also judges you.  \u{1F5D1}\u{FE0F}",
-        "",
-        "`when` runs at compile time, `if` runs at run time, and `else if`",
-        "  inside a `when` chain is how you learn to read diagnostics.  \u{1F4D6}",
-        "",
-        "There are four character widths. There is one `c64` literal prefix",
-        "  short of four, which is a story for another release.  \u{1F914}",
-        "",
-        "`let` is immutable and `var` is mutable. The compiler will remind",
-        "  you of this. Warmly. Repeatedly.  \u{1F49B}",
-        "",
-        "Pre-1.0 means the language is younger than some of its bug reports,",
-        "  and moves faster than all of them.  \u{1F3C3}"
-    ];
-
-    PrintLine();
     PrintLine("\u{1F680}  RUX MISSION CONTROL  \u{1F680}");
     PrintLine("========================");
-    PrintLine();
-    for line in jokes {
-        PrintLine(line);
+    let checklist = [
+        "fuel ............. loaded",
+        "crew ............. strapped in",
+        "weather .......... clear skies",
+        "snacks ........... dangerously low",
+        "borrow checker ... satisfied"
+    ];
+    for item in checklist {
+        PrintLine("  {}  \u{2705}", item);
+        Pause(150);
     }
     PrintLine();
-    Print("Press Enter to launch  \u{1F447}  ");
 
-    // The same input idiom as Circle: a builder on the system allocator, filled
-    // by ReadLine. Nothing is done with the text — it is the Enter that counts,
-    // so when the input ends before any Enter arrives, there is no launch.
     var system = SystemAllocator();
     let allocator: Allocator = system;
     var builder = StringBuilder(allocator);
-    match ReadLine(builder) {
-        .Success(_) => {},
-        .Failure(_) => {
-            PrintLine();
-            PrintLine("No Enter, no launch. Mission scrubbed.  \u{1F6D1}");
-            builder.Release();
-            return 1;
+
+    var count = 0;
+    while count == 0 {
+        Print("Count down from? (1 to 10, Enter for 10) ");
+        builder.Clear();
+        match ReadLine(builder) {
+            .Success(_) => {},
+            .Failure(error) if error.kind == IoErrorKind::EndOfStream => {
+                PrintLine();
+                PrintLine("No go from the flight director. Mission scrubbed.  \u{1F6D1}");
+                return 0;
+            },
+            .Failure(_) => {
+                PrintLine("The radio is down: the input could not be read.");
+                return 1;
+            }
+        }
+
+        let answer = builder.View().Trim();
+        if answer.IsEmpty() {
+            count = 10;
+        } else {
+            // Text that is not a number becomes 0, which the range check refuses as well.
+            let asked = ParseInt32(answer) catch { else => 0 };
+            if asked >= 1 && asked <= 10 {
+                count = asked;
+            } else {
+                PrintLine("Mission rules allow 1 to 10. Say again?");
+            }
         }
     }
-    builder.Release();
 
     PrintLine();
-    var count = 10;
     while count > 0 {
         PrintLine("   T minus {}...", count);
-        Pause(300);
+        Pause(400);
         count -= 1;
     }
-
-    PrintLine();
     PrintLine("   \u{1F525} IGNITION \u{1F525}");
     Pause(500);
 
-    // Each frame is one line, so the rocket climbs the terminal as it prints.
+    // Each frame is one line, so the rocket climbs up the terminal as it prints.
     let frames = [
-        "                    \u{1F680}",
-        "                  \u{1F680}",
         "                \u{1F680}",
         "              \u{1F680}",
         "            \u{1F680}",
@@ -89,12 +96,8 @@ func Main() -> int {
         PrintLine(frame);
         Pause(120);
     }
-
     PrintLine();
-    PrintLine("   \u{2B50}  \u{1F30D}  \u{2B50}      \u{1F468}\u{200D}\u{1F680} waves from the window");
-    PrintLine();
-    PrintLine("   Liftoff. Somewhere above you, a `let` binding is still");
-    PrintLine("   exactly what it was when it launched.  \u{1F6F0}\u{FE0F}");
-    PrintLine();
+    PrintLine("   \u{2B50}  \u{1F30D}  \u{2B50}");
+    PrintLine("   Liftoff! The crew waves from the window.  \u{1F44B}");
     return 0;
 }

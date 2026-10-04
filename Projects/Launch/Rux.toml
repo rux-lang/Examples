@@ -7,10 +7,11 @@ Name = "Launch"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "A countdown, a launch, and some jokes about Rux"
+Description = "A mission checklist, a bounded countdown and a launch"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
+Format = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Text = { Namespace = "Rux", Version = "*" }
 Time = { Namespace = "Rux", Version = "*" }
