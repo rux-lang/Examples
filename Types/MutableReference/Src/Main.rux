@@ -13,6 +13,7 @@ struct Account {
     deposits: int;
 }
 
+// Writing a field through the reference changes that field of the caller's account.
 func Deposit(account: &var Account, amount: int) {
     account.balance += amount;
     account.deposits += 1;
@@ -26,11 +27,14 @@ func Transfer(from: &var Account, to: &var Account, amount: int) {
     to.balance += amount;
 }
 
-// A `&var` array can have its elements assigned.
-func Double(values: &var int[4]) {
-    for i in 0..4 {
-        values[i] *= 2;
-    }
+// Assigning to the reference itself replaces the caller's whole value in one step.
+func Close(account: &var Account) {
+    account = Account { owner: account.owner, balance: 0, deposits: 0 };
+}
+
+// Any type can be lent this way, a plain integer included.
+func Tick(count: &var int) {
+    count += 1;
 }
 
 func Show(account: &Account) {
@@ -52,8 +56,13 @@ func Main() -> int {
     Show(alice);
     Show(bob);
 
-    var points: int[4] = [1, 5, 10, 50];
-    Double(points);
-    PrintLine("points: {} {} {} {}", points[0], points[1], points[2], points[3]);
+    Close(bob);
+    Show(bob);
+
+    var visits = 0;
+    Tick(visits);
+    Tick(visits);
+    Tick(visits);
+    PrintLine("visits: {}", visits);
     return 0;
 }
