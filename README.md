@@ -201,6 +201,7 @@ Strings, characters, formatting, parsing and input.
 - 14.3 **[StringView](Text/StringView/)** — borrow text without copying it
 - 14.4 **[String](Text/String/)** — own text that lives as long as you need it
 - 14.5 **[StringBuilder](Text/StringBuilder/)** — build text a piece at a time
+- 14.6 **[Utf8](Text/Utf8/)** — check and decode UTF-8 bytes
 - 14.7 **[Unicode](Text/Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
 - 14.9 **[Format](Text/Format/)** — control width and alignment when formatting values
 
