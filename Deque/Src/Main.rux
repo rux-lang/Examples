@@ -9,21 +9,21 @@
 // taken from the front, which is exactly the pair of operations a vector is
 // bad at.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::Deque;
+import Collections::{ CollectionError, Deque };
 import Io::{ Print, PrintLine };
 
 func Show(label: char8[..], queue: &Deque<int>) {
     Print("{:10}", label);
     for i in 0..queue.Length() {
         match queue.Get(i) {
-            .Some(value) => Print(" {}", value),
-            .None => Print(" ?")
+            value? => Print(" {}", value),
+            none => Print(" ?")
         }
     }
     PrintLine("   (length {})", queue.Length());
 }
 
-func Main() -> int {
+func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -31,22 +31,23 @@ func Main() -> int {
 
     // Built from both directions at once. The two pushed to the back arrive in
     // order; the two pushed to the front arrive in reverse, because each goes
-    // in ahead of the one before it.
-    queue.PushBack(2);
-    queue.PushBack(3);
-    queue.PushFront(1);
-    queue.PushFront(0);
+    // in ahead of the one before it. Each push can fail if memory runs out,
+    // so each ends in `?`, handing the failure to `Main`.
+    queue.PushBack(2)?;
+    queue.PushBack(3)?;
+    queue.PushFront(1)?;
+    queue.PushFront(0)?;
     Show("built", queue);
 
-    // Both ends come off as easily as they went on. Each returns an `Option`,
-    // since an empty deque has nothing to give.
+    // Both ends come off as easily as they went on. Each returns an optional,
+    // `int?`, since an empty deque has nothing to give.
     match queue.PopFront() {
-        .Some(value) => PrintLine("popped front {}", value),
-        .None => PrintLine("empty")
+        value? => PrintLine("popped front {}", value),
+        none => PrintLine("empty")
     }
     match queue.PopBack() {
-        .Some(value) => PrintLine("popped back  {}", value),
-        .None => PrintLine("empty")
+        value? => PrintLine("popped back  {}", value),
+        none => PrintLine("empty")
     }
     Show("after", queue);
 
@@ -54,5 +55,4 @@ func Main() -> int {
     // the end, a deque when either end is in play. A deque costs a little more
     // per element for the bookkeeping, which is why it is not simply the
     // default.
-    return 0;
 }
