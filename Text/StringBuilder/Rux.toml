@@ -1,0 +1,15 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "StringBuilder"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Build text step by step in one growing buffer, then hand it over as a String"
+
+[Dependencies]
+Allocator = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
+Text = { Namespace = "Rux", Version = "*" }
