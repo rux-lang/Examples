@@ -1,0 +1,53 @@
+// A pattern describes the shape of a value: "a deposit", "the number zero". Sometimes the shape is
+// not enough, and you want "a deposit, but only a large one". A guard adds that condition: write
+// `if` and a `bool` expression after the pattern, just before the `=>`.
+//
+// The arm is taken only when the pattern matches *and* the guard is true. The guard runs after the
+// pattern, so it can use the names the pattern has just bound. When the guard turns out false,
+// nothing is lost: the match moves on and tries the next arm, exactly as if this one had not
+// matched at all.
+import Io::PrintLine;
+
+variant Transaction {
+    Deposit(int32),
+    Withdrawal(int32),
+    Fee
+}
+
+// Arms are tried from top to bottom, so each guarded arm sits above the plain arm that catches the
+// rest of the same case. Swap them and the guarded arm could never be reached.
+func Review(entry: Transaction) -> char8[..] {
+    return match entry {
+        .Deposit(amount) if amount >= 10000 => "deposit, held for a check",
+        .Deposit(_) => "deposit",
+        .Withdrawal(amount) if amount > 500 => "withdrawal, over the daily limit",
+        .Withdrawal(_) => "withdrawal",
+        .Fee => "fee"
+    };
+}
+
+// A plain name is a pattern too: it matches any value and binds it. Add a guard and it becomes a
+// condition on the whole value, something a literal pattern cannot express.
+func Parity(number: int32) -> char8[..] {
+    return match number {
+        0 => "zero",
+        value if value % 2 == 0 => "even",
+        else => "odd"
+    };
+}
+
+func Main() -> int {
+    let entries: Transaction[5] = [
+        Transaction::Deposit(250),
+        Transaction::Deposit(12000),
+        Transaction::Withdrawal(80),
+        Transaction::Withdrawal(900),
+        Transaction::Fee
+    ];
+    for index in 0..5 {
+        PrintLine("{}", Review(entries[index]));
+    }
+
+    PrintLine("0 is {}, 14 is {}, -7 is {}", Parity(0), Parity(14), Parity(-7));
+    return 0;
+}

@@ -83,6 +83,12 @@ Declaring types of your own.
 - 6.12 **[TypeAlias](Types/TypeAlias/)** — give an existing type a second name to make a signature read clearly
 - 6.13 **[FunctionField](Types/FunctionField/)** — store a function in a struct field and call it later
 
+### 7. Patterns
+
+Everything a `match` arm can say.
+
+- 7.1 **[Guard](Patterns/Guard/)** — add an `if` condition to a match arm
+
 ### 8. Optionals
 
 A value that may be absent: `T?`.
