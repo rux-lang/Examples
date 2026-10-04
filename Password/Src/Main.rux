@@ -3,7 +3,6 @@
 // The program is short. The care is all in one decision — where the randomness
 // comes from — and getting that wrong produces something that looks exactly as
 // random as the correct version and is not.
-import Entropy::EntropyError;
 import Io::{ Print, PrintLine };
 import Random::{ Pcg64Dxsm, PcgFromEntropy, UniformBelow };
 
@@ -20,12 +19,17 @@ func Main() -> int {
     // This is the decision. `PcgFromEntropy` seeds from the operating system's
     // randomness, so each run differs. A fixed seed would produce the same
     // password every time — and a password anyone can reproduce is not one.
-    var entropyError = EntropyError::None;
-    var generator = PcgFromEntropy(@entropyError);
-    if entropyError != EntropyError::None {
-        PrintLine("no source of randomness available; refusing to invent one");
-        return 1;
-    }
+    //
+    // Seeding can fail, so `PcgFromEntropy` returns `Pcg64Dxsm ! EntropyError`:
+    // the generator, or why there is none. With no randomness to be had, the
+    // only honest answer is to stop.
+    var generator = match PcgFromEntropy() {
+        .Success(seeded) => seeded,
+        .Failure(_) => {
+            PrintLine("no source of randomness available; refusing to invent one");
+            return 1;
+        }
+    };
 
     let length: uint = 16;
     Print("password: ");
