@@ -1,0 +1,37 @@
+// `rux run` makes a debug build: unoptimized, quick to compile, full of checks. `rux run --release`
+// makes a release build: optimized, with the debug-only checks taken out. `#build` describes the
+// build in progress, and `#build.mode` says which of the two it is.
+//
+// `DebugAssert` is the check that comes and goes. In a debug build it behaves like `Assert`. In a
+// release build it is removed entirely, and its arguments are not even evaluated, so an expensive
+// check costs nothing once you ship. The other side of that bargain: never put work the program
+// needs inside one, or a release build will quietly skip it.
+import Core::{ #build, BuildMode, DebugAssert };
+import Io::PrintLine;
+
+// Stands in for a slow consistency check. The line it prints shows whether it ran at all.
+func ScoresAreSorted() -> bool {
+    PrintLine("  ...checking that the scores are sorted");
+    return true;
+}
+
+func Main() -> int {
+    // A project may name its own profiles; the mode is the part every profile has.
+    PrintLine("Profile: {}", #build.profile);
+    when #build.mode == BuildMode::Debug {
+        PrintLine("Debug build: unoptimized, with every check switched on");
+    } else {
+        PrintLine("Release build: optimized, with the debug checks compiled out");
+    }
+
+    // `#build.debugAssertions` answers the narrower question of whether those checks are kept.
+    when #build.debugAssertions {
+        PrintLine("Debug assertions: kept");
+    } else {
+        PrintLine("Debug assertions: removed");
+    }
+
+    DebugAssert(ScoresAreSorted(), "the scores must be sorted");
+    PrintLine("Done");
+    return 0;
+}
