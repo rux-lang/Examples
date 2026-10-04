@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "OptionalPropagate"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Passing absence up to the caller with ?"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
