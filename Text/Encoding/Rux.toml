@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Encoding"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "The c8, c16 and c32 literal prefixes, and code units versus scalar values"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
