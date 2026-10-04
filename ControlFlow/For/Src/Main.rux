@@ -26,8 +26,9 @@ func Main() -> int {
     }
     PrintLine();
 
-    // A range stored in a binding works the same as one written in place.
-    let die = 1..=6;
+    // A range stored in a binding works the same as one written in place. The loop variable takes
+    // the type of the bounds, so this `face` is an `int32`, like the `total` it is added to.
+    let die: int32..=int32 = 1..=6;
     var total: int32 = 0;
     for face in die {
         total += face;
