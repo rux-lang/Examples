@@ -26,6 +26,7 @@ Combining values into new ones.
 
 - 2.1 **[Arithmetic](Operators/Arithmetic/)** — add, subtract, multiply, divide and take the remainder
 - 2.2 **[Comparison](Operators/Comparison/)** — compare two values with `==`, `!=`, `<`, `<=`, `>` and `>=`
+- 2.3 **[Logical](Operators/Logical/)** — combine conditions with `&&`, `
 - **[Operator](Operators/Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence _(being split into the lessons above)_
 
 ### 3. Control flow
