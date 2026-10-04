@@ -9,11 +9,11 @@ rux run
 ```
 
 ```text
-round 1: total 11310, blocks held 2
+round 1: total 11310, bytes in use 480, blocks held 2
   reset: bytes in use 0, blocks held 1
-round 2: total 11310, blocks held 1
+round 2: total 11310, bytes in use 480, blocks held 1
   reset: bytes in use 0, blocks held 1
-round 3: total 11310, blocks held 1
+round 3: total 11310, bytes in use 480, blocks held 1
   reset: bytes in use 0, blocks held 1
 ```
 
