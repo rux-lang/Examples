@@ -52,7 +52,9 @@ func Main() -> int {
     let widths: float64[3] = [3.5, 1.5, 2.75];
     PrintLine("widest: {} metres", Widest(widths));
 
-    // A borrow needs something to borrow from. `Area(Room { ... })` is rejected, because a
-    // struct built on the spot has no name to lend: bind it with `let` first, as above.
+    // A borrow needs something to borrow from. A struct built on the spot has no name to lend,
+    // so `Area(Room { ... })` stops with
+    //     error: argument 1 to 'Area' has type 'Room', but parameter 'room' requires '&Room'
+    // Bind it with `let` first, as above.
     return 0;
 }
