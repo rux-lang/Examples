@@ -225,7 +225,6 @@ Algorithms over slices from the `Algorithms` package.
 - 18.3 **[BinarySearch](Algorithms/BinarySearch/)** — find a value in sorted data quickly
 - 18.4 **[MinMax](Algorithms/MinMax/)** — the smallest and largest values, and the empty case
 - 18.5 **[Fold](Algorithms/Fold/)** — combine all elements into one value with a function
-- **[Algorithm](Algorithms/Algorithm/)** — sort, search, and fold over the containers built so far _(being split into the lessons above)_
 
 ### 19. Files
 
