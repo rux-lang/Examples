@@ -288,6 +288,7 @@ Time, randomness, hashing and identifiers.
 - 20.6 **[Distribution](Utilities/Distribution/)** — draw from a range, shuffle, and sample a normal distribution
 - 20.7 **[Entropy](Utilities/Entropy/)** — unpredictable bytes from the operating system
 - 20.8 **[Hash](Utilities/Hash/)** — fast non-cryptographic hashes and checksums
+- 20.9 **[Uuid](Utilities/Uuid/)** — create, print and parse UUIDs
 
 ### 21. Data formats
 
