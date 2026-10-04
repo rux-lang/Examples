@@ -169,7 +169,7 @@ Code that runs or is chosen while compiling.
 Talking to the operating system and the machine.
 
 - 24.1 **[Extern](Platform/Extern/)** — call a platform API directly through an extern declaration and `#Link`
-- 24.4 **[Asm](Asm/)** — write a function body in assembly
+- 24.4 **[Asm](Platform/Asm/)** — write a function body in assembly
 
 ### 25. Projects
 
