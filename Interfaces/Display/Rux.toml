@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Display"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Making a type of your own printable with {}"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Format = { Namespace = "Rux", Version = "*" }
