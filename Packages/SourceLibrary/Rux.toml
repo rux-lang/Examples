@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "SourceLibrary"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A source library compiled into the program that depends on it"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
