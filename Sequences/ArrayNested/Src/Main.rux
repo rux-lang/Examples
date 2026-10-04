@@ -1,0 +1,49 @@
+// An array's element type can be another array, and that is all a two-dimensional array is. A
+// grid of three rows of four numbers is an array of three rows, where each row is an `int32[4]`.
+//
+// The surprise is the order in the type. Each `[n]` wraps everything written before it, so the
+// type is built inside out: `int32[4]` is one row, and `int32[4][3]` is three of those rows.
+// Indexing reads the other way, outside in: `grid[row]` picks a row, and `grid[row][column]`
+// picks a number within it.
+import Io::PrintLine;
+
+func Main() -> int {
+    // Three rows, each a literal of four numbers.
+    let grid: int32[4][3] = [
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        [9, 10, 11, 12]
+    ];
+
+    // The outer length counts rows; a row's length counts columns.
+    PrintLine("{} rows of {} columns", grid.length, grid[0].length);
+    PrintLine("grid[2][1] is {}", grid[2][1]);
+
+    // `for` over the grid yields whole rows, and an inner `for` walks each row.
+    for row in grid {
+        var sum: int32 = 0;
+        for value in row {
+            sum += value;
+        }
+        PrintLine("row {} {} {} {} adds up to {}", row[0], row[1], row[2], row[3], sum);
+    }
+
+    // Going down a column means holding the column fixed and stepping through the rows.
+    for column in 0..grid[0].length {
+        var total: int32 = 0;
+        for row in 0..grid.length {
+            total += grid[row][column];
+        }
+        PrintLine("column {} adds up to {}", column, total);
+    }
+
+    // A repeated array nests too: three copies of a row of three zeros, filled in afterwards.
+    var board: int32[3][3] = [[0; 3]; 3];
+    for i in 0..board.length {
+        board[i][i] = 1;
+    }
+    for row in board {
+        PrintLine("{} {} {}", row[0], row[1], row[2]);
+    }
+    return 0;
+}
