@@ -5,9 +5,9 @@
 //
 // Nobody calls it. The compiler does, exactly once for every value that is still alive when its
 // life ends: when its scope closes, when a function returns, or when `=` replaces it with a new
-// value. A value that was moved away is not destroyed where it was, because its new owner will
-// destroy it later. Values that end together are destroyed in reverse order of creation, newest
-// first.
+// value, whether it is a whole variable or one field of a struct. A value that was moved away is
+// not destroyed where it was, because its new owner will destroy it later. Values that end
+// together are destroyed in reverse order of creation, newest first.
 //
 // Here the destructor only prints, so its timing can be watched. In real code it gives back what
 // the value was holding: a file, a connection, a block of memory. Notice that this program never
