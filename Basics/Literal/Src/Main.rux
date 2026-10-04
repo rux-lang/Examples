@@ -1,0 +1,55 @@
+// A literal is a value written straight into the source: 42, 2.5, 'A', true. This lesson is about
+// the numeric ones — the many ways one number can be spelled, and how a literal gets its type.
+import Io::PrintLine;
+
+func Main() -> int {
+    // The same number in four bases. A prefix picks the base: `0x` for hexadecimal, `0o` for
+    // octal and `0b` for binary. The base is only how the source spells the value, so all four
+    // variables hold the same 255 and print it the same way.
+    let decimal = 255;
+    let hex = 0xFF;
+    let octal = 0o377;
+    let binary = 0b11111111;
+    PrintLine("bases      {} {} {} {}", decimal, hex, octal, binary);
+
+    // An underscore between digits is ignored. It groups them the way a comma does on paper.
+    let population = 8_100_000_000;
+    let mask = 0xFFFF_0000;
+    let flags = 0b1010_0101;
+    PrintLine("separators {} {} {}", population, mask, flags);
+
+    // A float literal may carry an exponent: `e8` means "times ten to the eighth".
+    let light = 2.998e8;
+    let charge = 1.6e-19;
+    PrintLine("exponents  {} {}", light, charge);
+
+    // A suffix fixes the type inside the literal itself: `u8` makes a uint8, `i64` an int64 and
+    // `f32` a float32. Plain `u` and `i` mean `uint` and `int`.
+    let small = 200u8;
+    let wide = 5i64;
+    let single = 0.5f32;
+    PrintLine("suffixes   {} {} {}", small, wide, single);
+
+    // With no suffix, a literal standing alone is an `int` or a `float64`. Next to a value that
+    // already has a type, it takes that value's type instead. Here 100 becomes a uint8, the sum
+    // is worked out in eight bits, and 300 does not fit in eight bits: the result wraps around
+    // past 255 and lands on 44.
+    let level: uint8 = 200;
+    let raised = level + 100;
+    PrintLine("uint8      {}", raised);
+
+    // Two literals together have no typed partner, so both are `int` and the sum is plain 300.
+    let plain = 200 + 100;
+    PrintLine("int        {}", plain);
+
+    // Because the literal takes the other side's type, it must also fit that type. These two are
+    // refused rather than quietly turned into something else:
+    //
+    //     let over = level + 300;
+    //         error: integer literal is out of range for type 'uint8'
+    //
+    //     let count: uint = 3;
+    //     let missing = count == -1;
+    //         error: integer literal is out of range for type 'uint'
+    return 0;
+}
