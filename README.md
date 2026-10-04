@@ -161,6 +161,7 @@ Who owns a value, and when it is cleaned up.
 - 11.6 **[CustomCopy](Ownership/CustomCopy/)** — write your own copy for a type that needs real work to duplicate
 - 11.7 **[PartialMove](Ownership/PartialMove/)** — move one field out of a struct, and what is cleaned up after
 - 11.8 **[Defer](Ownership/Defer/)** — schedule cleanup at the point you start the work, so it cannot be forgotten
+- 11.9 **[DeferReturn](Ownership/DeferReturn/)** — what a deferred action sees when the function returns a value
 - **[Ownership](Ownership/Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope _(being split into the lessons above)_
 
 ### 12. Interfaces
