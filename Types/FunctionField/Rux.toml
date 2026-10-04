@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "FunctionField"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Storing a function in a struct field, so a value carries its behaviour"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
