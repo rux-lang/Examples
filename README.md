@@ -157,6 +157,7 @@ Who owns a value, and when it is cleaned up.
 - 11.2 **[Copy](Ownership/Copy/)** — assignment copies a value, and the copies are independent
 - 11.3 **[Move](Ownership/Move/)** — hand a value over with `<-` instead of copying it
 - 11.4 **[Destructor](Ownership/Destructor/)** — run cleanup when a value goes out of scope with `~T`
+- 11.5 **[NoCopy](Ownership/NoCopy/)** — forbid copying a type that owns a resource
 - 11.8 **[Defer](Ownership/Defer/)** — schedule cleanup at the point you start the work, so it cannot be forgotten
 - **[Ownership](Ownership/Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope _(being split into the lessons above)_
 
