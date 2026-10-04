@@ -37,7 +37,10 @@ func Main() -> int {
     //     /// Prints the total.
     //     PrintLine("total");
     //
-    // it is refused with "error: expected an expression before '/// Prints the total.'".
+    // it is refused, because there is no declaration for it to describe:
+    //
+    //     error: documentation comment inside a block is not attached to a declaration
+    //
     // Inside a function, use `//`.
     return 0;
 }
