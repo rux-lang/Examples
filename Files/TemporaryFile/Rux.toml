@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "TemporaryFile"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Scratch files with unguessable names that delete themselves"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
