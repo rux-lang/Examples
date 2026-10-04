@@ -1,0 +1,52 @@
+// A character is one Unicode code point: a letter, a digit, a symbol, an emoji. A character
+// literal is written in single quotes, 'A'. Double quotes make a string instead, which is a
+// sequence of characters and a topic of its own.
+//
+// `char` is the everyday type. It is another name for `char32`, four bytes, enough for every code
+// point there is, and it is the type a quoted character gets when nothing says otherwise.
+import Io::PrintLine;
+
+func Main() -> int {
+    // Any code point fits in a `char`, from plain ASCII to an emoji.
+    let letter = 'A';
+    let accented = 'é';
+    let greek: char = 'π';
+    let emoji = '😀';
+    PrintLine("letter    {}", letter);
+    PrintLine("accented  {}", accented);
+    PrintLine("greek     {}", greek);
+    PrintLine("emoji     {}", emoji);
+
+    // A backslash starts an escape, for characters that are awkward to type between quotes:
+    // '\'' is a single quote, '\\' a backslash, '\n' a line break and '\t' a tab. `\u{...}`
+    // names any code point by its number in hexadecimal.
+    let quote = '\'';
+    let backslash = '\\';
+    let smile = '\u{263A}';
+    PrintLine("quote     {}", quote);
+    PrintLine("backslash {}", backslash);
+    PrintLine("smile     {}", smile);
+
+    // A prefix picks another width. `c32` spells the default out, and `c64` holds the same code
+    // points in eight bytes. `c8` and `c16` are different in kind: a `char8` holds one byte of
+    // UTF-8 text and a `char16` one unit of UTF-16 text. Those are pieces of an encoding, and a
+    // piece is a whole character only for the code points small enough to fit in one: plain
+    // ASCII for `char8`, and most living scripts for `char16`.
+    let unit8: char8 = c8'R';
+    let unit16: char16 = c16'Ж';
+    let scalar32: char32 = c32'€';
+    let scalar64: char64 = c64'😀';
+    PrintLine("char8     {}", unit8);
+    PrintLine("char16    {}", unit16);
+    PrintLine("char32    {}", scalar32);
+    PrintLine("char64    {}", scalar64);
+
+    // An unprefixed literal is always a `char32`, so a narrower type needs the prefix:
+    //
+    //     let initial: char8 = 'R';
+    //         error: cannot assign 'char32' to 'char8'
+    //
+    // Keep `c8` literals to plain ASCII. A character outside it needs more than one byte of
+    // UTF-8, and one `char8` can only ever hold one of those bytes.
+    return 0;
+}
