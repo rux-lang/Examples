@@ -143,7 +143,7 @@ Paths, files and directories.
 Time, randomness, hashing and identifiers.
 
 - 20.5 **[Random](Random/)** — a reproducible random number generator
-- **[Time](Time/)** — measure elapsed time, work with durations, and format a calendar date _(being split into the lessons above)_
+- **[Time](Utilities/Time/)** — measure elapsed time, work with durations, and format a calendar date _(being split into the lessons above)_
 
 ### 21. Data formats
 
