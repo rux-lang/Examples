@@ -48,6 +48,7 @@ Naming a piece of work and reusing it.
 - 4.2 **[Return](Functions/Return/)** — return early, and write functions that return nothing
 - 4.3 **[Recursion](Functions/Recursion/)** — a function that calls itself, and the base case that stops it
 - 4.4 **[Overload](Functions/Overload/)** — give several functions one name, and let the arguments choose between them
+- 4.5 **[DefaultArgument](Functions/DefaultArgument/)** — give a parameter a default value so callers may leave it out
 - 4.6 **[Generic](Functions/Generic/)** — write one function that works for many types
 - 4.7 **[Callback](Functions/Callback/)** — pass a function to another function as an ordinary value
 
