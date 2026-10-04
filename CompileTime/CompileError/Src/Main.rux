@@ -1,0 +1,42 @@
+// Some mistakes are better caught by the compiler than by whoever runs the program. Three
+// directives let source code speak to the build:
+//
+// - `#Error("...")` stops the build with that message, wherever it is reached.
+// - `#Warn("...")` prints a warning and lets the build carry on.
+// - `#Allow("rule")` silences one `rux lint` rule for the declaration it is attached to.
+//
+// `#Error` is almost always written inside a `when` branch: the branch a build should never take.
+// A branch that is not taken is never looked at, so the directive in it never fires. Written as
+// an attribute on a declaration instead, `#Error` or `#Warn` fires at every use of that
+// declaration, which is how an old function points its callers at the new one.
+import Core::{ #Error, #target };
+import Io::PrintLine;
+
+// Fires at each call below, as a warning; the program still builds and runs.
+#Warn("Average rounds toward zero; call AverageRounded instead")
+func Average(total: int, count: int) -> int {
+    return total / count;
+}
+
+func AverageRounded(total: int, count: int) -> int {
+    return (total + count / 2) / count;
+}
+
+// `rux lint` asks for PascalCase constant names, which would turn kilobytes (kB) into KB. The
+// spelling is deliberate here, so the rule is switched off for this one declaration.
+#Allow("naming.const")
+const kB: int = 1000;
+
+func Main() -> int {
+    // Every supported target has 64-bit pointers, so this branch is never taken. Flip the
+    // condition to `>= 64` and the build stops with:
+    //   Src/Main.rux:35:15: error: this program needs a 64-bit target
+    when #target.pointerBits < 64 {
+        #Error("this program needs a 64-bit target");
+    }
+
+    PrintLine("Average of 7 and 8: {}", Average(15, 2));
+    PrintLine("Rounded average: {}", AverageRounded(15, 2));
+    PrintLine("A 3 kB file holds {} bytes", 3 * kB);
+    return 0;
+}

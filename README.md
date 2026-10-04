@@ -320,6 +320,7 @@ Code that runs or is chosen while compiling.
 - 23.2 **[Target](CompileTime/Target/)** — the operating system and architecture being compiled for
 - 23.3 **[BuildMode](CompileTime/BuildMode/)** — tell debug builds from release builds
 - 23.4 **[SourceLocation](CompileTime/SourceLocation/)** — the file and line of an expression
+- 23.5 **[CompileError](CompileTime/CompileError/)** — stop the build with `#Error`, or warn with `#Warn`
 
 ### 24. Platform
 
