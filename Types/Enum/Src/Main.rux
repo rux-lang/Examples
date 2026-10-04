@@ -17,7 +17,9 @@ enum Direction {
 // here: a case is as small as a number.
 extend Direction {
     // Inside a `match` on a `Direction`, the type is already known, so a pattern may be written
-    // `.North` rather than `Direction::North`. A value outside a pattern is written in full.
+    // `.North` rather than `Direction::North`. A value outside a pattern is written in full:
+    // `.North => .East` stops with
+    //     error: '.East' must be written in full, as in 'Direction::East'
     func TurnRight(self: Direction) -> Direction {
         return match self {
             .North => Direction::East,
