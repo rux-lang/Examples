@@ -7,7 +7,7 @@ Name = "Variable"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Immutable and mutable bindings with let and var"
+Description = "Naming a value with let, and letting the compiler infer its type"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

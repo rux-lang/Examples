@@ -1,39 +1,38 @@
-// A binding gives a value a name. `let` names a value that never changes,
-// `var` one that does. Reach for `let` first: a name that cannot change is one
-// less thing to keep track of while reading the code.
+// A variable gives a value a name. `let` makes one: a name, an `=` and a value, and from then on
+// the name stands for that value. A `let` variable never changes — the next lesson, Mutable,
+// introduces the kind that does. Reach for `let` first: a name that cannot change is one less
+// thing to keep track of while reading the code.
 import Io::PrintLine;
 
 func Main() -> int {
-    // With no annotation the type comes from the literal. A whole number is an
-    // `int`, a fraction is a `float64`, and a character is a `char32` — the
-    // widest member of each family, so nothing is lost by default.
-    let whole = 5;
-    let fraction = 2.5;
-    let letter = 'A';
-    PrintLine("inferred   {}  {}  {}", whole, fraction, letter);
+    // With no type written, the compiler infers one from the value. A whole number makes an
+    // `int`, a number with a decimal point makes a `float64`, text in double quotes makes a
+    // string, and `true` or `false` makes a `bool`.
+    let year = 2026;
+    let price = 4.99;
+    let language = "Rux";
+    let ready = true;
 
-    // An annotation asks for a different type. An integer literal is written
-    // directly at the width requested, but a float literal is a `float64`
-    // already, so narrowing one needs the `f32` suffix rather than a bare 2.5.
-    let small: int8 = 5;
-    let narrow: float32 = 2.5f32;
-    PrintLine("annotated  {}  {}", small, narrow);
+    // Each `{}` in the text is replaced by the next value after it. The Console lesson has the
+    // details; until then, this is how a value gets printed.
+    PrintLine("year      {}", year);
+    PrintLine("price     {}", price);
+    PrintLine("language  {}", language);
+    PrintLine("ready     {}", ready);
 
-    // `var` is the binding that may be assigned again, either outright or
-    // through a compound operator.
-    var counter = 0;
-    counter = counter + 1;
-    counter += 10;
-    PrintLine("counter    {}", counter);
+    // A type can also be written after the name, following a colon. Then the value has to fit
+    // that type: 100 fits in an `int8`, which holds -128 to 127, but 300 would not.
+    let small: int8 = 100;
+    let large: int64 = 100;
+    PrintLine("small     {}", small);
+    PrintLine("large     {}", large);
 
-    // A `var` may also be declared now and given its value later, so long as
-    // it is assigned before anything reads it.
-    var doubled: int;
-    doubled = counter * 2;
-    PrintLine("doubled    {}", doubled);
+    // The value can be any expression, including one that uses earlier variables.
+    let nextYear = year + 1;
+    PrintLine("next year {}", nextYear);
 
-    // Two things the compiler refuses. Neither can appear in a program that
-    // builds, so they are written here rather than run:
+    // Two things the compiler refuses. Neither can appear in a program that builds, so they are
+    // written here rather than run:
     //
     //     let total = 5;
     //     total = 6;
@@ -44,8 +43,7 @@ func Main() -> int {
     //     let name = 2;
     //         error: variable 'name' is already declared in this scope
     //
-    // The second one is worth meeting early if you come from a language where
-    // redeclaring a name quietly shadows the old one. In Rux a name means one
-    // thing for the whole scope it is declared in.
+    // The second is worth meeting early if you come from a language where declaring a name again
+    // quietly hides the old one. In Rux a name means one thing for the whole scope it lives in.
     return 0;
 }
