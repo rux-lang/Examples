@@ -1,70 +1,58 @@
-// An enum is a named set of cases over an integer. It says that a value is one
-// of a fixed list, which a bare `int` cannot: nothing stops an `int` holding 47
-// where a month was meant.
+// An enum is a type with a fixed list of named values, called its cases. A direction is north,
+// east, south or west, and nothing else. Stored as an `int`, a direction could just as well be
+// 47, and nothing would notice; stored as a `Direction`, it cannot.
 //
-// The cases carry no data. A case that needs to carry something is a `variant`,
-// which is the next lesson.
+// The cases carry no data; each one is simply itself. A case that needs to carry something is a
+// `variant`, two lessons on.
 import Io::PrintLine;
 
-// The base type is optional and picks how the value is stored. Discriminants
-// may be assigned, and any case left unassigned continues from the one before,
-// so February is 2 and April is 4.
-enum Month: uint8 {
-    January = 1,
-    February,
-    March,
-    April
+enum Direction {
+    North,
+    East,
+    South,
+    West
 }
 
-// With neither a base type nor assignments, cases number from zero.
-enum Level {
-    Low,
-    Medium,
-    High
-}
+// An enum can be extended with methods like any other type. Taking `self` by value is natural
+// here: a case is as small as a number.
+extend Direction {
+    // Inside a `match` on a `Direction`, the type is already known, so a pattern may be written
+    // `.North` rather than `Direction::North`. A value outside a pattern is written in full.
+    func TurnRight(self: Direction) -> Direction {
+        return match self {
+            .North => Direction::East,
+            .East => Direction::South,
+            .South => Direction::West,
+            .West => Direction::North
+        };
+    }
 
-// `match` is an expression as well as a statement, so its arms can produce the
-// value that gets returned. Inside a `match` on a `Month`, the type is already
-// known, and the cases may be written `.January` rather than `Month::January`.
-func Days(month: Month) -> int32 {
-    return match month {
-        .January => 31i32,
-        .February => 28i32,
-        .March => 31i32,
-        .April => 30i32
-    };
-}
-
-func Describe(level: Level) -> char8[..] {
-    return match level {
-        .Low => "take your time",
-        .Medium => "keep an eye on it",
-        .High => "deal with it now"
-    };
+    // An enum cannot be printed with `{}` directly, so it is given a name to print.
+    func Name(self: Direction) -> char8[..] {
+        return match self {
+            .North => "north",
+            .East => "east",
+            .South => "south",
+            .West => "west"
+        };
+    }
 }
 
 func Main() -> int {
-    // Outside a context that fixes the type, a case is written in full.
-    let month = Month::February;
-    PrintLine("February has {} days", Days(month));
-    PrintLine("March has {} days", Days(Month::March));
+    // A case is named through its type.
+    var heading = Direction::North;
+    PrintLine("start facing {}", heading.Name());
 
-    PrintLine("Low    -> {}", Describe(Level::Low));
-    PrintLine("High   -> {}", Describe(Level::High));
+    for turn in 1..=4 {
+        heading = heading.TurnRight();
+        PrintLine("turn {}: facing {}", turn, heading.Name());
+    }
 
-    // Cases compare as values.
-    PrintLine("March == March  {}", Month::March == Month::March);
-    PrintLine("March == April  {}", Month::March == Month::April);
+    // Cases compare with `==` and `!=`.
+    PrintLine("back to north: {}", heading == Direction::North);
+    PrintLine("facing east:   {}", heading == Direction::East);
 
-    // The discriminant is reachable by casting to the base type, using the same
-    // `as` from the Convert lesson.
-    PrintLine("January is {}", Month::January as uint8);
-    PrintLine("April is   {}", Month::April as uint8);
-    PrintLine("Level::High is {}", Level::High as int32);
-
-    // Assigned discriminants are part of what the enum promises. If these
-    // numbers are written to a file or sent to another program, inserting a
-    // case in the middle silently changes what the old numbers mean — so add
-    // cases at the end, or assign every one explicitly.
+    // Neither `match` above needs an `else`: naming all four cases covers every value a
+    // `Direction` can hold. Add a fifth case, and both stop compiling until they handle it.
     return 0;
 }
