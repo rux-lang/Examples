@@ -46,6 +46,11 @@ func Main() -> ! FormatError {
     // request was invalid, not where or why.
     Show(Render(allocator, "{} of {}", 3, 10));
     Show(Render(allocator, "[{:>>>}]", 3));
-    Show(Render(allocator, "{}, {} and {}", 3, 4));
+    // The compiler counts the placeholders of a pattern written in the call itself, so
+    // `Render(allocator, "{}, {} and {}", 3, 4)` does not build: "format string has 3
+    // placeholders, but 2 arguments were provided". A pattern that arrives as a value is
+    // counted only when it runs.
+    let pattern = "{}, {} and {}";
+    Show(Render(allocator, pattern, 3, 4));
     Show(Render(allocator, "{:x}", "text"));
 }
