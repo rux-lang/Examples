@@ -1,0 +1,51 @@
+// A destructor is code that runs when a value's life ends. It is written inside `extend`, named
+// after the type with a leading `~`, and borrows the dying value mutably:
+//
+//     func ~Guest(self: &var Guest) { ... }
+//
+// Nobody calls it. The compiler does, exactly once for every value that is still alive when its
+// life ends: when its scope closes, when a function returns, or when `=` replaces it with a new
+// value. A value that was moved away is not destroyed where it was, because its new owner will
+// destroy it later. Values that end together are destroyed in reverse order of creation, newest
+// first.
+//
+// Here the destructor only prints, so its timing can be watched. In real code it gives back what
+// the value was holding: a file, a connection, a block of memory. Notice that this program never
+// copies a guest: a copy would be a second guest that leaves too. The NoCopy lesson deals with it.
+import Io::PrintLine;
+
+struct Guest {
+    name: char8[..];
+}
+
+extend Guest {
+    func ~Guest(self: &var Guest) {
+        PrintLine("    {} leaves", self.name);
+    }
+}
+
+// The guest lives only as long as this call.
+func Visit(name: char8[..]) {
+    let guest = Guest { name: name };
+    PrintLine("    {} visits", guest.name);
+}
+
+func Main() -> int {
+    PrintLine("a short visit:");
+    Visit("Ada");
+    PrintLine("    back in Main");
+
+    // Replacing a value ends the old one's life first.
+    PrintLine("swapping the seat:");
+    var seat = Guest { name: "Bob" };
+    seat = Guest { name: "Cy" };
+
+    // After a move only the new owner is destroyed, so Dee leaves once, at the end.
+    PrintLine("moving:");
+    let host = Guest { name: "Dee" };
+    let moved <- host;
+
+    // `moved` was created after `seat`, so it is destroyed before it.
+    PrintLine("end of Main:");
+    return 0;
+}
