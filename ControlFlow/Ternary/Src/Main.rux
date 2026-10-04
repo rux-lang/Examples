@@ -1,15 +1,16 @@
-// `if` chooses which statements to run. Sometimes what is wanted is smaller
-// than that: choosing between two *values*, in the middle of an expression.
+// `if` chooses which statements run. Sometimes the choice is smaller than that: one of two
+// *values*, in the middle of an expression. `condition ? whenTrue : whenFalse` makes that choice.
+// It is an expression, so it goes anywhere a value goes.
 //
-// `condition ? whenTrue : whenFalse` is that. It is an expression, so it can
-// go wherever a value goes.
+// The whole conditional is one value with one type, so both sides must have the same type.
+// `ready ? "yes" : 0` is a mistake; give both sides text, or both numbers.
 import Io::PrintLine;
 
 func Main() -> int {
-    let n = 7;
+    let n: int32 = 7;
 
-    // Written with `if`, this needs a `var` and four lines, and the binding
-    // cannot be a `let` because it is assigned after being declared.
+    // Written with `if`, choosing a label needs a `var`: the binding is declared first and given
+    // its value later, in whichever branch runs.
     var labelTheLongWay = "";
     if n % 2 == 0 {
         labelTheLongWay = "even";
@@ -17,30 +18,27 @@ func Main() -> int {
         labelTheLongWay = "odd";
     }
 
-    // Written as an expression, it is one line and the binding stays immutable
-    // — which is the real gain, not the brevity.
+    // Written as a conditional, the binding gets its value where it is declared, so it can be a
+    // `let`. That is the real gain, more than the shorter line.
     let label = n % 2 == 0 ? "even" : "odd";
+    PrintLine("{} is {} ({} the long way)", n, label, labelTheLongWay);
 
-    PrintLine("{} is {} (and {})", n, label, labelTheLongWay);
+    // Being a value, it can be passed straight to a call or used inside arithmetic.
+    let a: int32 = 3;
+    let b: int32 = 5;
+    PrintLine("the larger of {} and {} is {}", a, b, a > b ? a : b);
 
-    // Because it is an expression, it nests inside anything.
-    PrintLine("larger of 3 and 5 is {}", 3 > 5 ? 3 : 5);
+    let count: int32 = 3;
+    PrintLine("{} item{}", count, count == 1 ? "" : "s");
 
-    // Note that this is bound to a name before being printed rather than
-    // written inside the call. That is deliberate: a conditional whose
-    // operands are text currently misbehaves when passed straight to a
-    // function, so give it a name first.
-    let count = 3;
-    let plural = count == 1 ? "" : "s";
-    PrintLine("{} item{}", count, plural);
+    let price: int32 = 40;
+    let member = true;
+    let total = price - (member ? 5 : 0);
+    PrintLine("members pay {}", total);
 
-    // Chaining works, and reads as a list of cases.
+    // A conditional may take the place of the false side of another, which reads as a list of
+    // cases tested from the left. Past two or three cases, an `else if` chain is clearer.
     let sign = n < 0 ? "negative" : n == 0 ? "zero" : "positive";
     PrintLine("{} is {}", n, sign);
-
-    // The limit is worth knowing: both branches must produce the same type,
-    // because the whole thing is one value with one type. And a chain longer
-    // than about two is usually clearer as an `if` chain or a `match` — this
-    // is for the small choice made in passing, not for hiding a decision.
     return 0;
 }
