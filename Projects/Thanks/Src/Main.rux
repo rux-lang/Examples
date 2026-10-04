@@ -1,58 +1,59 @@
 // A banner drawn as text, and a thank-you to the people who make Rux.
 //
-// The whole program is an array of lines and a loop, which is everything from
-// the Array and Range lessons and nothing more. Large letters are just rows of
+// Everything here comes from the first three parts of the course: printing, a `for` loop over a
+// range, and `match` used as an expression. There are no arrays yet, so each list is a loop that
+// counts rows and a `match` that says what belongs on each one. Large letters are only rows of
 // characters printed one after another.
 import Io::{ Print, PrintLine };
 
 func Main() -> int {
-    // Each string is one row across all three letters. Read the array
-    // vertically rather than line by line and the shapes appear.
-    let banner = [
-        "  ####    ##  ##   ##   ##  ",
-        "  ##  ##  ##  ##    ## ##   ",
-        "  ##  ##  ##  ##     ###    ",
-        "  #####   ##  ##     ###    ",
-        "  ## ##   ##  ##    ## ##   ",
-        "  ##  ##   ####    ##   ##  "
-    ];
-
+    // Each row runs across all three letters. Read the arms from top to bottom rather than one
+    // at a time, and the shapes of R, U and X appear.
     PrintLine();
-    for line in banner {
-        PrintLine(line);
+    for row in 0..6 {
+        let line = match row {
+            0 => "  ####    ##  ##   ##   ##  ",
+            1 => "  ##  ##  ##  ##    ## ##   ",
+            2 => "  ##  ##  ##  ##     ###    ",
+            3 => "  #####   ##  ##     ###    ",
+            4 => "  ## ##   ##  ##    ## ##   ",
+            else => "  ##  ##   ####    ##   ##  "
+        };
+        PrintLine("{}", line);
     }
     PrintLine();
 
     // A rule drawn by repeating one character, rather than by typing it out.
-    for i in 0..44 {
+    let width = 44;
+    for i in 0..width {
         Print("=");
     }
     PrintLine();
-
     PrintLine("            Thank you, everyone");
-    for i in 0..44 {
+    for i in 0..width {
         Print("=");
     }
     PrintLine();
     PrintLine();
 
-    // Every kind of help that goes into a language, in no particular order —
-    // because none of them is the one that matters least.
-    let contributions = [
-        "the ideas, and the patience to explain them twice",
-        "the long discussions, and the short sharp ones",
-        "the code, the tests, and the unglamorous fixes",
-        "the critique that was right, and the kind that stung",
-        "the bug reports written carefully by strangers",
-        "the documentation nobody is thanked for",
-        "the funding that bought time to think",
-        "turning up, reading along, and asking good questions",
-        "the posts, the shares, the subscribes, the word of mouth"
-    ];
-
+    // Every kind of help that goes into a language, in no particular order, because none of them
+    // is the one that matters least. The `else` arm is the last item, so a match over numbers
+    // still has an answer for every row.
+    let count = 9;
     PrintLine("Rux exists because of:");
     PrintLine();
-    for contribution in contributions {
+    for item in 1..=count {
+        let contribution = match item {
+            1 => "the ideas, and the patience to explain them twice",
+            2 => "the long discussions, and the short sharp ones",
+            3 => "the code, the tests, and the unglamorous fixes",
+            4 => "the critique that was right, and the kind that stung",
+            5 => "the bug reports written carefully by strangers",
+            6 => "the documentation nobody is thanked for",
+            7 => "the funding that bought time to think",
+            8 => "turning up, reading along, and asking good questions",
+            else => "the posts, the shares, the subscribes, the word of mouth"
+        };
         PrintLine("  - {}", contribution);
     }
 
