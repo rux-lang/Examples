@@ -89,7 +89,7 @@ Describing behaviour that many types share.
 
 - 12.1 **[Interface](Interfaces/Interface/)** — declare an interface and implement it for your own types
 - 12.8 **[OperatorOverload](Interfaces/OperatorOverload/)** — define `==`, `+` and the other operators for your own type
-- 12.11 **[Iterator](Iterator/)** — implement `Next` so a type of your own can be used with `for`
+- 12.11 **[Iterator](Interfaces/Iterator/)** — implement `Next` so a type of your own can be used with `for`
 
 ### 14. Text
 
