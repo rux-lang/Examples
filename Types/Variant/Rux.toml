@@ -7,7 +7,7 @@ Name = "Variant"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Cases that carry data, and matching on them"
+Description = "Declaring and building cases that carry data"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

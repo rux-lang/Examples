@@ -1,61 +1,51 @@
-// An enum says a value is one of a fixed list of cases. A variant says the
-// same, and lets each case carry data of its own.
+// An enum says a value is one of a fixed list of cases. A variant says the same, and lets each
+// case carry data of its own. A thermometer reading might be missing, or an exact temperature, or
+// a range between two temperatures. Those are three cases, and two of them hold numbers.
 //
-// That combination is what makes it useful: the data is reachable only after
-// the case has been established, so there is no way to read a radius from
-// something that turned out to be a rectangle.
+// A struct holds all of its fields at once. A variant holds one case at a time, and only that
+// case's data. This lesson declares and builds variants; reading the data back out is the next.
 import Io::PrintLine;
 
-// Three shapes of case. `Missing` carries nothing; `Exact` carries one unnamed
-// value; `Range` carries named fields, declared like a struct's.
+// A case can take one of three shapes. `Missing` carries nothing, like an enum case. `Exact`
+// carries one value by position, like a one-element tuple. `Between` carries named fields,
+// declared like a struct's.
 variant Reading {
     Missing,
     Exact(float64),
-    Range { low: float64; high: float64; }
+    Between { low: float64; high: float64; }
 }
 
-// Matching tests which case is active and unpacks its data in the same step.
-// The names in the pattern are new bindings holding that case's payload.
-func Describe(reading: Reading) -> float64 {
-    return match reading {
-        .Missing => 0.0,
-        .Exact(value) => value,
-        .Range { low, high } => (low + high) / 2.0
-    };
-}
-
-func Label(reading: Reading) -> char8[..] {
-    return match reading {
-        .Missing => "no reading",
-        .Exact(value) => "exact",
-        .Range { low, high } => "a range"
-    };
+// A variant is a type like any other: a function can return one, choosing the case as it goes.
+func Measure(low: float64, high: float64) -> Reading {
+    if low > high {
+        return Reading::Missing;
+    }
+    if low == high {
+        return Reading::Exact(low);
+    }
+    return Reading::Between { low: low, high: high };
 }
 
 func Main() -> int {
-    // Each case is built with its own shape: nothing, a positional value, or
-    // named fields.
+    // Each case is built in its own shape: just its name, its values in parentheses, or its
+    // fields in braces.
     let absent = Reading::Missing;
     let precise = Reading::Exact(21.5);
-    let between = Reading::Range { low: 20.0, high: 24.0 };
+    let range = Reading::Between { low: 20.0, high: 24.0 };
 
-    PrintLine("{:12} -> {}", Label(absent), Describe(absent));
-    PrintLine("{:12} -> {}", Label(precise), Describe(precise));
-    PrintLine("{:12} -> {}", Label(between), Describe(between));
+    // Two variant values are equal when they hold the same case with the same data. Different
+    // cases are never equal.
+    PrintLine("same case, same data       {}", precise == Reading::Exact(21.5));
+    PrintLine("same case, different data  {}", precise == Reading::Exact(9.0));
+    PrintLine("different cases            {}", precise == absent);
+    PrintLine("same fields                {}",
+        range == Reading::Between { low: 20.0, high: 24.0 });
 
-    // Equality is structural and case-aware. Two values are equal when they
-    // hold the same case and that case's payload matches; different cases are
-    // never equal, whatever their storage happens to contain.
-    PrintLine("same case, same payload      {}",
-        Reading::Exact(21.5) == precise);
-    PrintLine("same case, different payload {}",
-        Reading::Exact(9.0) == precise);
-    PrintLine("different cases              {}",
-        Reading::Missing == precise);
+    PrintLine("Measure(5.0, 5.0) exact    {}", Measure(5.0, 5.0) == Reading::Exact(5.0));
+    PrintLine("Measure(9.0, 1.0) missing  {}", Measure(9.0, 1.0) == Reading::Missing);
 
-    // The tag recording which case is active is private: it cannot be read,
-    // assigned a number, or written to a file. When a value has to survive
-    // outside the program, encode an `enum` — whose numbers you control — and
-    // translate to and from the variant at the boundary.
+    // Unlike an enum, a variant has no number behind its cases that `as` could reach: which case
+    // is held is the variant's own business. A value that must be written to a file or sent
+    // elsewhere is encoded with an enum, whose numbers you choose.
     return 0;
 }
