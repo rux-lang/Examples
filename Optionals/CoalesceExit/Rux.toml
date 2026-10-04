@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "CoalesceExit"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Leaving with return, continue or break when an optional is absent"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
