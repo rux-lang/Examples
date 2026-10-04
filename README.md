@@ -161,6 +161,7 @@ Describing behaviour that many types share.
 - 12.7 **[StructuralEquality](Interfaces/StructuralEquality/)** — compare whole structs and tuples with `==`
 - 12.8 **[OperatorOverload](Interfaces/OperatorOverload/)** — define `==`, `+` and the other operators for your own type
 - 12.9 **[DerivedOperator](Interfaces/DerivedOperator/)** — define one operator and get its partners for free
+- 12.10 **[Indexer](Interfaces/Indexer/)** — let your own type be indexed with `[]`
 - 12.11 **[Iterator](Interfaces/Iterator/)** — implement `Next` so a type of your own can be used with `for`
 
 ### 13. Generics
