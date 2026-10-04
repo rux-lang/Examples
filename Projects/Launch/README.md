@@ -42,7 +42,8 @@ Count down from? (1 to 10, Enter for 10) 3
    Liftoff! The crew waves from the window.  👋
 ```
 
-The answer can be piped in. With no input at all, nobody gave the go:
+The answer can be piped in. With no input at all, nobody gave the go, and after the checklist
+the run ends with:
 
 ```sh
 "3" | rux run
@@ -50,7 +51,7 @@ $null | rux run
 ```
 
 ```text
-Count down from? (1 to 10, Enter for 10)
+Count down from? (1 to 10, Enter for 10) 
 No go from the flight director. Mission scrubbed.  🛑
 ```
 

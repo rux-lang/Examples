@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Launch"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A mission checklist, a bounded countdown and a launch"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
