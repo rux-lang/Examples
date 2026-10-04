@@ -161,7 +161,7 @@ Modules, packages, libraries and tools.
 
 Code that runs or is chosen while compiling.
 
-- 23.1 **[Version](Version/)** — select code at compile time with `when`
+- 23.1 **[When](CompileTime/When/)** — select code at compile time with `when`
 - **[Config](Config/)** — read the build's target, profile and source location at compile time _(being split into the lessons above)_
 
 ### 24. Platform
