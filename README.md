@@ -91,6 +91,7 @@ Everything a `match` arm can say.
 - 7.2 **[RangePattern](Patterns/RangePattern/)** — match a whole range of numbers in one arm
 - 7.4 **[StructPattern](Patterns/StructPattern/)** — take a struct-shaped variant case apart by field name
 - 7.5 **[CharacterPattern](Patterns/CharacterPattern/)** — match single characters
+- 7.6 **[Exhaustive](Patterns/Exhaustive/)** — why a match on a variant must cover every case, and when `else` is needed
 
 ### 8. Optionals
 

@@ -1,0 +1,67 @@
+// A variant or an enum has a closed list of cases, so the compiler knows every value a match on it
+// could meet, and it insists that every one has an arm. Leave a case out and the program does not
+// build. Delete the `.Paused` arm below and the compiler names what is missing:
+//     error: match on 'Player' is not exhaustive; missing Player::Paused
+//
+// That check is what makes a variant safe to grow. Add a case such as `Buffering` to `Player` next
+// year, and every match that forgot it fails to compile, pointing at the exact spot to fix. A match
+// that names every case therefore has no `else`, and should not have one.
+//
+// `else` is for the values you cannot list. An integer has billions of them, so the compiler cannot
+// tell you which ones you missed, and a value that fits no arm simply matches nothing. Give every
+// integer match an `else`, and decide on purpose what the leftovers mean.
+import Io::PrintLine;
+
+variant Player {
+    Stopped,
+    Playing(int32),
+    Paused(int32)
+}
+
+// Every case has an arm, so no `else` is needed. A guarded arm does not count towards that: the
+// guard might be false, so `.Playing(second)` still needs an unguarded arm of its own. Without it
+// the error would read `missing Player::Playing`.
+func Describe(player: Player) -> char8[..] {
+    return match player {
+        .Stopped => "stopped",
+        .Playing(second) if second < 5 => "just started",
+        .Playing(_) => "playing",
+        .Paused(_) => "paused"
+    };
+}
+
+// An `else` on a variant is allowed, but it is a promise you make on behalf of cases that do not
+// exist yet: a future `Buffering` would quietly count as "not playing" here, with no error to
+// warn you. Use it only when that is truly the right answer for any new case.
+func IsPlaying(player: Player) -> bool {
+    return match player {
+        .Playing(_) => true,
+        else => false
+    };
+}
+
+// An integer match always has an `else`: the arms name a few volume levels and `else` covers the
+// rest.
+func Loudness(volume: int32) -> char8[..] {
+    return match volume {
+        0 => "muted",
+        1..=3 => "quiet",
+        10 => "maximum",
+        else => "normal"
+    };
+}
+
+func Main() -> int {
+    let states: Player[4] = [
+        Player::Stopped,
+        Player::Playing(2),
+        Player::Playing(95),
+        Player::Paused(95)
+    ];
+    for index in 0..4 {
+        PrintLine("{:12} playing: {}", Describe(states[index]), IsPlaying(states[index]));
+    }
+
+    PrintLine("0 {}, 2 {}, 7 {}, 10 {}", Loudness(0), Loudness(2), Loudness(7), Loudness(10));
+    return 0;
+}
