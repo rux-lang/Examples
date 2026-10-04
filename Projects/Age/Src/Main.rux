@@ -1,91 +1,96 @@
-// Working out how old someone is, which sounds like subtraction and is not.
+// Working out how old someone is, in completed years, months and days. It sounds like
+// subtraction and is not, because months have different lengths.
 //
-// Ages are counted in whole years, and a year is not a fixed number of days.
-// So the answer is "how many birthdays have happened", which means comparing
-// month and day as well as year — and that comparison is the whole program.
+// The rule is the one people use: count whole years, then whole months, then the days left over.
+// A month is complete when its day comes round again. When that day does not exist, the month
+// is complete on its last day instead: one month after 31 January is 28 February, and someone
+// born on 29 February has their birthday on 28 February in a year that is not a leap year.
+//
+// `PlusMonths` from the Time package follows exactly that rule, clamping to the end of the
+// month, so the program never counts days in a month by hand. It finds the last date, on or
+// before the second one, that is a whole number of months after the birth, and the days left
+// over are a plain `DaysSince`.
+//
+// Every date is written out, so the output is the same on every run. A real program would ask
+// the clock for today.
 import Io::PrintLine;
-import Time::{ Date, DaysInMonth, IsLeapYear };
+import Time::{ Date, ParseDate };
 
-// Years, months and days between two dates, counted the way people count them.
-func AgeBetween(birth: Date, today: Date, years: *var int32, months: *var int32, days: *var int32) {
-    var y = today.year - birth.year;
-    var m = (today.month as int32) - (birth.month as int32);
-    var d = (today.day as int32) - (birth.day as int32);
-
-    // If the day of the month has not come round yet, borrow a month — and the
-    // number of days borrowed is however many the *previous* month had, which
-    // is why this cannot be done with a fixed 30.
-    if d < 0i32 {
-        m -= 1i32;
-        var borrowedMonth = today.month;
-        var borrowedYear = today.year;
-        if borrowedMonth == 1u8 {
-            borrowedMonth = 12u8;
-            borrowedYear -= 1i32;
-        } else {
-            borrowedMonth -= 1u8;
-        }
-        d += DaysInMonth(borrowedYear, borrowedMonth) as int32;
-    }
-
-    // If the month has not come round yet either, borrow a year.
-    if m < 0i32 {
-        y -= 1i32;
-        m += 12i32;
-    }
-
-    *years = y;
-    *months = m;
-    *days = d;
+struct Age {
+    years: int64;
+    months: int64;
+    days: int64;
 }
 
-func Report(label: char8[..], birth: Date, today: Date) {
-    var years: int32 = 0;
-    var months: int32 = 0;
-    var days: int32 = 0;
-    AgeBetween(birth, today, @years, @months, @days);
-    PrintLine("{:22} {} years, {} months, {} days", label, years, months, days);
+enum AgeError {
+    BornLater,
+    OutOfRange
+}
+
+// The age on `on` of someone born on `birth`, or why there is none.
+func AgeOn(birth: Date, on: Date) -> Age ! AgeError {
+    if on.DaysSince(birth) < 0 {
+        fail AgeError::BornLater;
+    }
+
+    // Counting the calendar months between the two gives the right answer, or one too many
+    // when the day of the month has not come round yet. Stepping from `birth` rather than
+    // from the previous month keeps the clamping from drifting: 31 January plus two months
+    // is 31 March, not 28 March.
+    var months = ((on.year - birth.year) as int64) * 12 + (on.month as int64)
+        - (birth.month as int64);
+    var reached = birth.PlusMonths(months) ?? fail AgeError::OutOfRange;
+    if on.DaysSince(reached) < 0 {
+        months -= 1;
+        reached = birth.PlusMonths(months) ?? fail AgeError::OutOfRange;
+    }
+    return Age { years: months / 12, months: months % 12, days: on.DaysSince(reached) };
+}
+
+func Show(birthText: char8[..], onText: char8[..]) {
+    let birth = ParseDate(birthText) catch {
+        else => {
+            PrintLine("{}  {}  {} is not a date", birthText, onText, birthText);
+            return;
+        }
+    };
+    let on = ParseDate(onText) catch {
+        else => {
+            PrintLine("{}  {}  {} is not a date", birthText, onText, onText);
+            return;
+        }
+    };
+    match AgeOn(birth, on) {
+        .Success(age) => PrintLine("{}  {}  {:5} {:7} {:5}", birth, on,
+            age.years, age.months, age.days),
+        .Failure(AgeError::BornLater) => PrintLine("{}  {}  refused, born after that date",
+            birth, on),
+        .Failure(AgeError::OutOfRange) => PrintLine("{}  {}  outside the calendar", birth, on)
+    }
 }
 
 func Main() -> int {
-    // Pretend today is a fixed date, so the example prints the same thing
-    // every time it is run. A real program would ask the clock.
-    let today = Date::New(2026i32, 9u8, 10u8) ?? Date::FromEpochDays(0i64);
-    PrintLine("today is {}-{}-{}", today.year, today.month, today.day);
-    PrintLine("");
+    PrintLine("born        on          years  months  days");
 
-    // A birthday that has already happened this year.
-    match Date::New(1990i32, 3u8, 15u8) {
-        birth? => Report("born 1990-03-15", birth, today),
-        none => PrintLine("not a date")
-    }
+    // A birthday already past this year, one still to come, and the day itself.
+    Show("1990-03-15", "2026-10-04");
+    Show("1990-12-25", "2026-10-04");
+    Show("2000-10-04", "2026-10-04");
 
-    // One still to come, where the year count is one less than subtracting.
-    match Date::New(1990i32, 12u8, 25u8) {
-        birth? => Report("born 1990-12-25", birth, today),
-        none => PrintLine("not a date")
-    }
+    // The end of a month. 31 January reaches a whole month on 28 February, and the next on
+    // 31 March, so 30 March is one month and 30 days.
+    Show("2026-01-31", "2026-02-28");
+    Show("2026-01-31", "2026-03-30");
+    Show("2026-01-31", "2026-03-31");
 
-    // Today's date exactly, which is a whole number of years.
-    match Date::New(2000i32, 9u8, 10u8) {
-        birth? => Report("born 2000-09-10", birth, today),
-        none => PrintLine("not a date")
-    }
+    // A leap-day birthday falls on 28 February in an ordinary year, and on the 29th in a
+    // leap year, which makes 28 February 2028 the day before it.
+    Show("2004-02-29", "2025-02-28");
+    Show("2004-02-29", "2028-02-28");
+    Show("2004-02-29", "2028-02-29");
 
-    // The day after, where a month has to be borrowed.
-    match Date::New(2000i32, 9u8, 11u8) {
-        birth? => Report("born 2000-09-11", birth, today),
-        none => PrintLine("not a date")
-    }
-
-    // The 29th of February, which only exists every fourth year. Someone born
-    // on one has a birthday most years only by agreement.
-    match Date::New(2004i32, 2u8, 29u8) {
-        birth? => Report("born 2004-02-29", birth, today),
-        none => PrintLine("not a date")
-    }
-    PrintLine("");
-    PrintLine("2004 was a leap year: {}", IsLeapYear(2004i32));
-    PrintLine("2026 is not:          {}", IsLeapYear(2026i32));
+    // Dates the other way round, and a date that does not exist.
+    Show("2026-10-04", "1990-03-15");
+    Show("2023-02-29", "2026-10-04");
     return 0;
 }
