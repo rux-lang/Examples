@@ -7,15 +7,16 @@
 //
 // "Below" means the limit itself is not a candidate: with a limit of 100 the numbers examined are
 // 0 to 99. That matches the array, whose indices run from 0 to one less than its length, and the
-// half-open range `0..limit` that walks it.
+// half-open range `0..Limit` that walks it.
 import Io::{ Print, PrintLine };
 
+// The limit is named once, here. A constant is known at compile time, so it can size the array
+// as well as bound the loops, and changing it changes both.
+const Limit = 100;
+
 func Main() -> int {
-    // One flag per number, indexed by the number itself, none crossed out yet. The count in
-    // `[false; 100]` must be known at compile time, so the limit is written here, once, and read
-    // back as the array's length.
-    var crossedOut = [false; 100];
-    let limit = crossedOut.length;
+    // One flag per number, indexed by the number itself, none crossed out yet.
+    var crossedOut = [false; Limit];
 
     // 0 and 1 are not prime, and no pass below would cross them out.
     crossedOut[0] = true;
@@ -26,10 +27,10 @@ func Main() -> int {
     // factor of k) has already crossed it out. For the same reason the passes can stop once
     // n * n reaches the limit, because such an n has no multiples left to visit.
     var n: uint = 2;
-    while n * n < limit {
+    while n * n < Limit {
         if !crossedOut[n] {
             var multiple = n * n;
-            while multiple < limit {
+            while multiple < Limit {
                 crossedOut[multiple] = true;
                 multiple += n;
             }
@@ -39,8 +40,8 @@ func Main() -> int {
 
     // Everything still standing is prime.
     var found = 0;
-    Print("primes below {}:", limit);
-    for i in 0..limit {
+    Print("primes below {}:", Limit);
+    for i in 0..Limit {
         if !crossedOut[i] {
             Print(" {}", i);
             found += 1;

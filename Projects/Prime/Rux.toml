@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Prime"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Every prime below 100, found with the sieve of Eratosthenes in an inline array"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
