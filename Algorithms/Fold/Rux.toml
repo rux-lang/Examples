@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Fold"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Folding a slice into one answer by passing a named function as the step"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Algorithms = { Namespace = "Rux", Version = "*" }
