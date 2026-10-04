@@ -1,0 +1,43 @@
+// A comment is text the compiler skips. It is there for the people who read the code, and Rux has
+// three kinds of it. This file uses all three.
+//
+// A line comment, like this one, starts with two slashes and runs to the end of the line. It is
+// the everyday kind: use it to say why the code is the way it is.
+import Io::PrintLine;
+
+/* A block comment starts with a slash and a star and ends with a star and a slash. It can cover
+   several lines, or sit in the middle of one. */
+
+/* Block comments nest, which is less common than it sounds. In many languages the first closing
+   star-slash below would end the whole comment and leave the line after it as broken code. In
+   Rux every opening pair needs its own closing pair:
+   /* an inner comment */
+   so this line is still inside the outer comment.
+*/
+
+/// A documentation comment starts with three slashes. It describes the declaration that follows
+/// it — here `Main` — and tools read it: `rux doc` turns these comments into a package's
+/// reference pages. `/** ... */` is the block form of the same thing.
+func Main() -> int {
+    // A comment can have a line of its own, or follow code on the same line.
+    PrintLine("Comments never reach the program."); // This one sits beside a statement.
+
+    // A block comment can even sit inside a statement, between any two pieces of it.
+    PrintLine(/* the message */ "A block comment can sit inside a call.");
+
+    // Inside quotes, the comment markers are only characters, and they print like any others.
+    PrintLine("// is not a comment here");
+    PrintLine("/* and neither is this */");
+
+    // Putting `//` in front of a line switches it off without deleting it:
+    // PrintLine("This line never runs.");
+
+    // A documentation comment must document a declaration. Written inside a body, as in
+    //
+    //     /// Prints the total.
+    //     PrintLine("total");
+    //
+    // it is refused with "error: expected an expression before '/// Prints the total.'".
+    // Inside a function, use `//`.
+    return 0;
+}
