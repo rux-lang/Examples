@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Format"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Width, alignment and fill in a placeholder, for output that lines up in columns"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
