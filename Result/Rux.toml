@@ -10,5 +10,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A value or an error, and handling both"
 
 [Dependencies]
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
