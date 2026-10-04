@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "ErrorSum"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Fail with one of several error types through an error sum"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

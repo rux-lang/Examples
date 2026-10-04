@@ -47,6 +47,8 @@ func ParsePercent(text: char8[..]) -> int ! (DigitError | RangeError) {
 // The caller tells the members apart with a typed pattern: `e: DigitError`
 // matches only that member and binds it as a plain `DigitError`. The match
 // must cover every member of the sum, or the compiler names the missing one.
+// Drop the `RangeError` arm and it says "match on 'int ! (DigitError |
+// RangeError)' is not exhaustive; missing .Failure(_: RangeError)".
 func Show(text: char8[..]) {
     match ParsePercent(text) {
         .Success(percent) => PrintLine("{:5} -> {}%", text, percent),
