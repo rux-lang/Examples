@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "NumberLimit"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Each number type's limits as associated constants: Min, Max, Bits, Epsilon"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
