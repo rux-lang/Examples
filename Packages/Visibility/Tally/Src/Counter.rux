@@ -1,0 +1,30 @@
+// The companion library. It is a package of its own, with its own `Rux.toml`, so everything in it
+// is private to it unless it says `pub`.
+//
+// The public surface is the `Counter` type, its `step` field and three of its functions. The
+// running total, the limit and the helper that enforces the limit stay private, and that is the
+// whole point: no caller can push `count` past `Limit`, because no caller can touch `count`.
+pub struct Counter {
+    pub step: int;
+    count: int;
+}
+
+extend Counter {
+    pub func Counter(step: int) -> Counter {
+        return Counter { step: step, count: 0 };
+    }
+
+    pub func Tick(self: &var Counter) {
+        self.count = Clamp(self.count + self.step);
+    }
+
+    pub func Count(self: &Counter) -> int {
+        return self.count;
+    }
+}
+
+const Limit: int = 10;
+
+func Clamp(value: int) -> int {
+    return value > Limit ? Limit : value;
+}

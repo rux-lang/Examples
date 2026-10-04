@@ -311,6 +311,7 @@ Reading and writing JSON and TOML.
 Modules, packages, libraries and tools.
 
 - 22.1 **[Module](Packages/Module/)** — split a package across source files and modules
+- 22.2 **[Visibility](Packages/Visibility/)** — choose what a package shows to others with `pub`
 
 ### 23. Compile time
 

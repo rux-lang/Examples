@@ -1,0 +1,41 @@
+// Inside one package, every file sees every declaration. `pub` matters at the boundary between
+// packages: it marks what a package lets the packages that depend on it see.
+//
+// This lesson needs two packages to show that. The companion library lives in `Tally/`, beside
+// `Src/`, with its own `Rux.toml`. This package's manifest lists it under `[Dependencies]` as
+// `Tally = { Path = "Tally" }`, so building this program compiles the library as well.
+//
+// Visibility is chosen per declaration, and a member does not inherit it from its type. `Counter`
+// is public, its `step` field is public, and its `count` field is not. A caller can read `step`,
+// but can learn the count only by asking `Count()`, and can change it only through `Tick()`, which
+// never lets it pass the library's private limit.
+import Io::PrintLine;
+import Tally::Counter;
+
+// A private function cannot even be imported. Adding it to the import above is rejected:
+//
+//     import Tally::{ Counter, Clamp };
+//
+//     error: function 'Clamp' is private to package 'local:.../Visibility/Tally/Rux.toml'
+//     help: add 'pub' to the declaration of 'Clamp'
+
+func Main() -> int {
+    // The public constructor is the only way to make a `Counter` here. A struct literal would have
+    // to set the private `count`, and is refused for that reason.
+    var counter = Counter(4);
+
+    counter.Tick();
+    counter.Tick();
+    counter.Tick();
+
+    // Three ticks of 4 would make 12; the library's private limit keeps it at 10.
+    PrintLine("step {}, count {}", counter.step, counter.Count());
+
+    // The private field itself is out of reach, for reading as much as for writing:
+    //
+    //     counter.count = 0;
+    //
+    //     error: struct field 'count' is private to package 'local:.../Visibility/Tally/Rux.toml'
+    //     help: add 'pub' before the declaration of 'count'
+    return 0;
+}
