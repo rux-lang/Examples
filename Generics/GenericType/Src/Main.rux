@@ -40,8 +40,9 @@ func Lowest<T>(reading: Reading<T>, fallback: T) -> T {
 }
 
 func Main() -> int {
-    // A struct literal names its type arguments: `Pair { ... }` alone is rejected, because a
-    // literal does not guess `T` from its fields.
+    // A struct literal names its type arguments. A literal does not guess `T` from its fields,
+    // so `Pair { first: 3, second: 4 }` is rejected: "struct initializer for 'Pair' requires 1
+    // type argument, but 0 were provided".
     let point = Pair<int32> { first: 3, second: 4 };
     let words = Pair<char8[..]> { first: "left", second: "right" };
     let flipped = Swapped(point);
@@ -52,12 +53,12 @@ func Main() -> int {
     PrintLine("entry    {} = {}", age.key, age.value);
 
     // A case with a payload learns `T` from it, the way a generic function learns from its
-    // arguments, so this is a `Reading<float64>`. The type argument can also be written out. A
-    // case without a payload has nothing to learn from, so it must be written out, and the case
-    // is then called like a function: `Reading::Missing<int32>()`.
+    // arguments, so this is a `Reading<float64>`. An annotation supplies `T` too: `floor` is a
+    // `Reading<int32>`, so its 7 is an `int32`. A case without a payload has nothing to learn
+    // from, so the annotation is what tells `Missing` which reading it is.
     let temperature = Reading::Between(18.5, 21.0);
-    let floor = Reading::Exact<int32>(7);
-    let lost = Reading::Missing<int32>();
+    let floor: Reading<int32> = Reading::Exact(7);
+    let lost: Reading<int32> = Reading::Missing;
     PrintLine("lowest   {}", Lowest(temperature, 0.0));
     PrintLine("lowest   {}", Lowest(floor, 0));
     PrintLine("lowest   {}", Lowest(lost, -1));

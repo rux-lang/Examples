@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "GenericType"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A struct and a variant that take a type parameter"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
