@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "PathNormalize"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Lexical path normalization with Normalize, and what it cannot know"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
