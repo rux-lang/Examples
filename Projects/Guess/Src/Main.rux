@@ -1,83 +1,77 @@
-// A guessing game: the program picks a number, you try to find it, and it says
-// higher or lower until you do.
+// A guessing game: the program picks a number from 1 to 100, and you have seven guesses to find
+// it, with a "higher" or "lower" after each one.
 //
-// It is the first program here that keeps going until something happens rather
-// than running a fixed number of steps — a loop whose ending depends on the
-// person using it.
+// Seven is enough if you halve what is left every time, because seven halvings take a hundred
+// candidates down to one. So a guess only counts when it is a real one: text that is not a
+// number, or a number outside 1 to 100, is answered and asked again without using a guess up.
+//
+// The game ends in one of four ways, and each is handled on purpose: the number is found, the
+// guesses run out, the input ends (Ctrl+Z and Enter on Windows, Ctrl+D elsewhere, or the end of
+// piped input), or the input cannot be read at all.
+//
+// The number comes from a generator seeded from the system's entropy, so every game is
+// different. Asking for entropy can fail, and then there is no fair number to pick, so the
+// program says so and stops.
 import Allocator::{ Allocator, SystemAllocator };
-import Format::ParseInt64;
-import Io::{ Print, PrintLine, ReadLine };
+import Format::ParseInt32;
+import Io::{ IoErrorKind, Print, PrintLine, ReadLine };
 import Random::{ Pcg64Dxsm, PcgFromEntropy, UniformInRange };
 import Text::StringBuilder;
 
-func ReadGuess(allocator: Allocator, value: *var int64) -> bool {
-    Print("your guess: ");
-    var builder = StringBuilder(allocator);
-    var ok = false;
-    match ReadLine(builder) {
-        .Success(_) => {},
-        .Failure(_) => {
-            builder.Release();
-            return false;
-        }
-    }
-    match ParseInt64(builder.View()) {
-        .Success(parsed) => {
-            *value = parsed;
-            ok = true;
-        },
-        .Failure(_) => ok = false
-    }
-    builder.Release();
-    return ok;
-}
+const Guesses = 7;
 
 func Main() -> int {
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
-
-    // Seeded from entropy, so the answer differs every run. A fixed seed here
-    // would make the game the same game every time — useful for testing it,
-    // useless for playing it. Asking the system for entropy can fail, so the
-    // generator arrives as a fallible and the failure is handled first.
     var generator = PcgFromEntropy() catch {
         else => {
-            PrintLine("There is no entropy to pick a number with.");
+            PrintLine("There is no entropy to pick a number with, so there is no game.");
             return 1;
         }
     };
-    let secret = UniformInRange<Pcg64Dxsm>(generator, 1u64, 100u64) as int64;
+    let secret = UniformInRange<Pcg64Dxsm>(generator, 1, 100) as int32;
 
-    PrintLine("I am thinking of a number between 1 and 100.");
-    PrintLine("You have 7 guesses, which is enough if you halve the range each time.");
-    PrintLine("");
+    PrintLine("I am thinking of a number from 1 to 100. You have {} guesses.", Guesses);
 
-    var remaining = 7;
-    var guess: int64 = 0;
-    while remaining > 0 {
-        if !ReadGuess(allocator, @guess) {
-            PrintLine("I need a number. Stopping here.");
-            return 1;
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+    var builder = StringBuilder(allocator);
+
+    var used = 0;
+    while used < Guesses {
+        Print("guess {}: ", used + 1);
+        builder.Clear();
+        match ReadLine(builder) {
+            .Success(_) => {},
+            .Failure(error) if error.kind == IoErrorKind::EndOfStream => {
+                PrintLine();
+                PrintLine("Leaving already? It was {}.", secret);
+                return 0;
+            },
+            .Failure(_) => {
+                PrintLine("The input could not be read.");
+                return 1;
+            }
         }
-        remaining -= 1;
+
+        // Spaces around the number are forgiven; anything else that is not a number is not.
+        let guess = ParseInt32(builder.View().Trim()) catch {
+            else => {
+                PrintLine("That is not a number. It does not count; try again.");
+                continue;
+            }
+        };
+        if guess < 1 || guess > 100 {
+            PrintLine("That is outside 1 to 100. It does not count; try again.");
+            continue;
+        }
+        used += 1;
 
         if guess == secret {
-            PrintLine("That is it — {} was the number.", secret);
-            PrintLine("You had {} guesses to spare.", remaining);
+            PrintLine("Yes, {}! Found in {} of {} guesses.", secret, used, Guesses);
             return 0;
         }
-
-        // The hint is what makes seven guesses enough: each answer removes
-        // half of what is left, and seven halvings covers a hundred.
-        if guess < secret {
-            Print("higher");
-        } else {
-            Print("lower");
-        }
-        let plural = remaining == 1 ? "" : "es";
-        PrintLine("  ({} guess{} left)", remaining, plural);
+        let hint = guess < secret ? "higher" : "lower";
+        PrintLine("{}", hint);
     }
-
     PrintLine("Out of guesses. It was {}.", secret);
     return 0;
 }
