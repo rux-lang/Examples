@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Integer"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Signed and unsigned integers, from int8 to uint512, and int and uint"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
