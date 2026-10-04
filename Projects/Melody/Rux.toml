@@ -7,7 +7,7 @@ Name = "Melody"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Playing a tune through the console speaker"
+Description = "Play a tune through the console speaker with the Windows Beep function"
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
