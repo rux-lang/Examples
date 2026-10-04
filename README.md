@@ -225,6 +225,7 @@ Numbers in depth.
 
 - 16.1 **[WideInteger](Numbers/WideInteger/)** — 128-, 256- and 512-bit integers
 - 16.2 **[NumberLimit](Numbers/NumberLimit/)** — the smallest and largest value each number type can hold
+- 16.3 **[FloatSpecial](Numbers/FloatSpecial/)** — infinity and NaN, and how they compare
 - 16.11 **[Math](Numbers/Math/)** — roots, powers, logarithms, trigonometry, and rounding
 
 ### 17. Collections
