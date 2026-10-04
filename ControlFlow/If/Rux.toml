@@ -7,7 +7,7 @@ Name = "If"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Run-time branching with if, else if, and else"
+Description = "Run-time branching with if and else"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

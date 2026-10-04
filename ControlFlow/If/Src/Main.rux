@@ -1,56 +1,60 @@
-// `if` picks a branch while the program is running. There is a second, very
-// similar-looking conditional in Rux — `when` — that picks a branch while the
-// program is being compiled; that one comes much later, in the Version lesson.
+// `if` runs a block only when its condition is true. Add `else`, and exactly one of two blocks
+// runs: the first when the condition holds, the second when it does not.
+//
+// The condition must be a `bool`: a comparison, a logical expression, or a `bool` binding. Rux has
+// no "truthy" numbers, so a number is not a shortcut for "not zero":
+//
+//     if count { }
+//         error: condition for 'if' must have type 'bool', but found 'int'
+//
+// Write the comparison you mean instead, `if count != 0 { }`.
+//
+// `if` decides while the program runs. Rux also has `when`, which decides while the program is
+// being compiled; that one comes much later, in the When lesson.
 import Io::PrintLine;
 
 func Main() -> int {
     let temperature: int32 = 18;
 
-    // Parentheses around the condition are optional, and these two say the
-    // same thing. The examples that follow leave them out.
+    // Without `else`, the block either runs or is skipped, and the program carries on after it.
     if temperature > 15 {
-        PrintLine("warm enough");
+        PrintLine("warm enough for a walk");
     }
-    if (temperature > 15) {
-        PrintLine("warm enough, with parentheses");
-    }
-
-    // A chain tests each condition in turn and runs the first that holds, so
-    // at most one branch of the chain happens. A final `else` catches whatever
-    // none of the conditions matched.
-    if temperature > 30 {
-        PrintLine("hot");
-    } else if temperature > 20 {
-        PrintLine("mild");
-    } else if temperature > 10 {
-        PrintLine("cool");
-    } else {
-        PrintLine("cold");
+    if temperature > 25 {
+        PrintLine("hot enough for a swim");
     }
 
-    // Because only the first match runs, the order of a chain is part of its
-    // meaning. If the `> 10` test came first, nothing below it could ever be
-    // reached: every temperature above 30 is also above 10.
+    // Parentheses around the condition are allowed but never needed. The braces are always
+    // needed, even around a single statement: `if ready PrintLine("go");` is an error.
+    if (temperature < 20) {
+        PrintLine("bring a jacket");
+    }
 
-    // A condition is an ordinary `bool` expression, so the logical operators
-    // combine them.
+    // With `else`, one of the two blocks always runs.
     let raining = true;
-    let windy = false;
-    if raining && !windy {
+    if raining {
         PrintLine("take an umbrella");
-    } else if raining && windy {
-        PrintLine("take a coat instead");
+    } else {
+        PrintLine("leave the umbrella at home");
     }
 
-    // `if` accepts a `bool` and nothing else. A number is not a shortcut for
-    // "not zero", so this is an error rather than a test against zero:
-    //
-    //     if temperature { }
-    //         error: condition for 'if' must have type 'bool', but found 'int32'
-    //
-    // Write the comparison you mean instead.
-    if temperature != 0 {
-        PrintLine("temperature is not zero");
+    // Any `bool` expression is a condition, including ones built with `&&`, `||` and `!`.
+    let windy = true;
+    if raining && !windy {
+        PrintLine("the umbrella will do");
+    } else {
+        PrintLine("wear a hood instead");
+    }
+
+    // A block may change variables declared before it. A binding declared inside the block,
+    // though, belongs to the block and is gone after its closing brace.
+    var budget: int32 = 12;
+    let price: int32 = 9;
+    if price <= budget {
+        budget -= price;
+        PrintLine("bought it, {} left", budget);
+    } else {
+        PrintLine("cannot afford it");
     }
     return 0;
 }
