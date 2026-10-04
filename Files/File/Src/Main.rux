@@ -46,8 +46,7 @@ func Main() -> ! IoError | TextError {
             error => fail error
         };
         // Only the first `filled` bytes are new. The rest of the buffer is left over.
-        let piece: char8[..] = buffer[..filled];
-        Print("{}", piece);
+        Print("{}", buffer[..filled]);
         reads += 1;
         total += filled;
     }
