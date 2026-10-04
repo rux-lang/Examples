@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "FixedBuffer"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Allocate from storage you already own, and get OutOfMemory when it is full"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
