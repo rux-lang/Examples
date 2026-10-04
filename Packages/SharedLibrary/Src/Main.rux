@@ -1,0 +1,28 @@
+// `Type = "SharedLibrary"` asks `rux build` for a library that programs load while they run:
+// `SharedLibrary.dll` on Windows, `libSharedLibrary.so` on Linux and FreeBSD, and
+// `libSharedLibrary.dylib` on macOS. Unlike an archive, it is not copied into the program. It
+// ships as its own file, and every program that loads it shares the one copy.
+//
+// What other programs can call is the library's export table, and `pub` decides what goes in it.
+// `Area` and `Perimeter` are exported under exactly those names. `Double` is package-private, so
+// it is compiled into the library but never exported: no program can look it up.
+//
+// On Windows, the build also writes `SharedLibrary.lib` beside the `.dll`. That small file is an
+// import library, which a native linker reads to know which exports the program will find in the
+// `.dll` at run time.
+//
+// Like a static library, a shared library has no `Main`, so `rux run` refuses it; and a Rux
+// package that depends on it compiles its source instead, as for every dependency in Rux 0.4.0.
+// Calling an export from a separately built program is done with `extern` and `#Link`, which the
+// Platform part covers.
+pub func Area(width: int, height: int) -> int {
+    return width * height;
+}
+
+pub func Perimeter(width: int, height: int) -> int {
+    return Double(width + height);
+}
+
+func Double(value: int) -> int {
+    return 2 * value;
+}
