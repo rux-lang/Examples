@@ -280,6 +280,7 @@ Paths, files and directories.
 
 Time, randomness, hashing and identifiers.
 
+- 20.1 **[Duration](Utilities/Duration/)** — lengths of time, and arithmetic on them
 - 20.5 **[Random](Utilities/Random/)** — a reproducible random number generator
 - **[Time](Utilities/Time/)** — measure elapsed time, work with durations, and format a calendar date _(being split into the lessons above)_
 
