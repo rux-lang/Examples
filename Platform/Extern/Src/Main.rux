@@ -1,34 +1,42 @@
-#Link("Kernel32.dll") 
-extern {
-    func CreateFileA(
-        fileName: *char8,
-        dwDesiredAccess: uint32,
-        dwShareMode: uint32,
-        lpSecurityAttributes: *opaque,
-        creationDisposition: uint32,
-        dwFlagsAndAttributes: uint32,
-        templateFile: *opaque
-    ) -> *opaque;
+// Not every function a program calls was written in Rux. The operating system offers thousands
+// of its own, compiled long ago and shipped in shared libraries. `extern` declares one of them:
+// its name, its parameters and its result, with no body, because the body is already in the
+// library. `#Link` names that library, and the linker connects the two.
+//
+// The compiler cannot look inside the library to check the declaration. It takes what you wrote
+// on trust, so a wrong parameter type is not a compile error: the call goes ahead and passes the
+// wrong bytes. Copy a declaration carefully from the library's documentation.
+//
+// The functions below live in Kernel32.dll, which only Windows has. `when #target.os` keeps
+// them out of every other build, and `#Error` explains why such a build stops.
+import Core::{ #Error, #target };
+import Io::PrintLine;
 
-    func WriteFile(
-        file: *opaque,
-        buffer: *opaque,
-        numberOfBytesToWrite: uint32,
-        numberOfBytesWritten: *uint32,
-        overlapped: *opaque
-    ) -> bool32;
+when #target.os {
+    .Windows => {
+        // One `#Link` on a block applies to every declaration inside it.
+        #Link("Kernel32.dll")
+        extern {
+            // DWORD GetCurrentProcessId(void): the number Windows gave this running program.
+            func GetCurrentProcessId() -> uint32;
 
-    func CloseHandle( object: *opaque) -> bool32;
+            // int lstrlenA(const char *text): counts bytes up to the first zero byte.
+            func lstrlenA(text: *char8) -> int32;
+        }
+    },
+    else => #Error("This lesson calls Kernel32.dll, so it builds for Windows only")
 }
 
 func Main() -> int {
-    let filename = "Info.txt\0";
-    let file = CreateFileA(filename.data, 0x40000000, 0, null, 2, 0, null);
-    if (file == null) {
-        return 1;
-    }
-    let text = "Hello, Rux!";
-    WriteFile(file, text.data, text.length as uint32, null, null);
-    CloseHandle(file);
+    // Called like any other function. Neither of these can fail, which is why they were
+    // chosen: most system functions can, and the next lesson checks for that.
+    PrintLine("process id   {}", GetCurrentProcessId());
+
+    // C functions find the end of a string by looking for a zero byte. A Rux string literal
+    // keeps one after its last character, though `.length` does not count it, so `.data`, the
+    // address of the first byte, is exactly what a C function expects.
+    let word = "extern";
+    PrintLine("Rux length   {}", word.length);
+    PrintLine("lstrlenA     {}", lstrlenA(word.data));
     return 0;
 }
