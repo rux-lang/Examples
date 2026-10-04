@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Allocator"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Allocate through the Allocator interface, handling AllocError before using the block"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
