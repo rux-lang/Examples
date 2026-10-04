@@ -39,8 +39,7 @@ func Main() -> int {
         PrintLine("sprintf failed");
         return 1;
     }
-    let text: char8[..] = buffer[..written as uint];
-    PrintLine("{} ({} bytes)", text, written);
+    PrintLine("{} ({} bytes)", buffer[..written as uint], written);
 
     // gmtime fills a `tm` struct that the C runtime owns, and returns its address, or null.
     var stamp: time_t = 1000000000;

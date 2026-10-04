@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "CInterop"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "C types, an opaque pointer, a C struct and a variadic call through the C package"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 C = { Namespace = "Rux", Version = "*" }
