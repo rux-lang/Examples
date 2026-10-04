@@ -1,12 +1,15 @@
-// The smallest complete Rux program: an import, an entry point, and one line
-// of output. Running `rux run` in this directory builds the file and executes
-// the result.
+// The smallest complete Rux program: an import, an entry point and one line of output. Running
+// `rux run` in this directory builds the program and then runs it.
+//
+// `import` brings a name from another package into this file. `PrintLine` lives in `Io`, the
+// standard input and output package, and the `[Dependencies]` table in Rux.toml is what makes
+// `Io` available to import from.
 import Io::PrintLine;
 
-// `Main` is where every executable package starts. The `int` it returns is the
-// process exit status, and zero means the program finished successfully.
+// `Main` is where every program starts. The `int` it returns is the exit status, and zero means
+// the program finished successfully.
 func Main() -> int {
-    // `PrintLine` writes the text and ends the line, so no "\n" is needed.
+    // `PrintLine` writes the text in the quotes and then ends the line.
     PrintLine("Hello, World!");
     return 0;
 }
