@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Hash"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Fingerprinting data with fast, non-cryptographic hashes such as FNV-1a and CRC-32"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Hash = { Namespace = "Rux", Version = "*" }
