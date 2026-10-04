@@ -4,10 +4,7 @@ Example projects and programming tutorials for the [Rux](https://rux-lang.dev) l
 
 ## The Course
 
-The course is read in order: each lesson is one package that teaches one idea, and assumes
-only the lessons before it. Each lesson has a page at `https://rux-lang.dev/docs/learn/<lesson>`.
-Parts 1–17 build the language step by step; Parts 18–24 tour the standard packages and can be
-read in any order once their prerequisites are done; Part 25 holds complete small programs.
+The course is read in order: each lesson is one package that teaches one idea, and assumes only the lessons before it. Each lesson has a page at `https://rux-lang.dev/docs/learn/<lesson>`. Parts 1–17 build the language step by step; Parts 18–24 tour the standard packages and can be read in any order once their prerequisites are done; Part 25 holds complete small programs.
 
 ### 1. Basics
 
@@ -373,14 +370,33 @@ cd Basics/Hello
 rux run
 ```
 
-If necessary, install the dependencies first with `rux install`. To type-check an example
-without running it, use `rux check`.
+If necessary, install the dependencies first with `rux install`. To type-check an example without running it, use `rux check`.
 
-To check every example in the repository at once, from the root:
+Use the repository runners to check or test the examples. Running without arguments shows help:
+
+```powershell
+./Run.ps1
+./Run.ps1 check
+./Run.ps1 test -Filter Errors
+./Run.ps1 test -RuxExecutable ../Rux/Bin/rux.exe
+```
+
+On Linux, macOS, or FreeBSD, use the equivalent POSIX shell runner:
 
 ```sh
-./Check.ps1
+sh Run.sh
+sh Run.sh check
+sh Run.sh test --filter Errors
+sh Run.sh test --rux-executable ../Rux/Bin/rux
 ```
+
+`check` type-checks the selected packages. `test` also runs eligible executables and builds static/shared libraries; source libraries are only checked. Tests verify exit codes, not printed output. Interactive and audible examples are checked but not run, and lessons that require another OS or architecture are reported as platform skips. Each run ends with checked, executed, built, skipped, and failed counts, returning a nonzero exit code if any check fails.
+
+Both runners use `rux` on PATH unless an executable is supplied. Dependencies must already be installed. The filter is a case-insensitive literal substring of a repository-relative package path; matching a workspace selects its members. An unmatched filter is an error. You can invoke a runner from another directory: package paths remain relative to the repository, while an explicit relative compiler path is resolved from your current directory.
+
+Exceptions are maintained in `Scripts/RunnerExceptions.tsv`. The runners execute sequentially and do not build the compiler, install dependencies, or update the package cache. The runner regression tests use temporary fixtures and a fake compiler: `pwsh -File Scripts/TestRunners.ps1` (use `-ShellExecutable PATH` if a POSIX shell is not on PATH).
+
+Output follows the compiler runner's style: a `==>` heading, green `Passed` or red `Failed` statuses with the package and stage, and elapsed times. Skips are yellow. Redirected output stays plain text; set `NO_COLOR` to disable terminal colors. Shell timings fall back to whole seconds where a fractional clock is unavailable.
 
 ## License
 
