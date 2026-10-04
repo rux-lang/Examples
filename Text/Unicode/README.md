@@ -12,7 +12,7 @@ rux run
 ```text
 cafe  bytes 4, scalars 4, graphemes 4
 café  bytes 5, scalars 4, graphemes 4
-café  bytes 6, scalars 5, graphemes 4
+café  bytes 6, scalars 5, graphemes 4
 🇺🇦  bytes 8, scalars 2, graphemes 1
 ```
 
