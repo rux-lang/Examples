@@ -29,7 +29,6 @@ Combining values into new ones.
 - 2.3 **[Logical](Operators/Logical/)** — combine conditions with `&&`, `
 - 2.4 **[Assignment](Operators/Assignment/)** — update a variable in place with `+=`, `-=`, `++` and friends
 - 2.5 **[Precedence](Operators/Precedence/)** — which operator binds first, and how parentheses change it
-- **[Operator](Operators/Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence _(being split into the lessons above)_
 
 ### 3. Control flow
 
