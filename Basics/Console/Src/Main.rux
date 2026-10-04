@@ -36,14 +36,14 @@ func Main() -> int {
     PrintLine("{{}} marks a place for {}", "a value");
     PrintLine("{} with nothing to fill it");
 
-    // Watch the count. A placeholder with no argument, or an argument with no placeholder, makes
-    // the whole call print nothing at all:
+    // Watch the count. Once a call has arguments, the compiler matches them against the
+    // placeholders, and a placeholder with no argument, or an argument with no placeholder, is
+    // refused:
     //
     //     PrintLine("{} and {}", 1);
+    //         error: format string has 2 placeholders, but 1 argument was provided
+    //         help: pass one argument for each '{}' placeholder
     //
-    // Nothing stops the program, because the problem is reported through the value both
-    // functions return, and these lessons leave that value unread. Console output is rarely worth
-    // checking; reading such a value is what the Optionals part is about. Width, alignment and
-    // decimal places inside `{}` wait for the Format lesson.
+    // Width, alignment and decimal places inside `{}` wait for the Format lesson.
     return 0;
 }
