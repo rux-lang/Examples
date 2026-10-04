@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Statistics"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Count, extremes, mean, variance and median of a slice, including empty and single-value input"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Algorithms = { Namespace = "Rux", Version = "*" }
