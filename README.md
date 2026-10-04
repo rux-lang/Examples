@@ -75,6 +75,7 @@ Declaring types of your own.
 - 6.4 **[Method](Types/Method/)** — give a struct behaviour with `extend` and a `self` receiver
 - 6.5 **[MutatingMethod](Types/MutatingMethod/)** — a method that changes its receiver through `self: &var T`
 - 6.6 **[Constructor](Types/Constructor/)** — build a valid value in one place with a constructor
+- 6.7 **[Extension](Types/Extension/)** — add methods to a type you did not write
 - 6.8 **[Enum](Types/Enum/)** — name a fixed set of cases
 - 6.10 **[Variant](Types/Variant/)** — attach data to each case
 - 6.12 **[TypeAlias](Types/TypeAlias/)** — give an existing type a second name to make a signature read clearly

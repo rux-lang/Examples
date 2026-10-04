@@ -1,0 +1,64 @@
+// `extend` is not only for types you declared yourself. It can add methods to a type you did not
+// write, the built-in ones included, and from then on, in this package, every value of that type
+// has them.
+//
+// The receiver here is taken by value: `self: int`, not `self: &int`. A number or a slice is small,
+// and copying it is as cheap as borrowing it. A slice is a view, so even by value it still sees
+// the caller's elements.
+import Io::PrintLine;
+
+extend int {
+    func IsEven(self: int) -> bool {
+        return self % 2 == 0;
+    }
+
+    func Clamped(self: int, low: int, high: int) -> int {
+        if self < low {
+            return low;
+        }
+        if self > high {
+            return high;
+        }
+        return self;
+    }
+}
+
+// The extended type must be one exact type. `int[..]` gains these methods, but a `uint8[..]` or an
+// `int32[..]` does not: it is a different type, and would need an `extend` of its own.
+extend int[..] {
+    func Sum(self: int[..]) -> int {
+        var total = 0;
+        for value in self {
+            total += value;
+        }
+        return total;
+    }
+
+    func CountEven(self: int[..]) -> uint {
+        var count: uint = 0;
+        for value in self {
+            // A method added above is used like any other.
+            if value.IsEven() {
+                count += 1;
+            }
+        }
+        return count;
+    }
+}
+
+func Main() -> int {
+    let answer = 42;
+    let volume = 130;
+    PrintLine("{} is even:        {}", answer, answer.IsEven());
+    PrintLine("{} clamped:       {}", volume, volume.Clamped(0, 100));
+
+    let scores: int[5] = [7, 12, 9, 20, 4];
+    let all: int[..] = scores;
+    PrintLine("sum of all:        {}", all.Sum());
+    PrintLine("even scores:       {}", all.CountEven());
+
+    // An array is not a slice, so `scores.Sum()` is rejected. The slice methods are reached
+    // through a view of the array instead.
+    PrintLine("sum of the last 3: {}", scores[2..].Sum());
+    return 0;
+}
