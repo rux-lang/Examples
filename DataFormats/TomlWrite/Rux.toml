@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "TomlWrite"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Read a TOML document, change it, write it back, and see what a round trip keeps"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
