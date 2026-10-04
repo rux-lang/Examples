@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "ErrorVariant"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Design an error as a variant whose cases carry the details"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
