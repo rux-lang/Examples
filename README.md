@@ -163,6 +163,7 @@ Describing behaviour that many types share.
 - 12.9 **[DerivedOperator](Interfaces/DerivedOperator/)** — define one operator and get its partners for free
 - 12.10 **[Indexer](Interfaces/Indexer/)** — let your own type be indexed with `[]`
 - 12.11 **[Iterator](Interfaces/Iterator/)** — implement `Next` so a type of your own can be used with `for`
+- 12.12 **[Iterable](Interfaces/Iterable/)** — let a container hand out an iterator for `for`
 
 ### 13. Generics
 
