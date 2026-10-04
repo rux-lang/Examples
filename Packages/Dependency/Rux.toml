@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Dependency"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Registry dependencies from the package cache and a path dependency beside the source"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
