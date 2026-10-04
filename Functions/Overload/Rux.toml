@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Overload"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Several functions sharing one name, chosen by their arguments"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
