@@ -11,8 +11,10 @@
 import Core::{ #compiler, SemanticVersion };
 import Io::PrintLine;
 
-const Rux040 = SemanticVersion(0, 4, 0);
-const Rux100 = SemanticVersion(1, 0, 0);
+// A constant is written as a struct literal: a call such as `SemanticVersion(1, 0, 0)` would only
+// run when the program does, and is "not a compile-time value".
+const Rux040 = SemanticVersion { major: 0, minor: 4, patch: 0 };
+const Rux100 = SemanticVersion { major: 1, minor: 0, patch: 0 };
 
 // Between declarations, `when` decides which declarations exist. Each branch declares the same
 // function, so the rest of the program calls `Channel` without knowing which one it got.

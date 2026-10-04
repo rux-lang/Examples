@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "When"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Choosing code while compiling with when, and branches that are never resolved"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
