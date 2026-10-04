@@ -7,7 +7,7 @@ Name = "Array"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Fixed-size arrays and iterating over their elements"
+Description = "Fixed-size arrays stored inline: literals, indexing, length and copying"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

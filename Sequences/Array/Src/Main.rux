@@ -1,46 +1,47 @@
-// An array holds a fixed number of values of one type, written as a list in
-// square brackets. `for` walks an array with the same keyword that walked a
-// range in the previous lesson.
+// An array holds a fixed number of values of one type, side by side. `int32[4]` is "four int32
+// values": the element type, then the count in square brackets. The count is part of the type,
+// so an `int32[4]` and an `int32[5]` are different types, and an array never grows or shrinks.
+//
+// The elements live inline, right inside the variable, exactly like the bytes of a single
+// integer do. Nothing is allocated, and copying an array copies every element.
 import Io::PrintLine;
 
 func Main() -> int {
-    // Nothing here says what type this is: it is inferred from the contents as
-    // twelve string slices, written `char8[..][12]`. The length is part of the
-    // type, which is what makes it an array rather than a growable list.
-    //
-    // Each string is stored as UTF-8, so a greeting in any script is an
-    // ordinary value needing no special handling to print.
-    let greetings = [
-        "Hello World",
-        "你好，世界",
-        "नमस्ते दुनिया",
-        "Hola Mundo",
-        "Bonjour le monde",
-        "مرحبا يا عالم",
-        "হ্যালো বিশ্ব",
-        "Привет мир",
-        "Olá Mundo",
-        "سلام دنیا",
-        "Привіт світ",
-        "🐯🐶🐱🐭"
-    ];
+    // An array literal lists the elements in square brackets.
+    let primes: int32[4] = [2, 3, 5, 7];
 
-    // Walking the array binds each element in turn. This is the form to reach
-    // for when the body does not care where in the array it is.
-    for greeting in greetings {
-        PrintLine(greeting);
+    // Elements are numbered from zero, so the last one sits at `length - 1`.
+    PrintLine("first {}, last {}", primes[0], primes[primes.length - 1]);
+    PrintLine("length {}", primes.length);
+
+    // `for` walks an array element by element, just as it walked a range.
+    var sum: int32 = 0;
+    for prime in primes {
+        sum += prime;
+    }
+    PrintLine("sum {}", sum);
+
+    // When the position matters, walk the indices instead. `..` stops before its upper bound,
+    // which is exactly the set of valid indices.
+    for i in 0..primes.length {
+        PrintLine("primes[{}] = {}", i, primes[i]);
     }
 
-    // An array knows its own length and is indexed from zero, so the last
-    // element sits at `length - 1`.
-    PrintLine();
-    PrintLine("{} greetings, from {} to {}",
-        greetings.length, greetings[0], greetings[greetings.length - 1]);
+    // `let` freezes the elements too. To change one, the array must be `var`.
+    var scores: int32[3] = [10, 20, 30];
+    scores[1] = 25;
 
-    // When the position matters, walk a range of indices instead. `..` stops
-    // before its upper bound, which is exactly what indexing from zero wants.
-    for i in 0..3 {
-        PrintLine("index {} holds {}", i, greetings[i]);
-    }
+    // Assigning an array copies all of its elements. Changing the copy leaves the original
+    // alone, because the two variables share nothing.
+    var copy = scores;
+    copy[0] = 99;
+    PrintLine("scores {} {} {}", scores[0], scores[1], scores[2]);
+    PrintLine("copy   {} {} {}", copy[0], copy[1], copy[2]);
+
+    // Two arrays of the same type are equal when every element is.
+    PrintLine("scores == copy  {}", scores == copy);
+
+    // Nothing stops an index past the end: `primes[7]` compiles and reads whatever memory lies
+    // beyond the array. Keep every index below `length`.
     return 0;
 }
