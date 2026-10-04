@@ -6,8 +6,9 @@
 // matched with `c8'w'` instead. Mix the two and the compiler stops with
 //     error: pattern has type 'char32', but the matched value has type 'char8'
 //
-// There is no character range pattern: `'a'..='z' =>` is rejected. When you need a whole class of
-// characters, bind the character and test it in a guard.
+// There is no character range pattern. `'a'..='z' =>` stops with
+//     error: range pattern cannot match value of type 'char32'
+// When you need a whole class of characters, bind the character and test it in a guard.
 import Io::PrintLine;
 
 // One arm per key. Uppercase and lowercase are different characters, so `'W'` would not reach the
