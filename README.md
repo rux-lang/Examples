@@ -352,6 +352,7 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 - 25.12 **[Age](Projects/Age/)** — an age in completed years, months and days, with month-end clamping _(after Utilities)_
 - 25.13 **[Password](Projects/Password/)** — a 16-character password drawn from system entropy with rejection sampling _(after Utilities)_
 - 25.14 **[Launch](Projects/Launch/)** — a mission checklist, a bounded countdown and a launch _(after Utilities)_
+- 25.15 **[Notes](Projects/Notes/)** — keep notes in a JSON file _(after Data formats)_
 - 25.16 **[Melody](Projects/Melody/)** — play a tune through the Windows console speaker (Windows only) _(after Platform)_
 
 ## Running an Example
