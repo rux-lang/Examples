@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "AsmArm"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "The AArch64 version of an asm func, selected with when #target.arch"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
