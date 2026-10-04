@@ -223,6 +223,7 @@ Algorithms over slices from the `Algorithms` package.
 - 18.1 **[Sort](Algorithms/Sort/)** — sort a slice in place
 - 18.2 **[Search](Algorithms/Search/)** — find a value in a slice, and handle not finding it
 - 18.3 **[BinarySearch](Algorithms/BinarySearch/)** — find a value in sorted data quickly
+- 18.4 **[MinMax](Algorithms/MinMax/)** — the smallest and largest values, and the empty case
 - **[Algorithm](Algorithms/Algorithm/)** — sort, search, and fold over the containers built so far _(being split into the lessons above)_
 
 ### 19. Files
