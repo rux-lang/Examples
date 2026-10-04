@@ -7,7 +7,7 @@ Name = "Convert"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Converting between numeric types with as"
+Description = "Converting between types with as, and what a value that does not fit becomes"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
