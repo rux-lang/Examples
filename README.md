@@ -83,6 +83,12 @@ Operations that can fail: `T ! E`.
 - 9.8 **[Propagate](Errors/Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 - 9.9 **[ErrorVariant](Errors/ErrorVariant/)** — describe the ways an operation can fail with a variant
 
+### 10. Sum types
+
+A value that is one of several types: `A | B`.
+
+- 10.1 **[SumType](SumTypes/SumType/)** — a value that can be an `int32` or a `bool`: `int32 
+
 ### 11. Ownership
 
 Who owns a value, and when it is cleaned up.
