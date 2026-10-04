@@ -4,8 +4,8 @@
 //
 // That buys two things. A constant can be declared outside any function, at the top of the file,
 // where all of the file can use it. And because its value is known before the program runs, it
-// can go where the compiler itself needs a value — the size of an array, or the condition of a
-// `when`, both of which come later in the course.
+// can go where the compiler itself needs a value, such as the condition of a `when`, which comes
+// later in the course.
 import Io::PrintLine;
 
 // The type is inferred, exactly as with `let`.

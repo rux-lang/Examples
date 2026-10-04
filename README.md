@@ -341,13 +341,13 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 - 25.1 **[Thanks](Projects/Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it _(after Control flow)_
 - 25.2 **[FizzBuzz](Projects/FizzBuzz/)** — the classic counting game _(after Control flow)_
 - 25.3 **[Temperature](Projects/Temperature/)** — a table of Celsius and Fahrenheit temperatures _(after Functions)_
-- 25.4 **[Prime](Projects/Prime/)** — find the primes below a limit with a sieve _(after Sequences)_
+- 25.4 **[Prime](Projects/Prime/)** — every prime below 100, found with the sieve of Eratosthenes _(after Sequences)_
 - 25.5 **[Calculator](Projects/Calculator/)** — evaluate expressions and report every way they can go wrong _(after Errors)_
-- 25.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Text)_
-- 25.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides _(after Text)_
+- 25.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Numbers)_
+- 25.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, including linear and degenerate cases _(after Numbers)_
 - 25.8 **[WordCount](Projects/WordCount/)** — count how often each word appears _(after Collections)_
 - 25.9 **[Inventory](Projects/Inventory/)** — keep a stock list of items, with updates that can fail _(after Collections)_
-- 25.10 **[Statistics](Projects/Statistics/)** — compute the mean, spread, and extremes of a set of numbers _(after Algorithms)_
+- 25.10 **[Statistics](Projects/Statistics/)** — count, extremes, mean, variance and median, including empty and single-value input _(after Algorithms)_
 - 25.11 **[Guess](Projects/Guess/)** — a number guessing game with seven valid guesses from 1 to 100 _(after Utilities)_
 - 25.12 **[Age](Projects/Age/)** — an age in completed years, months and days, with month-end clamping _(after Utilities)_
 - 25.13 **[Password](Projects/Password/)** — a 16-character password drawn from system entropy with rejection sampling _(after Utilities)_
