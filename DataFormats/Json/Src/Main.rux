@@ -1,36 +1,70 @@
-// JSON is a small format with a big job: it is how programs that share nothing
-// else agree on what a value is. This is parsing a document and walking what
-// comes back — which uses most of the course at once.
+// JSON is how programs that share nothing else agree on what a value is. The Json package reads
+// a document into a tree of `JsonValue`s, and every value in the tree is one of six kinds: text,
+// number, boolean, null, array or object.
 //
-// A parsed document is a tree of values, and each one is a kind: text, number,
-// boolean, null, array, or object. Reading it means asking which kind before
-// reading the value, which is the same discipline optionals and fallibles teach.
+//     Parse(allocator, text) -> JsonValue ! JsonParseError
+//
+// Parsing hands back a whole document or the reason there is none, never half of one. Reading the
+// tree then means asking a value what it is before taking it apart: `Find` and `At` answer a
+// pointer that is null when the member or element is not there, and the conversions answer
+// `false`, through an out-parameter, when the value is some other kind.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Json::{ JsonKind, JsonValue, Parse };
+import Text::StringView;
 
-// Asking the kind, then reading accordingly. Getting this wrong is not
-// possible by accident: the accessor for a number reports whether the value
-// really was one.
-func Describe(value: *JsonValue, label: char8[..]) {
-    let kind = (*value).Kind();
-    if kind == JsonKind::Text {
-        PrintLine("  {:10} text    {}", label, (*value).AsText());
-    } else if kind == JsonKind::Number {
-        var number: int64 = 0;
-        let numberPtr = (*value).AsNumber();
-        (*numberPtr).AsInt64(@number);
-        PrintLine("  {:10} number  {}", label, number);
-    } else if kind == JsonKind::Boolean {
-        var flag = false;
-        (*value).AsBoolean(@flag);
-        PrintLine("  {:10} boolean {}", label, flag);
-    } else if kind == JsonKind::Array {
-        PrintLine("  {:10} array of {}", label, (*value).Length());
-    } else if kind == JsonKind::Object {
-        PrintLine("  {:10} object of {}", label, (*value).Length());
-    } else {
-        PrintLine("  {:10} null", label);
+func KindName(kind: JsonKind) -> char8[..] {
+    return match kind {
+        JsonKind::Text => "text",
+        JsonKind::Number => "number",
+        JsonKind::Boolean => "boolean",
+        JsonKind::Array => "array",
+        JsonKind::Object => "object",
+        else => "null"
+    };
+}
+
+// Member names are compared as text, so `Find` takes a `StringView`.
+func Member(object: &JsonValue, name: char8[..]) -> *JsonValue {
+    return object.Find(StringView::FromValidated(name));
+}
+
+func Inspect(root: &JsonValue) {
+    PrintLine("root      {} of {} members", KindName(root.Kind()), root.Length());
+
+    // A member that is not there is a null pointer, so check before reading through it.
+    let name = Member(root, "name");
+    if name != null {
+        PrintLine("name      {}", (*name).AsText());
+    }
+    PrintLine("license   present: {}", Member(root, "license") != null);
+
+    // A number keeps the text it was written with, and converting it is a question that can
+    // be answered `false`: the text may have a fraction, or not fit the type asked for.
+    var year: int64 = 0;
+    let number = (*Member(root, "year")).AsNumber();
+    let fits = (*number).AsInt64(@year);
+    PrintLine("year      {} (text \"{}\", fits an int64: {})", year, (*number).Text(), fits);
+
+    // An array is walked by index, and each element is asked its kind like any other value.
+    let tags = Member(root, "tags");
+    for i in 0..(*tags).Length() {
+        let tag = (*tags).At(i);
+        PrintLine("tags[{}]   {} {}", i, KindName((*tag).Kind()), (*tag).AsText());
+    }
+
+    // A nested object is just another value with members of its own.
+    var beta = false;
+    let flags = Member(root, "flags");
+    let isBoolean = (*Member(*flags, "beta")).AsBoolean(@beta);
+    PrintLine("beta      boolean: {}, value: {}", isBoolean, beta);
+}
+
+func Check(allocator: Allocator, document: char8[..]) {
+    match Parse(allocator, document) {
+        .Success(root) => PrintLine("{:18} parsed as {}", document, KindName(root.Kind())),
+        .Failure(reason) =>
+            PrintLine("{:18} refused at byte {}: {}", document, reason.Offset(), reason)
     }
 }
 
@@ -38,37 +72,21 @@ func Main() -> int {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    let document = "{\"name\":\"Rux\",\"version\":4,\"stable\":false,\"tags\":[\"fast\",\"small\"]}";
-    PrintLine("document: {}", document);
-
-    // Parsing returns a `JsonValue ! JsonParseError`: either a document or a
-    // reason it is not one.
-    // A refused parse hands back no value at all, so there is no way to mistake
-    // a failure for a document that happened to say `null`.
+    let document =
+        "{\"name\":\"Rux\",\"year\":2026,\"tags\":[\"fast\",\"small\"],\"flags\":{\"beta\":true}}";
     match Parse(allocator, document) {
-        .Success(root) => {
-            PrintLine("parsed an object with {} members", root.Length());
-            var i: uint = 0;
-            while i < root.Length() {
-                let member = root.MemberAt(i);
-                Describe(@(*member).value, (*member).name.View().Bytes());
-                i += 1;
-            }
-        },
-        .Failure(reason) => PrintLine("refused at byte {}", reason.Offset())
+        .Success(root) => Inspect(root),
+        .Failure(reason) => PrintLine("refused at byte {}: {}", reason.Offset(), reason)
     }
 
-    // And a document that is not valid. The failure carries the byte offset
-    // where the parser stopped — just past the token it could not accept —
-    // which is what makes it useful in a message to a person.
-    match Parse(allocator, "{\"broken\": }") {
-        .Success(root) => PrintLine("that parsed?"),
-        .Failure(reason) => PrintLine("bad document refused at byte {}", reason.Offset())
-    }
-
-    // Worth noticing how much of the course this one program leans on:
-    // an allocator, a fallible matched for both outcomes, a variant-like kind
-    // tested before use, out-parameters for the conversions, and slices for
-    // the text. None of it was introduced here — it is all being used.
+    // Malformed input. The failure says why, and the byte where the parser stopped, so a message
+    // to a person can point at the problem. JSON is strict: no trailing commas, no single quotes.
+    PrintLine("");
+    Check(allocator, "[1, 2, 3]");
+    Check(allocator, "[1, 2, 3,]");
+    Check(allocator, "{'name': 'Rux'}");
+    Check(allocator, "{\"open\": [1, 2}");
+    Check(allocator, "{\"a\": 1} extra");
+    Check(allocator, "");
     return 0;
 }

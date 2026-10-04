@@ -7,9 +7,10 @@ Name = "Json"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Parsing JSON and walking the result"
+Description = "Parse a JSON document, inspect its values, and refuse malformed input"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Json = { Namespace = "Rux", Version = "*" }
+Text = { Namespace = "Rux", Version = "*" }
