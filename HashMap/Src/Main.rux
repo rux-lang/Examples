@@ -5,10 +5,10 @@
 // where that number points, so a lookup costs about the same whether the map
 // holds ten entries or ten million.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ EqualsInt32, HashInt32, HashMap, HashSet };
+import Collections::{ CollectionError, EqualsInt32, HashInt32, HashMap, HashSet };
 import Io::PrintLine;
 
-func Main() -> int {
+func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -20,47 +20,48 @@ func Main() -> int {
     // Passing functions as values like this is the Callback lesson's subject.
     var ages = HashMap<int32, int32>(allocator, HashInt32, EqualsInt32);
 
-    ages.Insert(101i32, 34i32);
-    ages.Insert(102i32, 28i32);
-    ages.Insert(103i32, 45i32);
+    // Inserting may need more room, and so can fail; `?` hands that failure on.
+    ages.Insert(101i32, 34i32)?;
+    ages.Insert(102i32, 28i32)?;
+    ages.Insert(103i32, 45i32)?;
     PrintLine("entries        {}", ages.Length());
 
-    // `Get` returns an `Option`, because a key may not be there — the same
-    // shape as indexing a vector out of range.
+    // `Get` returns an optional, `int32?`, because a key may not be there —
+    // the same shape as indexing a vector out of range.
     match ages.Get(102i32) {
-        .Some(age) => PrintLine("id 102 is      {}", age),
-        .None => PrintLine("id 102 unknown")
+        age? => PrintLine("id 102 is      {}", age),
+        none => PrintLine("id 102 unknown")
     }
     match ages.Get(999i32) {
-        .Some(age) => PrintLine("id 999 is      {}", age),
-        .None => PrintLine("id 999 unknown")
+        age? => PrintLine("id 999 is      {}", age),
+        none => PrintLine("id 999 unknown")
     }
 
     // Inserting an existing key replaces its value rather than adding a second
     // entry: a key appears at most once.
-    ages.Insert(101i32, 35i32);
+    ages.Insert(101i32, 35i32)?;
     PrintLine("after replace  {} entries", ages.Length());
     match ages.Get(101i32) {
-        .Some(age) => PrintLine("id 101 is now  {}", age),
-        .None => PrintLine("id 101 unknown")
+        age? => PrintLine("id 101 is now  {}", age),
+        none => PrintLine("id 101 unknown")
     }
 
     PrintLine("contains 103   {}", ages.ContainsKey(103i32));
     match ages.Remove(103i32) {
-        .Some(age) => PrintLine("removed 103, who was {}", age),
-        .None => PrintLine("103 was not there")
+        age? => PrintLine("removed 103, who was {}", age),
+        none => PrintLine("103 was not there")
     }
     PrintLine("contains 103   {}", ages.ContainsKey(103i32));
 
     // A set is the same structure with the values left out: it answers only
     // "is this one here", which is the question often actually being asked.
     var seen = HashSet<int32>(allocator, HashInt32, EqualsInt32);
-    var added = false;
-    seen.Insert(1i32, @added);
+    // Its `Insert` answers whether the value was new.
+    var added = seen.Insert(1i32)?;
     PrintLine("adding 1       new? {}", added);
-    seen.Insert(2i32, @added);
+    added = seen.Insert(2i32)?;
     PrintLine("adding 2       new? {}", added);
-    seen.Insert(1i32, @added);
+    added = seen.Insert(1i32)?;
     PrintLine("adding 1 again new? {}", added);
     PrintLine("set size       {}", seen.Length());
     PrintLine("set has 2      {}", seen.Contains(2i32));
@@ -70,5 +71,4 @@ func Main() -> int {
     // arrangement the hashing produced, which has nothing to do with the order
     // they were inserted or the order of the keys. When order matters, the
     // next lesson's tree map keeps it.
-    return 0;
 }
