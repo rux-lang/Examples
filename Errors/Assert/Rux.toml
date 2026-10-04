@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Assert"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Check what the program relies on with Assert and DebugAssert"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
