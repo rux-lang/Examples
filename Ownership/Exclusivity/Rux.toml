@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Exclusivity"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "One mutable borrow at a time, ending at its last use"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
