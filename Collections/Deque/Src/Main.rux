@@ -1,58 +1,55 @@
-// A vector is fast at the end and slow at the front: inserting at position
-// zero means shifting everything along to make room.
+// A vector is quick at its end and slow at its front: putting a value at position zero means
+// shifting every other value along to make room.
 //
-// A `Deque<T>` — a double-ended queue — is the container that is quick at both
-// ends. It keeps track of where its contents start as well as where they end,
-// so adding at the front moves a marker rather than the elements.
-//
-// The usual reason to want one is a queue: work arrives at the back and is
-// taken from the front, which is exactly the pair of operations a vector is
-// bad at.
+// A `Deque<T>` — a double-ended queue, said "deck" — is quick at both ends. It remembers where its
+// contents start as well as where they end, so adding at the front moves a marker, not the
+// values. The everyday use is a queue: work joins at the back and is served from the front,
+// which is exactly the pair of operations a vector is bad at.
 import Allocator::{ Allocator, SystemAllocator };
 import Collections::{ CollectionError, Deque };
 import Io::{ Print, PrintLine };
 
 func Show(label: char8[..], queue: &Deque<int>) {
-    Print("{:10}", label);
+    Print("{:8}", label);
     for i in 0..queue.Length() {
-        match queue.Get(i) {
-            value? => Print(" {}", value),
-            none => Print(" ?")
-        }
+        Print(" {}", queue.Get(i) ?? -1);
     }
-    PrintLine("   (length {})", queue.Length());
+    PrintLine();
 }
 
 func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    var queue = Deque::Deque<int>(allocator);
+    var queue = Deque<int>(allocator);
 
-    // Built from both directions at once. The two pushed to the back arrive in
-    // order; the two pushed to the front arrive in reverse, because each goes
-    // in ahead of the one before it. Each push can fail if memory runs out,
-    // so each ends in `?`, handing the failure to `Main`.
-    queue.PushBack(2)?;
-    queue.PushBack(3)?;
-    queue.PushFront(1)?;
-    queue.PushFront(0)?;
-    Show("built", queue);
+    // Tickets join at the back, in the order they arrive. Each push may need more room, and so
+    // can fail; `?` hands that failure to `Main`.
+    queue.PushBack(101)?;
+    queue.PushBack(102)?;
+    queue.PushBack(103)?;
+    Show("arrived", queue);
 
-    // Both ends come off as easily as they went on. Each returns an optional,
-    // `int?`, since an empty deque has nothing to give.
+    // An urgent ticket jumps the line by going in at the front.
+    queue.PushFront(900)?;
+    Show("urgent", queue);
+
+    // Serving takes from the front. Both pops return an optional, `int?`, since an empty deque
+    // has nothing to give.
+    PrintLine("served   {}", queue.PopFront() ?? -1);
+    PrintLine("served   {}", queue.PopFront() ?? -1);
+
+    // The newest arrival changes their mind and leaves from the back.
+    PrintLine("left     {}", queue.PopBack() ?? -1);
+    Show("waiting", queue);
+
+    PrintLine("served   {}", queue.PopFront() ?? -1);
     match queue.PopFront() {
-        value? => PrintLine("popped front {}", value),
-        none => PrintLine("empty")
+        ticket? => PrintLine("served   {}", ticket),
+        none => PrintLine("empty    nobody is waiting")
     }
-    match queue.PopBack() {
-        value? => PrintLine("popped back  {}", value),
-        none => PrintLine("empty")
-    }
-    Show("after", queue);
 
-    // Which to reach for: a vector when values are only added and removed at
-    // the end, a deque when either end is in play. A deque costs a little more
-    // per element for the bookkeeping, which is why it is not simply the
-    // default.
+    // Which to reach for: a vector when values only come and go at the end, a deque when both
+    // ends are in play. The deque's bookkeeping costs a little per operation, which is why it
+    // is not simply the default.
 }
