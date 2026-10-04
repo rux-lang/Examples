@@ -6,10 +6,10 @@
 // values are pushed, takes a larger block when it runs out, and releases
 // everything when its life ends.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::Vector;
+import Collections::{ CollectionError, Vector };
 import Io::{ Print, PrintLine };
 
-func Main() -> int {
+func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -20,8 +20,12 @@ func Main() -> int {
 
     // Two different numbers, worth keeping apart. Length is how many values are
     // in it. Capacity is how many would fit before another block is needed.
+    //
+    // A push may need a larger block, and the allocator may have none to give,
+    // so `Push` is fallible: `-> ! CollectionError`. The `?` hands a failure
+    // straight to the caller, which is why `Main` is fallible too.
     for i in 1..=5 {
-        numbers.Push(i * 10);
+        numbers.Push(i * 10)?;
     }
     PrintLine("5 pushes   length {}  capacity {}", numbers.Length(), numbers.Capacity());
 
@@ -38,15 +42,16 @@ func Main() -> int {
     }
     PrintLine();
 
-    // `Get` returns an `Option`, because an index may be out of range and there
-    // is no value to return when it is. The bounds check is in the type.
+    // `Get` returns an optional, `int?`, because an index may be out of range
+    // and there is no value to return when it is. The bounds check is in the
+    // type.
     match numbers.Get(2u) {
-        .Some(value) => PrintLine("index 2    {}", value),
-        .None => PrintLine("index 2    out of range")
+        value? => PrintLine("index 2    {}", value),
+        none => PrintLine("index 2    out of range")
     }
     match numbers.Get(99u) {
-        .Some(value) => PrintLine("index 99   {}", value),
-        .None => PrintLine("index 99   out of range")
+        value? => PrintLine("index 99   {}", value),
+        none => PrintLine("index 99   out of range")
     }
 
     // Taking the last value off. It reports whether there was one, and writes
@@ -56,11 +61,11 @@ func Main() -> int {
         PrintLine("popped     {}, leaving {}", popped, numbers.Length());
     }
 
-    numbers.Set(0u, 999);
+    // `Set` checks its index too, and fails rather than writing out of range.
+    numbers.Set(0u, 999)?;
     PrintLine("after Set  first is {}", numbers.AsSlice()[0]);
 
     // Nothing here frees anything. The vector's destructor releases its block
     // when it goes out of scope, which is the Ownership lesson doing its job:
     // the memory belongs to the vector, so the vector gives it back.
-    return 0;
 }
