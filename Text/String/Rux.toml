@@ -7,7 +7,7 @@ Name = "String"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Borrowed text, owned text, and building it"
+Description = "Owned text: String, its fallible constructors, and Clone returning String ! TextError"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }

@@ -1,68 +1,51 @@
-// Text has appeared in every lesson without being explained. `"hello"` is a
-// `char8[..]` — a slice of bytes, borrowed from the program itself, costing no
-// allocation because the bytes are already in the binary.
+// A view borrows, so it can never outlive the bytes it looks at. Text that a function builds
+// and hands back, or that must be kept after its source is gone, needs an owner. That is
+// `String`: it keeps its own copy of the bytes, in memory it asked an allocator for, and gives
+// that memory back in its destructor when the value's life ends.
 //
-// That is enough until text has to be built or kept. Then it needs to live
-// somewhere, and somewhere means an allocator. Three types divide the work:
-// a view borrows text, a String owns it, and a builder assembles it.
-//
-// Owning and building can both fail — the bytes may not be valid text, or the
-// memory may not be there — so those calls return a fallible with a
-// `TextError` on its failure side. `Main` is fallible too, so `?` passes any
-// such failure on, ending the program with exit status 1.
+// Asking for memory can fail, and so can checking that bytes are UTF-8, so the calls that
+// make a `String` return `String ! TextError`. `Main` is fallible here, and `?` passes any such
+// failure on. The allocator itself is the subject of the Memory part; for now it is simply
+// where a String's bytes come from.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
-import Text::{ String, StringBuilder, StringView, TextError };
+import Text::{ String, TextError };
+
+// The reversed letters exist only in this function's array, which is gone once it returns. A
+// view of them would be left pointing at nothing, so the function returns a String that owns
+// a copy. `FromBytes` checks the bytes are text before copying them, and that check matters
+// here: reversed byte by byte, "né" puts the two bytes of `é` in the wrong order, and the
+// call fails with `TextError::InvalidUtf8`. The array has room for words of up to 16 bytes.
+func Reversed(allocator: Allocator, word: char8[..]) -> String ! TextError {
+    var letters: char8[16];
+    for i in 0..word.length {
+        letters[i] = word[word.length - 1 - i];
+    }
+    return String::FromBytes(allocator, letters[..word.length]);
+}
 
 func Main() -> ! TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    // A literal, with two accented letters in it.
-    let literal = "héllo wörld";
+    var word = Reversed(allocator, "stressed")?;
+    PrintLine("word   {}, {} bytes", word, word.Length());
 
-    // `StringView` is a borrowed look at text that already exists. It allocates
-    // nothing and owns nothing — it is to text what a slice is to an array.
-    let view = StringView::FromValidated(literal);
+    // `Clone` makes an independent copy with storage of its own. Replacing the original's text
+    // afterwards leaves the clone exactly as it was.
+    let saved = word.Clone()?;
+    word.ReplaceWith(Reversed(allocator, "drawer")?);
+    PrintLine("word   {}", word);
+    PrintLine("saved  {}", saved);
 
-    // Here is the distinction worth taking away. `Length` counts bytes, which
-    // is what the text occupies. `ScalarCount` counts characters, which is what
-    // a reader sees. They differ whenever the text leaves ASCII: é and ö take
-    // two bytes each, so eleven characters occupy thirteen bytes.
-    PrintLine("text            {}", view);
-    PrintLine("bytes           {}", view.Length());
-    PrintLine("characters      {}", view.ScalarCount());
+    // `let copy = saved;` would also copy, but plain assignment has no way to report failure,
+    // so it ends the program if memory runs out. `Clone` hands that failure back as a
+    // `TextError` instead, which is why it is the one to use when failure must be handled.
 
-    // Neither number is the wrong one — they answer different questions. Use
-    // bytes for how much room it takes, characters for how much there is to
-    // read. Indexing is by byte, so a program that steps through text one byte
-    // at a time will cut a character in half; `IsBoundary` exists to ask.
-    PrintLine("byte 1 starts a character  {}", view.IsBoundary(1u));
-    PrintLine("byte 2 starts a character  {}", view.IsBoundary(2u));
+    // A String lends out a view whenever borrowed text is enough, without copying anything.
+    let view = saved.View();
+    PrintLine("view   {}, {} characters", view, view.ScalarCount());
 
-    // `String` owns its bytes. It has to be given an allocator, because owning
-    // means having somewhere to keep them. It returns the `String` or a
-    // `TextError` when the bytes are not valid text.
-    let owned = String::FromBytes(allocator, literal)?;
-    PrintLine("owned copy      {} bytes, {} characters",
-        owned.Length(), owned.ScalarCount());
-
-    // Nothing releases it by hand. `String` has a destructor, so the memory
-    // goes back when the value's life ends — the Ownership lesson's rule,
-    // applied by a standard type.
-
-    // `StringBuilder` is for text assembled a piece at a time. Appending to a
-    // `String` would mean a new allocation each time; a builder grows one
-    // buffer instead, which is why reading a line uses one. Growing the
-    // buffer can fail, so each `Append` is fallible as well.
-    var builder = StringBuilder(allocator);
-    builder.Append("one")?;
-    builder.Append(" two")?;
-    builder.Append(" three")?;
-    PrintLine("built           {}", builder.View());
-    PrintLine("built length    {}", builder.Length());
-
-    // `View` looks at what the builder holds without taking it. To keep the
-    // text after the builder is gone, `IntoString` hands over ownership
-    // instead — which is what the Circle lesson does with a line of input.
+    // No cleanup is written: `word` and `saved` each release their own memory at the end of
+    // `Main`, as the Destructor lesson promised.
 }
