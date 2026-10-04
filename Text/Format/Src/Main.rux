@@ -1,71 +1,46 @@
-// Every lesson has used `{}`. The Primitive lesson added number bases and a
-// rounded float because they were needed early. This is the rest of it.
+// Every lesson has used `{}` to drop a value into a line. A placeholder can also say how much
+// room the value gets and where in that room it sits, which is how output lines up in columns.
+// The part after a colon is the placeholder's spec:
 //
-// Everything after the colon inside a placeholder is the spec, and each piece
-// is optional:
+//     {:8}      at least 8 characters wide
+//     {:<8}     ... with the value on the left
+//     {:^8}     ... in the middle
+//     {:>8}     ... on the right
+//     {:*^8}    ... in the middle, padded with `*` instead of spaces
 //
-//     {:[[fill]align][sign][#][0][width][.precision][base]}
-//
-// The spec belongs to the placeholder, not to the value, so the same value
-// renders differently in different places without being changed.
+// The spec belongs to the placeholder, not to the value, so the same value can be laid out
+// differently in different places without being changed.
 import Io::PrintLine;
 
 func Main() -> int {
-    let value = 255;
-    let pi = 3.14159265358979;
+    let count = 42;
     let word = "Rux";
 
-    // Base. `b`, `o`, `x` and `X` choose binary, octal, and hex in either case.
-    PrintLine("plain      {}", value);
-    PrintLine("binary     {:b}", value);
-    PrintLine("octal      {:o}", value);
-    PrintLine("hex        {:x}", value);
-    PrintLine("HEX        {:X}", value);
+    // Width is a minimum. Shorter values are padded; numbers go to the right by default and
+    // text to the left, which is what a column of each usually wants.
+    PrintLine("number   [{:8}]", count);
+    PrintLine("text     [{:8}]", word);
 
-    // `#` adds the prefix that names the base.
-    PrintLine("prefixed   {:#b}   {:#o}   {:#x}", value, value, value);
+    // Width never cuts. A value wider than its field is printed whole and pushes past it.
+    PrintLine("narrow   [{:2}]", 123456);
 
-    // Width sets a minimum. Anything shorter is padded, and nothing is ever
-    // truncated to fit — a number too wide for its field stays intact.
-    PrintLine("width 8    [{:8}]", value);
-    PrintLine("too narrow [{:2}]", value);
+    // Alignment overrides the default, for numbers and text alike.
+    PrintLine("left     [{:<8}] [{:<8}]", count, word);
+    PrintLine("centre   [{:^8}] [{:^8}]", count, word);
+    PrintLine("right    [{:>8}] [{:>8}]", count, word);
 
-    // Alignment decides which side the padding goes. Numbers default to the
-    // right and text to the left, so this is worth setting when a column has
-    // to line up regardless of what is in it.
-    PrintLine("left       [{:<8}]", value);
-    PrintLine("centre     [{:^8}]", value);
-    PrintLine("right      [{:>8}]", value);
+    // A fill character before the alignment replaces the spaces.
+    PrintLine("dots     [{:.<8}] [{:.>8}]", word, count);
+    PrintLine("stars    [{:*^8}]", word);
 
-    // A fill character may be given before the alignment. `0` before the width
-    // is the common case of this, and pads numbers with zeros.
-    PrintLine("dots       [{:.>8}]", value);
-    PrintLine("stars      [{:*^8}]", value);
-    PrintLine("zeros      [{:08}]", value);
-    PrintLine("zeroed hex [{:08x}]", value);
+    // Width counts characters, not bytes, so accented text lines up with plain text.
+    PrintLine("accent   [{:8}] [{:8}]", "née", "nee");
 
-    // `+` shows a sign even when the number is positive, which keeps a column
-    // of mixed signs aligned.
-    PrintLine("signed     {:+}  {:+}", 42, -42);
-
-    // Precision after a dot sets the digits kept after the point.
-    PrintLine("pi         {}", pi);
-    PrintLine("pi to 2    {:.2}", pi);
-    PrintLine("pi to 5    {:.5}", pi);
-    PrintLine("pi to 0    {:.0}", pi);
-
-    // The pieces combine, which is where the grammar earns itself. This is
-    // width and precision together, right-aligned in a ten-wide column.
-    PrintLine("combined   [{:10.4}]", pi);
-
-    // Text takes the same fill, alignment and width.
-    PrintLine("text       [{:<8}][{:^8}][{:>8}]", word, word, word);
-
-    // A small table, which is what all of this is for.
+    // What all of this is for: a table whose columns line up whatever is in them.
     PrintLine("");
-    PrintLine("{:<10}{:>8}{:>12}", "item", "count", "value");
-    PrintLine("{:<10}{:>8}{:>12.2}", "widgets", 12, 4.5);
-    PrintLine("{:<10}{:>8}{:>12.2}", "sprockets", 5, 19.75);
-    PrintLine("{:<10}{:>8}{:>12.2}", "cogs", 1440, 0.125);
+    PrintLine("{:<10}{:>6}{:>8}", "item", "count", "price");
+    PrintLine("{:<10}{:>6}{:>8}", "widgets", 12, 450);
+    PrintLine("{:<10}{:>6}{:>8}", "sprockets", 5, 1975);
+    PrintLine("{:<10}{:>6}{:>8}", "crêpes", 1440, 25);
     return 0;
 }

@@ -7,7 +7,7 @@ Name = "Format"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "The full placeholder grammar"
+Description = "Width, alignment and fill in a placeholder, for output that lines up in columns"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
