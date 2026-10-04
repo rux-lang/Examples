@@ -1,0 +1,28 @@
+// `Type = "StaticLibrary"` asks `rux build` for a native archive: the package compiled ahead of
+// time to machine code and packed into `StaticLibrary.lib` on Windows, or `libStaticLibrary.a` on
+// Linux, macOS and FreeBSD. A native linker copies what it needs from an archive into the program
+// it is building, so nothing extra has to ship beside that program.
+//
+// The archive holds one symbol per function. `Area` and `Perimeter` are `pub`, so they become
+// global symbols that other code can link against. `Double` is package-private, so it becomes a
+// local symbol: it is in the archive, because `Perimeter` calls it, but nothing outside can bind
+// to it.
+//
+// Two things a static library is not:
+//
+// - It is not a program. There is no `Main`, and `rux run` refuses with "package 'StaticLibrary'
+//   produces a static library and cannot be run".
+// - It is not what Rux packages consume. A package that lists this one under `[Dependencies]`
+//   compiles its source, exactly as it would a source library; in Rux 0.4.0 dependencies are
+//   always taken as source. The archive is for native toolchains.
+pub func Area(width: int, height: int) -> int {
+    return width * height;
+}
+
+pub func Perimeter(width: int, height: int) -> int {
+    return Double(width + height);
+}
+
+func Double(value: int) -> int {
+    return 2 * value;
+}

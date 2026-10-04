@@ -316,6 +316,7 @@ Modules, packages, libraries and tools.
 - 22.4 **[Dependency](Packages/Dependency/)** — depend on another package
 - 22.5 **[Workspace](Packages/Workspace/)** — build several packages together
 - 22.6 **[SourceLibrary](Packages/SourceLibrary/)** — write a library and use it from an executable
+- 22.7 **[StaticLibrary](Packages/StaticLibrary/)** — build a static library
 
 ### 23. Compile time
 
