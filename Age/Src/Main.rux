@@ -50,39 +50,39 @@ func Report(label: char8[..], birth: Date, today: Date) {
 func Main() -> int {
     // Pretend today is a fixed date, so the example prints the same thing
     // every time it is run. A real program would ask the clock.
-    let today = Date::New(2026i32, 9u8, 10u8).ValueOr(Date::FromEpochDays(0i64));
+    let today = Date::New(2026i32, 9u8, 10u8) ?? Date::FromEpochDays(0i64);
     PrintLine("today is {}-{}-{}", today.year, today.month, today.day);
     PrintLine("");
 
     // A birthday that has already happened this year.
     match Date::New(1990i32, 3u8, 15u8) {
-        .Some(birth) => Report("born 1990-03-15", birth, today),
-        .None => PrintLine("not a date")
+        birth? => Report("born 1990-03-15", birth, today),
+        none => PrintLine("not a date")
     }
 
     // One still to come, where the year count is one less than subtracting.
     match Date::New(1990i32, 12u8, 25u8) {
-        .Some(birth) => Report("born 1990-12-25", birth, today),
-        .None => PrintLine("not a date")
+        birth? => Report("born 1990-12-25", birth, today),
+        none => PrintLine("not a date")
     }
 
     // Today's date exactly, which is a whole number of years.
     match Date::New(2000i32, 9u8, 10u8) {
-        .Some(birth) => Report("born 2000-09-10", birth, today),
-        .None => PrintLine("not a date")
+        birth? => Report("born 2000-09-10", birth, today),
+        none => PrintLine("not a date")
     }
 
     // The day after, where a month has to be borrowed.
     match Date::New(2000i32, 9u8, 11u8) {
-        .Some(birth) => Report("born 2000-09-11", birth, today),
-        .None => PrintLine("not a date")
+        birth? => Report("born 2000-09-11", birth, today),
+        none => PrintLine("not a date")
     }
 
     // The 29th of February, which only exists every fourth year. Someone born
     // on one has a birthday most years only by agreement.
     match Date::New(2004i32, 2u8, 29u8) {
-        .Some(birth) => Report("born 2004-02-29", birth, today),
-        .None => PrintLine("not a date")
+        birth? => Report("born 2004-02-29", birth, today),
+        none => PrintLine("not a date")
     }
     PrintLine("");
     PrintLine("2004 was a leap year: {}", IsLeapYear(2004i32));
