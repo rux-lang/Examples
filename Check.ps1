@@ -23,6 +23,9 @@ $root = $PSScriptRoot
 # Packages that read standard input, so running them unattended would block.
 $needsInput = @('Circle', 'Guess', 'Quadratic', 'Launch', 'Input')
 
+# Packages whose run exits nonzero on purpose, with the status they are expected to return.
+$expectedStatus = @{ 'FallibleMain' = 1 }
+
 function Test-Companion([System.IO.DirectoryInfo]$directory) {
     $parent = $directory.Parent
     while ($parent -and $parent.FullName.Length -gt $root.Length) {
@@ -50,7 +53,8 @@ foreach ($package in $packages) {
             Write-Host ("{0,-32} check" -f $label) -NoNewline
             if ($Run -and $needsInput -notcontains $name) {
                 $null = & rux run 2>&1 | Out-String
-                if ($LASTEXITCODE -eq 0) {
+                $expected = if ($expectedStatus.ContainsKey($name)) { $expectedStatus[$name] } else { 0 }
+                if ($LASTEXITCODE -eq $expected) {
                     Write-Host "  run" -ForegroundColor Green
                 } else {
                     Write-Host "  run FAILED" -ForegroundColor Red
