@@ -87,6 +87,7 @@ Operations that can fail: `T ! E`.
 - 9.7 **[CatchFallback](Errors/CatchFallback/)** — turn any failure into a default value with `catch { else => ... }`
 - 9.8 **[Propagate](Errors/Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 - 9.9 **[ErrorVariant](Errors/ErrorVariant/)** — describe the ways an operation can fail with a variant
+- 9.10 **[ErrorMapping](Errors/ErrorMapping/)** — add context to an error as it passes through with `? else (e => ...)`
 
 ### 10. Sum types
 
