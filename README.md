@@ -280,6 +280,7 @@ Paths, files and directories.
 - 19.7 **[Binary](Files/Binary/)** — read and write fixed-width values and raw bytes
 - 19.8 **[BufferedIo](Files/BufferedIo/)** — buffer writes and flush them
 - 19.9 **[AtomicFile](Files/AtomicFile/)** — replace a file's contents all at once or not at all
+- 19.10 **[TemporaryFile](Files/TemporaryFile/)** — a scratch file that cleans up after itself
 
 ### 20. Utilities
 
