@@ -14,7 +14,7 @@ rux build
 Compiling SharedLibrary v0.1.0 (Debug, Windows x86-64)
 Built SharedLibrary (Debug, Windows x86-64) in 1 ms
   Output: Bin\Debug\Windows\x86-64\SharedLibrary.dll
-  1 file | 28 LOC | 61 tokens | 14.1K LOC/s | SharedLibrary.dll 2 KB
+  1 file | 30 LOC | 61 tokens | 24.6K LOC/s | SharedLibrary.dll 2 KB
 ```
 
 `SharedLibrary.lib`, the import library, is written beside the `.dll`. To see the export table, run `dumpbin /exports` from a Visual Studio prompt, or `llvm-readobj --coff-exports` with LLVM installed, on `Bin/Debug/Windows/x86-64/SharedLibrary.dll`. Both list `Area` and `Perimeter`, and not `Double`.

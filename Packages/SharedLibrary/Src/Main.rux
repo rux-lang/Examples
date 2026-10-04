@@ -5,7 +5,9 @@
 //
 // What other programs can call is the library's export table, and `pub` decides what goes in it.
 // `Area` and `Perimeter` are exported under exactly those names. `Double` is package-private, so
-// it is compiled into the library but never exported: no program can look it up.
+// it is compiled into the library but never exported: no program can look it up. The same holds
+// for dependencies: a library built on `Io` contains the code it uses, but exports only its own
+// `pub` functions, not `Io`'s.
 //
 // On Windows, the build also writes `SharedLibrary.lib` beside the `.dll`. That small file is an
 // import library, which a native linker reads to know which exports the program will find in the

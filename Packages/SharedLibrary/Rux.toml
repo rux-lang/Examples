@@ -6,5 +6,5 @@ MinRux = "0.4.0"
 Name = "SharedLibrary"
 Version = "0.1.0"
 Type = "SharedLibrary"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A library loaded at run time, and the functions it exports"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
