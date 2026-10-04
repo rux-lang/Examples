@@ -1,0 +1,48 @@
+// An optional says "nothing here" and stops there. `PriceOf(7)` returns
+// `none`, and `none` cannot say which code was missing or why that matters.
+// When absence is a real problem for the caller, turn it into an error that
+// does say so:
+//
+//     let price = PriceOf(code) ?? fail UnknownProduct { code: code };
+//
+// This is the `??` from the optionals part with `fail` as its fallback. When
+// the price is present, `price` is that number. When it is absent, the
+// function fails right there, and the error can carry whatever context is at
+// hand — here, the code that was not found.
+//
+// Like every `??` fallback, the right side runs only when it is needed, so
+// the error is not even built for a product that exists.
+import Io::PrintLine;
+
+struct UnknownProduct {
+    code: int;
+}
+
+// A small price list. An unknown code is simply absent.
+func PriceOf(code: int) -> int? {
+    return match code {
+        1 => 250,
+        2 => 120,
+        3 => 75,
+        else => none
+    };
+}
+
+func Total(code: int, quantity: int) -> int ! UnknownProduct {
+    let price = PriceOf(code) ?? fail UnknownProduct { code: code };
+    return price * quantity;
+}
+
+func Order(code: int, quantity: int) {
+    match Total(code, quantity) {
+        .Success(total) => PrintLine("{} x product {}: {} cents", quantity, code, total),
+        .Failure(e) => PrintLine("{} x product {}: no product has code {}", quantity, code, e.code)
+    }
+}
+
+func Main() -> int {
+    Order(1, 2);
+    Order(3, 4);
+    Order(7, 1);
+    return 0;
+}
