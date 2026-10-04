@@ -11,6 +11,5 @@ Description = "Borrowed text, owned text, and building it"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Text = { Namespace = "Rux", Version = "*" }

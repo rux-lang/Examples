@@ -5,11 +5,16 @@
 // That is enough until text has to be built or kept. Then it needs to live
 // somewhere, and somewhere means an allocator. Three types divide the work:
 // a view borrows text, a String owns it, and a builder assembles it.
+//
+// Owning and building can both fail — the bytes may not be valid text, or the
+// memory may not be there — so those calls return a fallible with a
+// `TextError` on its failure side. `Main` is fallible too, so `?` passes any
+// such failure on, ending the program with exit status 1.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Text::{ String, StringBuilder, StringView, TextError };
 
-func Main() -> int {
+func Main() -> ! TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -36,10 +41,9 @@ func Main() -> int {
     PrintLine("byte 2 starts a character  {}", view.IsBoundary(2u));
 
     // `String` owns its bytes. It has to be given an allocator, because owning
-    // means having somewhere to keep them, and it reports through an
-    // out-parameter whether the bytes were valid text.
-    var error = TextError::None;
-    let owned = String::FromBytes(allocator, literal, @error);
+    // means having somewhere to keep them. It returns the `String` or a
+    // `TextError` when the bytes are not valid text.
+    let owned = String::FromBytes(allocator, literal)?;
     PrintLine("owned copy      {} bytes, {} characters",
         owned.Length(), owned.ScalarCount());
 
@@ -49,16 +53,16 @@ func Main() -> int {
 
     // `StringBuilder` is for text assembled a piece at a time. Appending to a
     // `String` would mean a new allocation each time; a builder grows one
-    // buffer instead, which is why reading a line uses one.
+    // buffer instead, which is why reading a line uses one. Growing the
+    // buffer can fail, so each `Append` is fallible as well.
     var builder = StringBuilder(allocator);
-    builder.Append("one");
-    builder.Append(" two");
-    builder.Append(" three");
+    builder.Append("one")?;
+    builder.Append(" two")?;
+    builder.Append(" three")?;
     PrintLine("built           {}", builder.View());
     PrintLine("built length    {}", builder.Length());
 
     // `View` looks at what the builder holds without taking it. To keep the
     // text after the builder is gone, `IntoString` hands over ownership
     // instead — which is what the Circle lesson does with a line of input.
-    return 0;
 }
