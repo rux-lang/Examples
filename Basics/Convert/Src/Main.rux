@@ -29,6 +29,11 @@ func Main() -> int {
     PrintLine("float->int   {} becomes {}", ratio, ratio as int32);
     PrintLine("float->int   {} becomes {}", negativeRatio, negativeRatio as int32);
 
+    // A float too large for the integer type does not keep low bits the way narrowing does. It
+    // saturates: it becomes the largest value the type holds, or the smallest, below the range.
+    let huge = 1e10;
+    PrintLine("float->int   {} becomes {}", huge, huge as int32);
+
     let count: int32 = 7;
     PrintLine("int->float   {} becomes {}", count, count as float64);
 

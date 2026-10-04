@@ -15,6 +15,7 @@ narrow       int32 300 becomes int8 44
 sign         int32 -1 becomes uint8 255
 float->int   3.9 becomes 3
 float->int   -3.9 becomes -3
+float->int   10000000000.0 becomes 2147483647
 int->float   7 becomes 7.0
 narrow float 3.141592653589793 becomes 3.1415927
 char->int    A becomes 65
