@@ -1,68 +1,64 @@
-// `Alloc` and `Free` go straight to the system, one request at a time. That is
-// not the only way to get memory, and often not the best one.
+// `Alloc` and `Free` always go to the same place. An allocator turns "where memory comes from"
+// into a value: the `Allocator` interface promises three operations, and any type that keeps
+// those promises can stand behind it. A function written against the interface works with
+// whichever allocator its caller passes in.
 //
-// An allocator is a thing that hands out memory, named through the `Allocator`
-// interface. Anything wanting memory takes one as a parameter, which means the
-// caller decides where the memory comes from — and different strategies become
-// interchangeable.
+// This lesson uses `SystemAllocator`, which asks the operating system. The next lessons swap in
+// others without changing how they are called.
 //
-// Asking for memory can fail, so a call that asks returns a fallible: the
-// value, or an `AllocError` saying why not. `Main` is fallible too, which lets
-// each step pass a failure on with `?`; a failure ends the program with exit
-// status 1.
-import Allocator::{ AllocError, Allocator, Arena, Box, SystemAllocator };
+// Two things differ from `Alloc`. A request is a `Layout`, a size and an alignment together,
+// built here by `Layout::ForArray<T>(count)`. And failure is a real error, not a `null`:
+// `Allocate` returns `(*var opaque) ! AllocError`, so there is no address to misuse until the
+// failure has been handled. A block must go back through `Deallocate` with the same layout it
+// was asked for with.
+import Allocator::{ AllocError, Allocator, Layout, SystemAllocator };
 import Io::PrintLine;
 
-func Main() -> ! AllocError {
-    // The system allocator is the one behind `Alloc` and `Free`. Note the two
-    // steps: build the concrete type, then name it at the interface type. The
-    // annotation is what performs the conversion, exactly as in Interface.
+// Borrows `count` numbers' worth of memory, uses it, and gives it back.
+func SumOfSquares(allocator: Allocator, count: uint) -> int64 ! AllocError {
+    // `ForArray` is `none` when `count` elements could not even be described.
+    let layout = Layout::ForArray<int64>(count) ?? fail AllocError::Unsupported;
+
+    // `?` passes a refusal on to the caller. Past this line, `block` is real storage.
+    let block = allocator.Allocate(layout)?;
+
+    // Registered at once, so every path out returns the block with its layout. A refused release
+    // here would be the allocator's own bug, and there is nobody to report it to.
+    defer allocator.Deallocate(block, layout) catch { else => {} };
+
+    let numbers = (block as *var int64)[..count];
+    var total: int64 = 0;
+    for i in 0..count {
+        numbers[i] = (i * i) as int64;
+        total += numbers[i];
+    }
+    return total;
+}
+
+func Reason(error: AllocError) -> char8[..] {
+    return match error {
+        .Unsupported => "the request cannot be served",
+        .OutOfMemory => "there is not enough memory",
+        .InvalidBlock => "the block was not from this allocator"
+    };
+}
+
+func Try(allocator: Allocator, count: uint) {
+    match SumOfSquares(allocator, count) {
+        .Success(total) => PrintLine("{} squares add up to {}", count, total),
+        .Failure(error) => PrintLine("{} squares: refused, {}", count, Reason(error))
+    }
+}
+
+func Main() -> int {
+    // Build the concrete allocator, then name it at the interface type to get an `Allocator`.
     var system = SystemAllocator();
-    let backing: Allocator = system;
+    let allocator: Allocator = system;
 
-    // An arena takes memory from another allocator in large blocks and hands
-    // out pieces of them. Individual pieces are never released; the whole
-    // arena is thrown away at once.
-    //
-    // That suits work with a natural end — a request, a frame, a parse. It is
-    // faster, because handing out a piece is little more than moving a marker,
-    // and nothing can be leaked or freed twice because nothing is freed
-    // individually.
-    var arena = Arena(backing, 256);
-    PrintLine("fresh arena     blocks {}  bytes used {}",
-        arena.BlockCount(), arena.BytesUsed());
+    Try(allocator, 10);
+    Try(allocator, 1000);
 
-    // The arena is used through a handle, which is what satisfies `Allocator`.
-    var handle = arena.Handle();
-    let scratch: Allocator = handle;
-
-    // A `Box<T>` is one value living in allocated memory, owned by the box. It
-    // takes the allocator to use, so the same box works on the system
-    // allocator or the arena without knowing which it has.
-    //
-    // `Create` returns the box or an `AllocError`, and `?` passes a failure on
-    // out of `Main`.
-    var first = Box::Create<int>(scratch, 10)?;
-    var second = Box::Create<int>(scratch, 20)?;
-
-    // One 256-byte block was taken from the system, and both boxes came out of
-    // it — one system allocation for two values.
-    PrintLine("two boxes made  blocks {}  bytes used {}",
-        arena.BlockCount(), arena.BytesUsed());
-
-    // `Get` returns a pointer to the value, reached the same way as any other.
-    PrintLine("their values    {} and {}", first.Get()[0], second.Get()[0]);
-
-    // Resetting hands everything back at once. Nothing had to be matched up,
-    // and no box needed releasing individually — which is the whole point.
-    // The block stays, ready to be used again.
-    arena.Reset();
-    PrintLine("after reset     blocks {}  bytes used {}",
-        arena.BlockCount(), arena.BytesUsed());
-
-    // The idea worth taking away is not the arena itself. It is that "where
-    // does this memory come from" became a parameter. A function written
-    // against `Allocator` can be handed the system allocator in production, an
-    // arena for work that ends all at once, or a fixed buffer in a place where
-    // allocation is not allowed at all — without changing a line of it.
+    // Eight bytes times this count is far more memory than any machine has.
+    Try(allocator, 1000000000000000000);
+    return 0;
 }
