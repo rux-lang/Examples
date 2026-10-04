@@ -1,63 +1,49 @@
-// Some questions have no answer. "Which is the first even number here?" has
-// none when every number is odd, and there is no `int` that means "there
-// wasn't one" — every value it can hold is a perfectly good answer.
+// Some questions have no answer. "Which is the first even number here?" has none when every
+// number is odd, and no `int` can mean "there wasn't one" — every value an `int` holds is a
+// perfectly good answer.
 //
-// `int?` is the type for that: an optional `int`. It is either a present
-// `int` or absent, and absence is spelled `none`. Because the value lives
-// inside the optional, it cannot be used as an `int` without first
-// establishing that it is there.
+// `int?` is the type for that: an optional `int`. It either holds an `int`, and is then called
+// present, or it holds nothing, and is absent. Absence has its own spelling, `none`. A plain
+// `int` turns into a present `int?` by itself wherever an `int?` is expected, so there is nothing
+// to wrap.
 import Io::PrintLine;
 
-// The return type says, in the signature, that this may find nothing. A caller
-// cannot miss it and cannot ignore it.
+// The return type says, right in the signature, that this may find nothing.
 func FirstEven(values: int[..]) -> int? {
-    for i in 0..values.length {
-        if values[i] % 2 == 0 {
-            // A plain `int` returned from here becomes a present `int?` on
-            // its own; there is nothing to wrap.
-            return values[i];
+    for value in values {
+        if value % 2 == 0 {
+            // A plain `int`, returned where an `int?` is expected: it becomes present.
+            return value;
         }
     }
     return none;
 }
 
+// An optional cannot be printed or added up as it is; first you have to find out whether there
+// is a value inside. This is the smallest `match` that does it. `value?` means "present, and call
+// what it holds `value`", and `none` means absent. The next lesson, Presence, explains it fully.
+func Show(label: char8[..], answer: int?) {
+    match answer {
+        value? => PrintLine("{}: {}", label, value),
+        none => PrintLine("{}: none", label)
+    }
+}
+
 func Main() -> int {
-    let mixed = [ 3, 7, 8, 9 ];
-    let odds = [ 1, 3, 5, 7 ];
+    // Optionals can be written down directly, too: a plain value or `none`.
+    let known: int? = 42;
+    let unknown: int? = none;
+    Show("known", known);
+    Show("unknown", unknown);
 
-    // Matching is the complete way to handle it. `value?` matches a present
-    // optional and binds what it holds; `none` matches absence. Both arms
-    // have to be written.
-    match FirstEven(mixed) {
-        value? => PrintLine("mixed: first even is {}", value),
-        none => PrintLine("mixed: no even number")
-    }
+    Show("first even of 3, 7, 8, 9", FirstEven([ 3, 7, 8, 9 ]));
+    Show("first even of 1, 3, 5, 7", FirstEven([ 1, 3, 5, 7 ]));
 
-    match FirstEven(odds) {
-        value? => PrintLine("odds:  first even is {}", value),
-        none => PrintLine("odds:  no even number")
-    }
-
-    // When only the presence matters, `is` asks without unwrapping: it is
-    // true when the optional holds an `int`.
-    PrintLine("mixed has one  {}", FirstEven(mixed) is int);
-    PrintLine("odds has one   {}", FirstEven(odds) is int);
-
-    // And when a sensible stand-in exists, `??` supplies it, collapsing both
-    // cases into one ordinary `int`. The right side is only evaluated when
-    // the left is `none`.
-    PrintLine("mixed or -1    {}", FirstEven(mixed) ?? -1);
-    PrintLine("odds or -1     {}", FirstEven(odds) ?? -1);
-
-    // Which to reach for is a question of what absence means. `??` is right
-    // when a default is genuinely as good as an answer. When "there was
-    // nothing" needs different handling — a message, a different path — match
-    // it, so the two cases stay visibly different in the code.
+    // The type keeps the two apart. `let doubled = known * 2;` is rejected — "operator '*'
+    // cannot combine left operand 'int?' with right operand 'int'" — because `known` might be
+    // `none`. An `int?` is not an `int` until a match has shown that a value is there.
     //
-    // One trap: `??` binds more loosely than `==`, so comparing the result
-    // needs parentheses — `(FirstEven(odds) ?? -1) == -1`.
-    //
-    // An optional says only that a value is missing, never why. When the
-    // reason matters, the next lesson's fallible `int ! E` carries it.
+    // An optional says only that a value is missing, never why. When the reason matters, the
+    // fallible `int ! E` of the Errors part carries it.
     return 0;
 }
