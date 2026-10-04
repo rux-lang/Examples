@@ -33,8 +33,9 @@ func Main() -> int {
     PrintLine("    result {}", Side("left", false) || Side("right", true));
 
     // This is what makes short-circuiting useful: the left side can guard the
-    // right. Dividing by zero would crash the program, but with no items the
-    // division is never reached.
+    // right. An integer division by zero stops the program on the spot, with
+    // "Panic: division by zero" and the line it happened on. With no items, the
+    // guard settles the answer first and the division is never reached.
     let items: int32 = 0;
     let total: int32 = 120;
     PrintLine("average above 10: {}", items != 0 && total / items > 10);
