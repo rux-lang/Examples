@@ -60,10 +60,10 @@ func Main() -> int {
     }
     PrintLine("best after:  {}", best ?? -1);
 
-    // `null` and `none` are different. A `null` pointer wrapped in an optional is present: the
-    // optional holds a pointer, which happens to point nowhere. Use `none` to mean "no pointer".
-    let nowhere: *var int = null;
-    let wrapped: (*var int)? = nowhere;
+    // `null` and `none` are different. `null` is a pointer value, so an optional pointer given
+    // `null` is present: it holds a pointer, which happens to point nowhere. Use `none` to mean
+    // "no pointer".
+    let wrapped: (*var int)? = null;
     PrintLine("null wrapped is present: {}", wrapped is *var int);
     return 0;
 }
