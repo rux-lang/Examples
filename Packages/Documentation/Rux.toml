@@ -1,0 +1,13 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "Documentation"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Documentation comments, their tags, and the pages rux doc generates"
+
+[Dependencies]
+Io = { Namespace = "Rux", Version = "*" }
