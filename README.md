@@ -88,6 +88,7 @@ Operations that can fail: `T ! E`.
 A value that is one of several types: `A | B`.
 
 - 10.1 **[SumType](SumTypes/SumType/)** — a value that can be an `int32` or a `bool`: `int32 
+- 10.2 **[TypedPattern](SumTypes/TypedPattern/)** — match a sum by the type it holds
 
 ### 11. Ownership
 
