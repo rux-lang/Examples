@@ -41,6 +41,8 @@ func Main() -> int {
     Show(copy);
 
     // Assigning over a live value makes the new copy first, then ends the old value's life.
+    // Only a copy of an existing value runs `=`. A sheet made on the spot is not a copy of
+    // anything, so it moves straight in with no photocopy, here and in `board = Sheet { ... };`.
     PrintLine("assigning:");
     var board = Sheet { text: "Agenda", generation: 1 };
     board = copy;
