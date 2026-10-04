@@ -1,13 +1,14 @@
-// The previous lesson wrote one function for many *counts* of argument. This
-// one writes a single function for many *types*.
+// The Overload lesson wrote one function per type: an `Area` for `int` and
+// another for `float64`, with the same body. A generic function writes that
+// body once.
 //
-// A name in angle brackets after the function name is a type parameter: it
+// A name in angle brackets after the function name is a type parameter. It
 // stands for a type the caller supplies, and the compiler produces a separate
 // version of the function for each type actually used.
 import Io::PrintLine;
 
-// `T` is decided by the arguments. Both must be the same type, and the result
-// is that type too, so calling this with two `int` values yields an `int`.
+// Both arguments must be the same type `T`, and the result is that type too,
+// so two `int` values give back an `int` and two `float64` values a `float64`.
 func Larger<T>(first: T, second: T) -> T {
     if first > second {
         return first;
@@ -15,42 +16,36 @@ func Larger<T>(first: T, second: T) -> T {
     return second;
 }
 
-// Nothing here depends on what `T` can do, so it works for absolutely any type.
-func Second<T>(first: T, second: T) -> T {
+// Nothing in this body depends on what `T` can do, so it accepts any type.
+func Pick<T>(useFirst: bool, first: T, second: T) -> T {
+    if useFirst {
+        return first;
+    }
     return second;
 }
 
-// A type parameter may appear anywhere a type may, including inside a slice.
-// This one function counts elements of an array of any element type.
-func CountOf<T>(values: T[..]) -> uint {
-    return values.length;
-}
-
 func Main() -> int {
-    // One function, three types. There is no cast and no shared base type:
-    // each call compiles its own version of `Larger`.
-    PrintLine("Larger(3, 9)          {}", Larger(3, 9));
-    PrintLine("Larger(2.5, 1.5)      {}", Larger(2.5, 1.5));
-    PrintLine("Larger('a', 'z')      {}", Larger('a', 'z'));
+    // Usually `T` is inferred from the arguments. Four types and no conversion
+    // anywhere: each type used compiles its own version of the function.
+    PrintLine("Larger(3, 9)                  {}", Larger(3, 9));
+    PrintLine("Larger(2.5, 1.5)              {}", Larger(2.5, 1.5));
+    PrintLine("Larger('a', 'z')              {}", Larger('a', 'z'));
+    PrintLine("Pick(true, \"yes\", \"no\")       {}", Pick(true, "yes", "no"));
 
-    PrintLine("Second(1, 2)          {}", Second(1, 2));
-    PrintLine("Second(\"a\", \"b\")      {}", Second("a", "b"));
+    // `T` can also be given explicitly in angle brackets at the call. That
+    // matters when the arguments alone would choose a different type. Bare
+    // literals become `int`, but with `<uint8>` they become `uint8`, and so
+    // does the result — which is why adding 100 wraps around here.
+    PrintLine("Larger(200, 7) + 100          {}", Larger(200, 7) + 100);
+    PrintLine("Larger<uint8>(200, 7) + 100   {}", Larger<uint8>(200, 7) + 100);
 
-    let numbers = [ 10, 20, 30 ];
-    let words = [ "one", "two" ];
-    PrintLine("CountOf(numbers)      {}", CountOf(numbers));
-    PrintLine("CountOf(words)        {}", CountOf(words));
-
-    // `Larger` uses `>` on a `T` it knows nothing about, and that is checked
-    // once the type is known: a type without `>` is rejected at the call, not
-    // inside the function. A type parameter can also be required up front to
-    // implement an interface — `func Sorted<T: Comparable>(...)` — which is
-    // worth more once there are types of your own to implement it with, so it
-    // waits for the Interface lesson.
+    // `Larger` uses `>` on a `T` it knows nothing about. That is checked once
+    // `T` is known: calling `Larger` with a type that has no `>` is rejected
+    // when that version of `Larger` is compiled.
     //
-    // Note that every generic here returns its value for the caller to print.
-    // A generic function cannot print a `T` itself: passing one to `PrintLine`
-    // is refused because the placeholder list requires `Display`, and a type
-    // parameter is not accepted as one even when it is declared `<T: Display>`.
+    // Watch out: a function with an unconstrained `T` cannot print its value.
+    // `PrintLine("{}", first)` inside `Larger` is refused, because `{}` needs
+    // a type known to be printable and `T` promises nothing. That is why each
+    // function here returns its value for `Main` to print.
     return 0;
 }

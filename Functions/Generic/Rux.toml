@@ -7,7 +7,7 @@ Name = "Generic"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "One function that works for many types"
+Description = "One function written once for many types, inferred or explicit"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
