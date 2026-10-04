@@ -57,8 +57,9 @@ func Main() -> int {
     PrintLine("sum of all:        {}", all.Sum());
     PrintLine("even scores:       {}", all.CountEven());
 
-    // An array is not a slice, so `scores.Sum()` is rejected. The slice methods are reached
-    // through a view of the array instead.
+    // An array is not a slice, so `scores.Sum()` stops with
+    //     error: type 'int[5]' has no field 'Sum'
+    // The slice methods are reached through a view of the array instead.
     PrintLine("sum of the last 3: {}", scores[2..].Sum());
     return 0;
 }
