@@ -1,0 +1,60 @@
+// A `var` may be declared before its value is known, and given one later. Until then it holds
+// nothing, and the compiler tracks it: every path that reaches a read must have assigned it
+// first. A read that some path can reach without an assignment is rejected at compile time, so
+// a Rux program never sees leftover garbage from an unassigned variable.
+//
+// A `let` has no such freedom. It cannot be assigned later, so it needs its value where it is
+// declared.
+//
+// One exception to "holds nothing": when the type has a constructor taking no arguments,
+// `var value: T;` calls it, and the variable starts out initialized.
+import Io::PrintLine;
+
+// Every branch assigns `grade`, so the read in `return` is accepted. Delete the final `else` and
+// one path reaches the read with nothing assigned:
+//
+// error: value 'grade' may be uninitialized on some control-flow paths
+//   note: one unavailable path for 'grade' originates at 20:5
+//   help: initialize or preserve 'grade' on every path before this use
+func Grade(score: int32) -> char8[..] {
+    var grade: char8[..];
+    if score >= 90 {
+        grade = "excellent";
+    } else if score >= 50 {
+        grade = "pass";
+    } else {
+        grade = "retry";
+    }
+    return grade;
+}
+
+struct Tally {
+    count: int32;
+}
+
+extend Tally {
+    func Tally() -> Tally {
+        PrintLine("    Tally() starts the count at zero");
+        return Tally { count: 0 };
+    }
+}
+
+func Main() -> int {
+    PrintLine("grades: {}, {}, {}", Grade(95), Grade(72), Grade(31));
+
+    // Declared without a value and read straight away:
+    //
+    //     var total: int32;
+    //     PrintLine("{}", total);
+    //
+    // error: variable 'total' is used before it is initialized
+    //   note: 'total' was declared without an initializer at 47:5
+    //   help: assign a value to 'total' before this use
+
+    // `Tally` has a constructor without arguments, so this declaration runs it.
+    PrintLine("tally:");
+    var tally: Tally;
+    tally.count += 1;
+    PrintLine("    count {}", tally.count);
+    return 0;
+}
