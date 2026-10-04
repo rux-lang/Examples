@@ -10,7 +10,9 @@
 //     of an event must be used or copied before asking for another. The reader owns that buffer,
 //     and its destructor gives it back however the function holding it ends.
 //   - Errors. `Next()` answers `JsonEvent::Error` when the document goes wrong, and `Failure()`
-//     then says why. Events before the mistake were already delivered, so a program must be
+//     then says why and at which byte of the whole document, however it was split into reads.
+//     A source that fails is reported as `JsonParseError::Source`, its own `IoError` kept by
+//     `SourceError()`. Events before the mistake were already delivered, so a program must be
 //     ready to find out late that its input was bad.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::{ IoError, IoErrorKind, PrintLine, Reader };
@@ -80,7 +82,8 @@ func Report(allocator: Allocator, document: char8[..]) {
     match Titles(allocator, document) {
         .Success(books) => PrintLine("  {} books", books),
         .Failure(error) => match error {
-            reason: JsonParseError => PrintLine("  refused: {}", reason),
+            reason: JsonParseError =>
+                PrintLine("  refused at byte {}: {}", reason.Offset(), reason),
             _: IoError => PrintLine("  could not start reading")
         }
     }

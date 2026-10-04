@@ -16,10 +16,10 @@ rux run
 [{"title": "Dune"}, {"title": "Emma"]
   title: Dune
   title: Emma
-  refused: token that cannot appear here
+  refused at byte 36: token that cannot appear here
 [{"title": "Dune"}, {"title":
   title: Dune
-  refused: document ended in the middle of a value
+  refused at byte 29: document ended in the middle of a value
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/json-stream

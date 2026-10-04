@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "JsonStream"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Stream JSON as events, pulling only the fields a program wants and stopping on errors"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
