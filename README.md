@@ -24,7 +24,7 @@ First programs: printing, values and their types.
 
 Combining values into new ones.
 
-- **[Operator](Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence _(being split into the lessons above)_
+- **[Operator](Operators/Operator/)** — arithmetic, comparison, logical, and bitwise operators, and their precedence _(being split into the lessons above)_
 
 ### 3. Control flow
 
