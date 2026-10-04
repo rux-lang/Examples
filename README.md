@@ -119,7 +119,7 @@ Numbers in depth.
 Containers from the `Collections` package.
 
 - 17.1 **[Vector](Collections/Vector/)** — a growable array that manages its own memory and capacity
-- 17.3 **[Deque](Deque/)** — add and remove at both ends, and see where that beats a vector
+- 17.3 **[Deque](Collections/Deque/)** — add and remove at both ends, and see where that beats a vector
 - 17.4 **[HashMap](HashMap/)** — look values up by key
 - 17.6 **[TreeMap](TreeMap/)** — keep keys in order, and walk them in order
 
