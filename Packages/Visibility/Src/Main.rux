@@ -16,7 +16,7 @@ import Tally::Counter;
 //
 //     import Tally::{ Counter, Clamp };
 //
-//     error: function 'Clamp' is private to package 'local:.../Visibility/Tally/Rux.toml'
+//     error: function 'Clamp' is private to package 'Tally'
 //     help: add 'pub' to the declaration of 'Clamp'
 
 func Main() -> int {
@@ -35,7 +35,7 @@ func Main() -> int {
     //
     //     counter.count = 0;
     //
-    //     error: struct field 'count' is private to package 'local:.../Visibility/Tally/Rux.toml'
+    //     error: struct field 'count' is private to package 'Tally'
     //     help: add 'pub' before the declaration of 'count'
     return 0;
 }
