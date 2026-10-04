@@ -59,7 +59,7 @@ Many values of one type, and groups of values of different types.
 Declaring types of your own.
 
 - 6.1 **[Struct](Types/Struct/)** — group related values into a struct with named fields
-- 6.8 **[Enum](Enum/)** — name a fixed set of cases
+- 6.8 **[Enum](Types/Enum/)** — name a fixed set of cases
 - 6.10 **[Variant](Variant/)** — attach data to each case
 - 6.12 **[TypeAlias](TypeAlias/)** — give an existing type a second name to make a signature read clearly
 
