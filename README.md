@@ -76,6 +76,7 @@ Operations that can fail: `T ! E`.
 - 9.1 **[Fallible](Errors/Fallible/)** — return either a value or an error with `T ! E`
 - 9.2 **[Fail](Errors/Fail/)** — report a failure with `fail`
 - 9.3 **[UnitFallible](Errors/UnitFallible/)** — a function that returns nothing but can still fail: `! E`
+- 9.4 **[Outcome](Errors/Outcome/)** — match a result as `.Success` or `.Failure`
 - 9.8 **[Propagate](Errors/Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 
 ### 11. Ownership

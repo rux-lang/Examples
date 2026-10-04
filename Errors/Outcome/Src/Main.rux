@@ -1,0 +1,57 @@
+// What a fallible call hands back is an outcome: one value that is either a success or a
+// failure. It is an ordinary value. It can sit in a variable, be passed to a function, and be
+// looked at later.
+//
+// `.Success(...)` and `.Failure(...)` are the two shapes an outcome can have. In a `match` they
+// are patterns, and whatever is written inside the parentheses is matched against the payload —
+// a name binds it, a literal compares it. Outside a match they are constructors, so an outcome
+// can also be built by hand, without calling anything.
+import Io::PrintLine;
+
+struct NobodyToShare {
+    slices: int;
+}
+
+// Shares out pizza slices evenly. It fails when there is nobody to share them with.
+func Share(slices: int, people: int) -> int ! NobodyToShare {
+    if people == 0 {
+        fail NobodyToShare { slices: slices };
+    }
+    return slices / people;
+}
+
+// An outcome arrives as a parameter like any other value.
+func Describe(outcome: int ! NobodyToShare) {
+    match outcome {
+        .Success(0) => PrintLine("not even one slice each"),
+        .Success(each) => PrintLine("{} slices each", each),
+        .Failure(error) => PrintLine("{} slices and nobody to eat them", error.slices)
+    }
+}
+
+func Main() -> int {
+    // Each call's outcome is stored first and examined afterwards.
+    let party = Share(12, 4);
+    let empty = Share(12, 0);
+    Describe(party);
+    Describe(empty);
+    Describe(Share(3, 4));
+
+    // The same two shapes as constructors. The type annotation says which fallible is meant.
+    let promised: int ! NobodyToShare = .Success(2);
+    let refused: int ! NobodyToShare = .Failure(NobodyToShare { slices: 8 });
+    Describe(promised);
+    Describe(refused);
+
+    // A match can also produce a value, one per shape.
+    let eaten = match party {
+        .Success(each) => each * 4,
+        .Failure(_) => 0
+    };
+    PrintLine("eaten at the party: {}", eaten);
+
+    // A match on an outcome must cover both shapes. Drop the `.Failure` arm above and the
+    // compiler refuses: "match on 'int ! NobodyToShare' is not exhaustive; missing .Failure(_)".
+    // A failure can never slip through unnoticed.
+    return 0;
+}
