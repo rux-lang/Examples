@@ -2,54 +2,62 @@
 // none when every number is odd, and there is no `int` that means "there
 // wasn't one" — every value it can hold is a perfectly good answer.
 //
-// `Option<T>` is the type for that. It is a variant with two cases: `Some`
-// carrying a `T`, and `None` carrying nothing. Because the value lives inside
-// the `Some`, it cannot be read without first establishing that there is one.
-import Core::Option;
+// `int?` is the type for that: an optional `int`. It is either a present
+// `int` or absent, and absence is spelled `none`. Because the value lives
+// inside the optional, it cannot be used as an `int` without first
+// establishing that it is there.
 import Io::PrintLine;
 
 // The return type says, in the signature, that this may find nothing. A caller
 // cannot miss it and cannot ignore it.
-func FirstEven(values: int[..]) -> Option<int> {
+func FirstEven(values: int[..]) -> int? {
     for i in 0..values.length {
         if values[i] % 2 == 0 {
-            return Option::Some<int>(values[i]);
+            // A plain `int` returned from here becomes a present `int?` on
+            // its own; there is nothing to wrap.
+            return values[i];
         }
     }
-    return Option::None<int>();
+    return none;
 }
 
 func Main() -> int {
     let mixed = [ 3, 7, 8, 9 ];
     let odds = [ 1, 3, 5, 7 ];
 
-    // Matching is the complete way to handle it: one arm has the value, the
-    // other does not, and both have to be written.
+    // Matching is the complete way to handle it. `value?` matches a present
+    // optional and binds what it holds; `none` matches absence. Both arms
+    // have to be written.
     match FirstEven(mixed) {
-        .Some(value) => PrintLine("mixed: first even is {}", value),
-        .None => PrintLine("mixed: no even number")
+        value? => PrintLine("mixed: first even is {}", value),
+        none => PrintLine("mixed: no even number")
     }
 
     match FirstEven(odds) {
-        .Some(value) => PrintLine("odds:  first even is {}", value),
-        .None => PrintLine("odds:  no even number")
+        value? => PrintLine("odds:  first even is {}", value),
+        none => PrintLine("odds:  no even number")
     }
 
-    // When only the presence matters, asking is shorter than matching.
-    PrintLine("mixed has one  {}", FirstEven(mixed).IsSome());
-    PrintLine("odds has one   {}", FirstEven(odds).IsNone());
+    // When only the presence matters, `is` asks without unwrapping: it is
+    // true when the optional holds an `int`.
+    PrintLine("mixed has one  {}", FirstEven(mixed) is int);
+    PrintLine("odds has one   {}", FirstEven(odds) is int);
 
-    // And when a sensible stand-in exists, `ValueOr` supplies it, collapsing
-    // both cases into one ordinary value.
-    PrintLine("mixed or -1    {}", FirstEven(mixed).ValueOr(-1));
-    PrintLine("odds or -1     {}", FirstEven(odds).ValueOr(-1));
+    // And when a sensible stand-in exists, `??` supplies it, collapsing both
+    // cases into one ordinary `int`. The right side is only evaluated when
+    // the left is `none`.
+    PrintLine("mixed or -1    {}", FirstEven(mixed) ?? -1);
+    PrintLine("odds or -1     {}", FirstEven(odds) ?? -1);
 
-    // Which to reach for is a question of what absence means. `ValueOr` is
-    // right when a default is genuinely as good as an answer. When "there was
+    // Which to reach for is a question of what absence means. `??` is right
+    // when a default is genuinely as good as an answer. When "there was
     // nothing" needs different handling — a message, a different path — match
     // it, so the two cases stay visibly different in the code.
     //
-    // An `Option` says only that a value is missing, never why. When the
-    // reason matters, the next lesson's `Result` carries it.
+    // One trap: `??` binds more loosely than `==`, so comparing the result
+    // needs parentheses — `(FirstEven(odds) ?? -1) == -1`.
+    //
+    // An optional says only that a value is missing, never why. When the
+    // reason matters, the next lesson's fallible `int ! E` carries it.
     return 0;
 }

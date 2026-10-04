@@ -10,5 +10,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A value that may be absent"
 
 [Dependencies]
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
