@@ -1,0 +1,65 @@
+// The Generic lesson gave a function a type parameter. A type can have one too: `struct Pair<T>`
+// is not one struct but a pattern for many, and `Pair<int32>` and `Pair<char8[..]>` are two
+// different types stamped out of it. Each one is laid out for its own `T`, so a pair of bytes is
+// small and a pair of strings is wide.
+//
+// Variants work the same way. A generic variant's cases can carry a `T`, and that is how one
+// declaration describes "a reading of something" without saying what is being read.
+import Io::PrintLine;
+
+// Two values of the same type, whatever that type is.
+struct Pair<T> {
+    first: T;
+    second: T;
+}
+
+// A type may take several parameters, and they need not agree.
+struct Entry<K, V> {
+    key: K;
+    value: V;
+}
+
+// A measurement that may be exact, a range, or missing altogether.
+variant Reading<T> {
+    Exact(T),
+    Between(T, T),
+    Missing
+}
+
+// A generic function can take a generic type. `T` is inferred from the pair it is given.
+func Swapped<T>(pair: Pair<T>) -> Pair<T> {
+    return Pair<T> { first: pair.second, second: pair.first };
+}
+
+func Lowest<T>(reading: Reading<T>, fallback: T) -> T {
+    return match reading {
+        .Exact(value) => value,
+        .Between(low, _) => low,
+        .Missing => fallback
+    };
+}
+
+func Main() -> int {
+    // A struct literal names its type arguments: `Pair { ... }` alone is rejected, because a
+    // literal does not guess `T` from its fields.
+    let point = Pair<int32> { first: 3, second: 4 };
+    let words = Pair<char8[..]> { first: "left", second: "right" };
+    let flipped = Swapped(point);
+    PrintLine("point    {} {}", flipped.first, flipped.second);
+    PrintLine("words    {} {}", words.first, words.second);
+
+    let age = Entry<char8[..], int32> { key: "age", value: 42 };
+    PrintLine("entry    {} = {}", age.key, age.value);
+
+    // A case with a payload learns `T` from it, the way a generic function learns from its
+    // arguments, so this is a `Reading<float64>`. The type argument can also be written out. A
+    // case without a payload has nothing to learn from, so it must be written out, and the case
+    // is then called like a function: `Reading::Missing<int32>()`.
+    let temperature = Reading::Between(18.5, 21.0);
+    let floor = Reading::Exact<int32>(7);
+    let lost = Reading::Missing<int32>();
+    PrintLine("lowest   {}", Lowest(temperature, 0.0));
+    PrintLine("lowest   {}", Lowest(floor, 0));
+    PrintLine("lowest   {}", Lowest(lost, -1));
+    return 0;
+}
