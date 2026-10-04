@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Pointer"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Take an address with @ and read or write through *T and *var T"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
