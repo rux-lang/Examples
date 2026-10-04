@@ -1,10 +1,10 @@
-// Handling a `Result` with `match` is right when this function is the one that
-// should decide what a failure means. Often it is not: the function is a step
-// in the middle, and a failure should simply become the caller's problem.
+// Handling a fallible with `match` or `catch` is right when this function is
+// the one that should decide what a failure means. Often it is not: the
+// function is a step in the middle, and a failure should simply become the
+// caller's problem.
 //
-// Written by hand that is the same four lines every time — match, take the
-// success, return the error unchanged. `?` is that written once.
-import Core::{ Result, Unit };
+// Written by hand that is the same few lines every time — match, take the
+// success, fail with the error unchanged. Postfix `?` is that written once.
 import Io::PrintLine;
 
 variant DigitError {
@@ -13,51 +13,48 @@ variant DigitError {
 }
 
 // A small step that can fail, carrying which position was wrong.
-func DigitAt(text: char8[..], index: uint) -> Result<int, DigitError> {
+func DigitAt(text: char8[..], index: uint) -> int ! DigitError {
     if text.length == 0 {
-        return Result::Error<int, DigitError>(DigitError::Empty);
+        fail DigitError::Empty;
     }
     let byte = text[index];
     if byte < c8'0' || byte > c8'9' {
-        return Result::Error<int, DigitError>(DigitError::BadDigit(index as int));
+        fail DigitError::BadDigit(index as int);
     }
-    return Result::Success<int, DigitError>((byte as int) - 48);
+    return (byte as int) - 48;
 }
 
 // The long way. Every failure is matched, and each one is handed straight back
-// to the caller — three near-identical blocks that say nothing new.
-func FirstTwoByHand(text: char8[..]) -> Result<int, DigitError> {
+// to the caller — two near-identical blocks that say nothing new.
+func FirstTwoByHand(text: char8[..]) -> int ! DigitError {
     var tens = 0;
     match DigitAt(text, 0) {
         .Success(value) => tens = value,
-        .Error(reason) => { return Result::Error<int, DigitError>(reason); }
+        .Failure(reason) => fail reason
     }
     var units = 0;
     match DigitAt(text, 1) {
         .Success(value) => units = value,
-        .Error(reason) => { return Result::Error<int, DigitError>(reason); }
+        .Failure(reason) => fail reason
     }
-    return Result::Success<int, DigitError>(tens * 10 + units);
+    return tens * 10 + units;
 }
 
 // The same function with `?`. On success the expression is the value, so it can
-// be used straight away. On failure the enclosing function returns that error
-// immediately, and nothing after the `?` runs.
-func FirstTwo(text: char8[..]) -> Result<int, DigitError> {
+// be used straight away. On failure the enclosing function fails with that
+// error immediately, and nothing after the `?` runs.
+func FirstTwo(text: char8[..]) -> int ! DigitError {
     let tens = DigitAt(text, 0)?;
     let units = DigitAt(text, 1)?;
-    return Result::Success<int, DigitError>(tens * 10 + units);
+    return tens * 10 + units;
 }
 
-func Show(label: char8[..], outcome: Result<int, DigitError>) {
+func Show(label: char8[..], outcome: int ! DigitError) {
     match outcome {
         .Success(value) => PrintLine("{:10} {}", label, value),
-        .Error(reason) => {
-            match reason {
-                .Empty => PrintLine("{:10} nothing to read", label),
-                .BadDigit(at) => PrintLine("{:10} not a digit at position {}", label, at)
-            }
-        }
+        .Failure(DigitError::Empty) => PrintLine("{:10} nothing to read", label),
+        .Failure(DigitError::BadDigit(at)) => PrintLine("{:10} not a digit at position {}",
+            label, at)
     }
 }
 
@@ -73,10 +70,11 @@ func Main() -> int {
     // 1, and each `BadDigit` still carries the position it was given, even
     // though neither error was looked at on the way out.
 
-    // Two things `?` requires. The function using it must itself return a
-    // `Result`, since that is where the early return goes. And its error type
-    // must be the one being propagated — `?` passes the error along unchanged
-    // rather than converting it, so a step failing with a different error type
-    // has to be matched and translated by hand.
+    // Two things `?` requires. The function using it must itself be fallible,
+    // since that is where the failure goes. And its error type must have room
+    // for the error being passed on: the same type, or a sum such as
+    // `! (DigitError | IoError)` that includes it. `?` never translates one
+    // error into another by itself. When a step fails with an unrelated error,
+    // say how to turn it into yours: `DigitAt(text, 0)? else (e => ...)`.
     return 0;
 }

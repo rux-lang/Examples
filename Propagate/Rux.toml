@@ -10,5 +10,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Passing a failure to the caller with ?"
 
 [Dependencies]
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
