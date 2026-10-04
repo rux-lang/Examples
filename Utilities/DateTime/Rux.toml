@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "DateTime"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Dates with times, UTC offsets and RFC 3339 text"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
