@@ -6,9 +6,10 @@
 // The collapse matters to a generic `match`. `Side` cannot write a second arm `second: U =>`:
 // at `Side<int32, int32>` that arm would come after `first: int32 =>`, which already matched
 // everything, and the instantiation is rejected — "match arm is unreachable because an earlier
-// pattern matches every value", with a note "in 'Side' instantiated with T = int32, U = int32".
-// An `else` arm is never reported as unreachable, so a match over `T | U` ends in `else` and
-// stays valid for every pair of type arguments.
+// pattern matches every value", with a note "in 'Side' instantiated with T = int32, U = int32
+// by the call at ..." that points at the call in `Main` responsible. An `else` arm is never
+// reported as unreachable, so a match over `T | U` ends in `else` and stays valid for every pair
+// of type arguments.
 import Io::PrintLine;
 
 // Hands back one of two values of possibly different types.
