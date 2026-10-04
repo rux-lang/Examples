@@ -87,7 +87,7 @@ Who owns a value, and when it is cleaned up.
 
 Describing behaviour that many types share.
 
-- 12.1 **[Interface](Interface/)** — declare an interface and implement it for your own types
+- 12.1 **[Interface](Interfaces/Interface/)** — declare an interface and implement it for your own types
 - 12.8 **[Overloading](Overloading/)** — define `==`, `+` and the other operators for your own type
 - 12.11 **[Iterator](Iterator/)** — implement `Next` so a type of your own can be used with `for`
 
