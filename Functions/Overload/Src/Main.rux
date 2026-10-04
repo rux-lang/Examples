@@ -1,15 +1,15 @@
 // Several functions may share one name as long as their parameters differ. The
-// compiler picks by the arguments at each call, so the caller writes one name
-// and gets the version that fits.
+// compiler picks one by the arguments at each call, so the caller writes one
+// name and gets the version that fits.
 //
 // This is not new: `PrintLine` has been an overload set since the first lesson.
-// There is one for `int`, one for `float64`, one for `bool`, one for text, one
-// taking nothing at all, and a further one taking a format string and a list of
-// values — over twenty in total. Writing `PrintLine(x)` has been choosing among
-// them all along.
+// There is one for `int`, one for `float64`, one for `bool`, one for a single
+// character, one taking nothing at all, one taking a format string and values,
+// and more — over twenty in total. Writing `PrintLine(x)` has been choosing
+// among them all along.
 import Io::PrintLine;
 
-// Three functions, one name, told apart by the type of their argument.
+// Four functions, one name, told apart by the type of their argument.
 func Describe(value: int) {
     PrintLine("an integer: {}", value);
 }
@@ -22,12 +22,12 @@ func Describe(value: bool) {
     PrintLine("a truth value: {}", value);
 }
 
-func Describe(value: char8[..]) {
-    PrintLine("some text: {}", value);
+func Describe(value: char) {
+    PrintLine("a character: {}", value);
 }
 
-// Overloads may also differ in how many parameters they take. These two are
-// unambiguous because no call can match both.
+// Overloads may also differ in how many parameters they take. These are
+// unambiguous because no call can match more than one.
 func Area(side: int) -> int {
     return side * side;
 }
@@ -36,24 +36,31 @@ func Area(width: int, height: int) -> int {
     return width * height;
 }
 
+func Area(width: float64, height: float64) -> float64 {
+    return width * height;
+}
+
 func Main() -> int {
-    // Nothing here says which `Describe` to run. The literal's type decides,
+    // Nothing here says which `Describe` to run. Each argument's type decides,
     // which is why the same call spelling produces four different messages.
     Describe(42);
     Describe(2.5);
     Describe(true);
-    Describe("hello");
+    Describe('R');
 
     // The count of arguments chooses just as well as their types.
-    PrintLine("square      {}", Area(4));
-    PrintLine("rectangle   {}", Area(4, 5));
+    PrintLine("square           {}", Area(4));
+    PrintLine("rectangle        {}", Area(4, 5));
+    PrintLine("float rectangle  {}", Area(1.5, 2.0));
 
     // Overloading is resolved by the parameters, never by the result. Two
-    // functions differing only in return type could not be told apart at a
-    // call, so that is not allowed:
+    // functions differing only in what they return could not be told apart
+    // at a call, so the second one is refused:
     //
-    //     func Parse(text: char8[..]) -> int { ... }
-    //     func Parse(text: char8[..]) -> float64 { ... }
+    //     func Half(value: int) -> int { ... }
+    //     func Half(value: int) -> float64 { ... }
+    //         error: function 'Half' has the same parameter signature as an
+    //                earlier overload
     //
     // Give them separate names when the difference is what comes back.
     return 0;
