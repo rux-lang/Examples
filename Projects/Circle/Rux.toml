@@ -7,10 +7,11 @@ Name = "Circle"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Reading a line from the console and parsing it to a number"
+Description = "Read a radius and print the circumference and area, telling apart every kind of bad input"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
+Core = { Namespace = "Rux", Version = "*" }
 Format = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Math = { Namespace = "Rux", Version = "*" }
