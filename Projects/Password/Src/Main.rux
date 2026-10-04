@@ -1,61 +1,70 @@
-// Building a password by drawing characters from an alphabet.
+// A password generator: sixteen characters, each drawn straight from the operating system's
+// entropy, from an alphabet chosen so nobody misreads the result.
 //
-// The program is short. The care is all in one decision — where the randomness
-// comes from — and getting that wrong produces something that looks exactly as
-// random as the correct version and is not.
-import Io::{ Print, PrintLine };
-import Random::{ Pcg64Dxsm, PcgFromEntropy, UniformBelow };
+// Two decisions carry the whole program.
+//
+// Where the randomness comes from. A seeded generator such as `Pcg64Dxsm` is predictable by
+// design, so a password made from one is only as secret as its seed. Here every character comes
+// from the Entropy package directly, and every request is checked: if the system has no
+// randomness to give, the program stops rather than invent some.
+//
+// How a random byte becomes a character. A byte has 256 values and the alphabet has 57
+// characters, and 57 does not divide 256. Taking `byte % 57` would make the first 28 characters
+// (256 - 4 * 57 of them) a little more likely than the rest. So a byte from the uneven top of the
+// range is thrown away and another is drawn: rejection sampling. Every character is then exactly
+// as likely as every other.
+//
+// The result has 16 * log2(57), about 93 bits of strength. The output differs on every run.
+import Entropy::{ EntropyError, Fill };
+import Io::PrintLine;
+
+// Lowercase, uppercase and digits, without the look-alikes l, I, O, 0 and 1. A character that
+// can be misread costs more in mistyped passwords than it adds in strength.
+const Alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+// An index into the alphabet, every one equally likely, or why no entropy was available.
+func DrawIndex() -> uint ! EntropyError {
+    let count = Alphabet.length;
+    // The largest multiple of `count` that fits in a byte's 256 values: 228 for 57 characters.
+    // Bytes below it split evenly among the characters; bytes from it upwards are rejected.
+    let limit = 256 - 256 % count;
+    loop {
+        var drawn: byte = 0;
+        Fill(@drawn as *var opaque, 1)?;
+        if (drawn as uint) < limit {
+            return (drawn as uint) % count;
+        }
+    }
+}
+
+func Reason(error: EntropyError) -> char8[..] {
+    return match error {
+        EntropyError::Unsupported => "this system has no entropy source",
+        EntropyError::Interrupted => "the request was interrupted",
+        EntropyError::Failed => "the system refused",
+        EntropyError::TooLarge => "too many bytes in one request"
+    };
+}
 
 func Main() -> int {
-    // The characters a password may contain. Keeping them in one place makes
-    // the set easy to see and easy to change — and the count is what every
-    // draw is taken against.
-    let alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    PrintLine("alphabet  {} ({} characters)", Alphabet, Alphabet.length);
 
-    // Note what is missing: l, I, O, 0 and 1. Characters that look like each
-    // other cost more in mistyped passwords than they add in strength.
-    PrintLine("alphabet has {} characters", alphabet.length);
-
-    // This is the decision. `PcgFromEntropy` seeds from the operating system's
-    // randomness, so each run differs. A fixed seed would produce the same
-    // password every time — and a password anyone can reproduce is not one.
-    //
-    // Seeding can fail, so `PcgFromEntropy` returns `Pcg64Dxsm ! EntropyError`:
-    // the generator, or why there is none. With no randomness to be had, the
-    // only honest answer is to stop.
-    var generator = match PcgFromEntropy() {
-        .Success(seeded) => seeded,
-        .Failure(_) => {
-            PrintLine("no source of randomness available; refusing to invent one");
-            return 1;
-        }
-    };
-
-    let length: uint = 16;
-    Print("password: ");
-    for i in 0..length {
-        let pick = UniformBelow<Pcg64Dxsm>(generator, alphabet.length as uint64);
-        Print("{}", alphabet[pick as uint]);
-    }
-    PrintLine();
-
-    // Two more, to show they differ.
-    for round in 0..2 {
-        Print("          ");
-        for i in 0..length {
-            let pick = UniformBelow<Pcg64Dxsm>(generator, alphabet.length as uint64);
-            Print("{}", alphabet[pick as uint]);
-        }
-        PrintLine();
+    // The password is built in full before any of it is printed, so a failure halfway leaves
+    // nothing on the screen that could be mistaken for a shorter password.
+    var password: char8[16];
+    for i in 0..password.length {
+        let index = DrawIndex() catch {
+            error => {
+                PrintLine("no password: {}", Reason(error));
+                return 1;
+            }
+        };
+        password[i] = Alphabet[index];
     }
 
-    // The honest caveat, which matters more than the code above. A generator
-    // like this one is built to be fast and repeatable, not unguessable: see
-    // enough of its output and the rest follows. It is seeded here from
-    // `Entropy`, which is genuinely unpredictable, and that is what carries
-    // the security — but a real password tool should take every character from
-    // `Entropy` directly rather than from a generator seeded once.
-    //
-    // The lesson worth keeping: know which of the two you are using, and why.
+    // `password[..]` is a writable view, because the array is `var`. Printing wants a plain
+    // read-only one, so the view is named at that type first.
+    let text: char8[..] = password[..];
+    PrintLine("password  {}", text);
     return 0;
 }

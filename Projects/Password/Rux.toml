@@ -7,8 +7,8 @@ Name = "Password"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Building a random password from an alphabet"
+Description = "A 16-character password drawn from system entropy with rejection sampling"
 
 [Dependencies]
+Entropy = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
-Random = { Namespace = "Rux", Version = "*" }
