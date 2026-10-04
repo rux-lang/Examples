@@ -7,7 +7,7 @@ Name = "Range"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Walking a range with for, inclusive and exclusive"
+Description = "Ranges as values: a..b, a..=b, their bounds, and empty ranges"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
