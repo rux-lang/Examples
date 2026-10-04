@@ -1,0 +1,42 @@
+// A `let` variable keeps its first value for good. A `var` variable may change: after it is
+// declared, `=` gives it a new value, as often as the program needs. That is the whole difference,
+// and it is why `let` is the default — `var` says "watch this name, it moves".
+import Io::PrintLine;
+
+func Main() -> int {
+    // `var` is declared exactly like `let`, and its type is inferred the same way.
+    var score = 10;
+    PrintLine("score   {}", score);
+
+    // Assignment replaces the value. The right-hand side is worked out first, so it may use the
+    // variable's own old value.
+    score = 25;
+    PrintLine("score   {}", score);
+    score = score + 5;
+    PrintLine("score   {}", score);
+
+    // A `var` may be declared with a type and no value, so long as it is given one before
+    // anything reads it.
+    var bonus: int;
+    bonus = score * 2;
+    PrintLine("bonus   {}", bonus);
+
+    // Assigning copies the value. `saved` took the 1 that `level` held at that moment, and
+    // changing `level` afterwards does not reach back into it.
+    var level = 1;
+    let saved = level;
+    level = 2;
+    PrintLine("level   {}", level);
+    PrintLine("saved   {}", saved);
+
+    // What may change is the value, never the type. `score` became an `int` when it was declared
+    // and stays one, and a variable cannot be read before it has a value:
+    //
+    //     score = 2.5;
+    //         error: cannot assign 'float64' to 'int'
+    //
+    //     var total: int;
+    //     PrintLine("{}", total);
+    //         error: variable 'total' is used before it is initialized
+    return 0;
+}
