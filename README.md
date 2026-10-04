@@ -93,6 +93,7 @@ Operations that can fail: `T ! E`.
 - 9.13 **[AbsenceToError](Errors/AbsenceToError/)** — turn a missing value into a failure with `?? fail`
 - 9.14 **[NestedFallible](Errors/NestedFallible/)** — results inside results: `T? ! E` and `(T ! E1) ! E2`
 - 9.15 **[Panic](Errors/Panic/)** — stop the program when something impossible happens
+- 9.16 **[Assert](Errors/Assert/)** — check an assumption while the program runs
 
 ### 10. Sum types
 
