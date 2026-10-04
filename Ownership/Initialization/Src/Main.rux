@@ -51,6 +51,17 @@ func Main() -> int {
     //   note: 'total' was declared without an initializer at 47:5
     //   help: assign a value to 'total' before this use
 
+    // When the type needs destroying, a variable without a value must also get its value whole.
+    // Here `Table` is a struct holding a `Guest`, the type with a destructor from the Destructor
+    // lesson. A guest written into one field would belong to no whole table, and nothing would
+    // ever destroy it:
+    //
+    //     var table: Table;
+    //     table.guest = Guest { name: "Gus" };
+    //
+    // error: cannot write field 'guest' of 'table', which holds no value
+    //   help: initialize 'table' whole, as in 'table = Table { ... }'
+
     // `Tally` has a constructor without arguments, so this declaration runs it.
     PrintLine("tally:");
     var tally: Tally;
