@@ -81,7 +81,7 @@ Operations that can fail: `T ! E`.
 Who owns a value, and when it is cleaned up.
 
 - 11.8 **[Defer](Ownership/Defer/)** — schedule cleanup at the point you start the work, so it cannot be forgotten
-- **[Ownership](Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope _(being split into the lessons above)_
+- **[Ownership](Ownership/Ownership/)** — copying, transferring with `<-`, and the destructor that runs when a value goes out of scope _(being split into the lessons above)_
 
 ### 12. Interfaces
 
