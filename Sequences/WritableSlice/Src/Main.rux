@@ -32,8 +32,9 @@ func Main() -> int {
     Show("view   ", storage);
 
     // The function writes through its view, so the change shows up in `storage`. An array
-    // becomes a read-only view on its own, but a writable one has to be asked for with a range:
-    // `Fill(storage, 0)` is rejected, and `Fill(storage[..], 0)` would fill all of it.
+    // becomes a read-only view on its own, but a writable one has to be asked for with a range.
+    // `Fill(storage[..], 0)` would fill all of it, while `Fill(storage, 0)` stops with
+    //     error: no matching overload for 'Fill' with argument types (int32[5], int)
     Fill(storage[3..], 0);
     Show("filled ", storage);
 

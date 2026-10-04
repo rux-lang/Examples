@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "WritableSlice"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Writable views: var T[..], and why writability belongs to the view, not its binding"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
