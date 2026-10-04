@@ -10,7 +10,7 @@
 #
 # A package is any directory holding a Rux.toml, at any depth. A package nested
 # inside another package is a companion of that lesson and is checked by it,
-# not on its own.
+# not on its own. With -Run, a static or shared library is built rather than run.
 
 param(
     [switch]$Run,
@@ -38,13 +38,24 @@ function Test-Companion([System.IO.DirectoryInfo]$directory) {
     return $false
 }
 
-$packages = Get-ChildItem -Path $root -Filter 'Rux.toml' -Recurse -File |
+$roots = Get-ChildItem -Path $root -Filter 'Rux.toml' -Recurse -File |
     Where-Object { $_.FullName -notmatch '[\\/](Bin|Temp|\.git)[\\/]' } |
     ForEach-Object { $_.Directory } |
     Where-Object { -not (Test-Companion $_) } |
     Where-Object { $_.FullName.Substring($root.Length + 1) -like "*$Filter*" } |
     Sort-Object FullName
 
+# A workspace root has nothing to build itself, so its members are checked from their own
+# directories instead.
+$packages = foreach ($directory in $roots) {
+    $manifest = Get-Content (Join-Path $directory.FullName 'Rux.toml') -Raw
+    if ($manifest -match '(?m)^\[Workspace\]' -and $manifest -match '(?ms)^Packages\s*=\s*\[(.*?)\]') {
+        [regex]::Matches($Matches[1], '"([^"]+)"') |
+            ForEach-Object { Get-Item (Join-Path $directory.FullName $_.Groups[1].Value) }
+    } else {
+        $directory
+    }
+}
 $failed = @()
 foreach ($package in $packages) {
     $name = $package.Name
@@ -54,7 +65,18 @@ foreach ($package in $packages) {
         $output = & rux check 2>&1 | Out-String
         if ($LASTEXITCODE -eq 0) {
             Write-Host ("{0,-32} check" -f $label) -NoNewline
-            if ($Run -and $needsInput -notcontains $name -and $audible -notcontains $name) {
+            $type = if ((Get-Content 'Rux.toml' -Raw) -match '(?m)^Type\s*=\s*"(\w+)"') { $Matches[1] } else { 'Executable' }
+            if ($Run -and $type -eq 'SourceLibrary') {
+                Write-Host "  (source library: nothing to run)" -ForegroundColor DarkGray
+            } elseif ($Run -and $type -ne 'Executable') {
+                $null = & rux build 2>&1 | Out-String
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "  build" -ForegroundColor Green
+                } else {
+                    Write-Host "  build FAILED" -ForegroundColor Red
+                    $failed += $label
+                }
+            } elseif ($Run -and $needsInput -notcontains $name -and $audible -notcontains $name) {
                 $null = & rux run 2>&1 | Out-String
                 $expected = if ($expectedStatus.ContainsKey($name)) { $expectedStatus[$name] } else { 0 }
                 if ($LASTEXITCODE -eq $expected) {
