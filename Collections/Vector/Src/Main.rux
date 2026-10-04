@@ -1,10 +1,10 @@
-// The Memory lesson built an array by hand: ask for a size, use it, give it
-// back, and get the count right yourself. It could not grow — the size was
-// fixed at the moment of asking.
+// The Memory lessons asked for a block of a fixed size and kept count by hand. A `Vector<T>` does
+// that bookkeeping for you: it owns a block, hands out room as values are pushed, and moves to a
+// larger block when the current one is full.
 //
-// A `Vector<T>` is that done properly. It owns a block, hands out room as
-// values are pushed, takes a larger block when it runs out, and releases
-// everything when its life ends.
+// Two numbers describe a vector, and they are worth keeping apart. Its length is how many values
+// it holds. Its capacity is how many would fit before it needs a larger block. Pushing raises the
+// length by one every time; the capacity only jumps now and then.
 import Allocator::{ Allocator, SystemAllocator };
 import Collections::{ CollectionError, Vector };
 import Io::{ Print, PrintLine };
@@ -13,59 +13,42 @@ func Main() -> ! CollectionError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    // It needs an allocator, for the same reason `String` did: owning means
-    // having somewhere to keep things. The `<int>` says what it holds.
-    var numbers = Vector::Vector<int>(allocator);
-    PrintLine("empty      length {}  capacity {}", numbers.Length(), numbers.Capacity());
+    // A vector keeps its storage somewhere, so it is given an allocator. Making one asks for
+    // nothing yet: an empty vector has a capacity of zero.
+    var numbers = Vector<int>(allocator);
+    PrintLine("empty       length {}  capacity {}", numbers.Length(), numbers.Capacity());
 
-    // Two different numbers, worth keeping apart. Length is how many values are
-    // in it. Capacity is how many would fit before another block is needed.
-    //
-    // A push may need a larger block, and the allocator may have none to give,
-    // so `Push` is fallible: `-> ! CollectionError`. The `?` hands a failure
-    // straight to the caller, which is why `Main` is fallible too.
-    for i in 1..=5 {
+    // A push may need a larger block, and the allocator may have none to give, so `Push`
+    // returns `! CollectionError`. The `?` hands that failure to `Main`.
+    for i in 1..=9 {
+        let before = numbers.Capacity();
         numbers.Push(i * 10)?;
+        if numbers.Capacity() != before {
+            PrintLine("push {}      length {}  capacity {}  (grew)", i, numbers.Length(),
+                numbers.Capacity());
+        }
     }
-    PrintLine("5 pushes   length {}  capacity {}", numbers.Length(), numbers.Capacity());
+    PrintLine("after 9     length {}  capacity {}", numbers.Length(), numbers.Capacity());
 
-    // Capacity grew past what was asked for, on purpose. Taking a bigger block
-    // than needed means the next few pushes cost nothing, and growth happens a
-    // handful of times rather than once per value.
+    // The capacity grows ahead of the length on purpose. Taking more room than needed means the
+    // next pushes cost nothing, so the vector moves house a handful of times, not once a value.
 
-    // `AsSlice` gives a view of the contents — the same `T[..]` from the Slice
-    // lesson, so anything written against slices works on a vector unchanged.
-    Print("contents  ");
-    let items = numbers.AsSlice();
-    for i in 0..items.length {
-        Print(" {}", items[i]);
+    // When the final size is known up front, `Reserve` makes the room in one step: at least 100
+    // more values will now fit, so the pushes that follow never need to grow.
+    numbers.Reserve(100)?;
+    PrintLine("reserved    length {}  capacity {}", numbers.Length(), numbers.Capacity());
+
+    // A vector is a container a `for` loop can walk, in the order the values went in.
+    Print("contents   ");
+    for value in numbers {
+        Print(" {}", value);
     }
     PrintLine();
 
-    // `Get` returns an optional, `int?`, because an index may be out of range
-    // and there is no value to return when it is. The bounds check is in the
-    // type.
-    match numbers.Get(2u) {
-        value? => PrintLine("index 2    {}", value),
-        none => PrintLine("index 2    out of range")
-    }
-    match numbers.Get(99u) {
-        value? => PrintLine("index 99   {}", value),
-        none => PrintLine("index 99   out of range")
-    }
+    // `Get` is bounds-checked: it returns `int?`, and `none` past the end.
+    PrintLine("index 2     {}", numbers.Get(2) ?? -1);
+    PrintLine("index 50    {}", numbers.Get(50) ?? -1);
 
-    // Taking the last value off. It reports whether there was one, and writes
-    // it through the out-parameter — an empty vector has nothing to hand back.
-    var popped = 0;
-    if numbers.TryPop(@popped) {
-        PrintLine("popped     {}, leaving {}", popped, numbers.Length());
-    }
-
-    // `Set` checks its index too, and fails rather than writing out of range.
-    numbers.Set(0u, 999)?;
-    PrintLine("after Set  first is {}", numbers.AsSlice()[0]);
-
-    // Nothing here frees anything. The vector's destructor releases its block
-    // when it goes out of scope, which is the Ownership lesson doing its job:
-    // the memory belongs to the vector, so the vector gives it back.
+    // Nothing here frees anything. The vector's destructor gives its block back to the allocator
+    // when `numbers` goes out of scope.
 }

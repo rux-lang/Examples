@@ -7,10 +7,9 @@ Name = "Vector"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "A growable array that manages its own memory"
+Description = "A growable array: length versus capacity, and a fallible Push"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
 Collections = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
