@@ -1,0 +1,45 @@
+// A fallible function has two ways out. `return value;` is the success, as the previous lesson
+// showed. `fail` is the other one: it leaves the function at once through the failure channel,
+// carrying an error value for the caller.
+//
+// The error can be any type you like. Here it is a struct, so it can report exactly what went
+// wrong — how much money the account held and how much was asked for. `fail ShortOfFunds { ... };`
+// builds that struct and hands it over in one statement. Nothing after a `fail` runs, just as
+// nothing after a `return` does.
+import Io::PrintLine;
+
+// The error: plain data describing the problem, nothing special about the type itself.
+struct ShortOfFunds {
+    balance: int;
+    requested: int;
+}
+
+// Answers with the new balance, or fails with the details of why it could not.
+func Withdraw(balance: int, amount: int) -> int ! ShortOfFunds {
+    if amount > balance {
+        fail ShortOfFunds { balance: balance, requested: amount };
+    }
+    // Only reached when the money is there.
+    return balance - amount;
+}
+
+func Report(balance: int, amount: int) {
+    match Withdraw(balance, amount) {
+        .Success(left) => PrintLine("take {} from {}: {} left", amount, balance, left),
+        .Failure(error) => PrintLine("take {} from {}: refused, {} short", amount, balance,
+            error.requested - error.balance)
+    }
+}
+
+func Main() -> int {
+    Report(100, 30);
+    Report(100, 100);
+    Report(100, 130);
+    Report(0, 5);
+
+    // `fail` must carry a value of the error type named after the `!`. `fail 30;` inside
+    // `Withdraw` is rejected — "'fail' value must have type 'ShortOfFunds', but found 'int'".
+    // And `fail` belongs only in a function that can fail: here in `Main`, which returns a plain
+    // `int`, it is an error too — "'fail' needs an enclosing fallible function".
+    return 0;
+}
