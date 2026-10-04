@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Deque"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A double-ended queue: adding and removing at both ends"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
