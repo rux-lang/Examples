@@ -112,7 +112,7 @@ Pointers, raw memory and allocators.
 
 Numbers in depth.
 
-- 16.11 **[Math](Math/)** — roots, powers, logarithms, trigonometry, and rounding
+- 16.11 **[Math](Numbers/Math/)** — roots, powers, logarithms, trigonometry, and rounding
 
 ### 17. Collections
 
