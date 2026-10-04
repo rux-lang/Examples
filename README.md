@@ -43,7 +43,7 @@ Naming a piece of work and reusing it.
 - 4.1 **[Function](Functions/Function/)** — declare functions with parameters and a return value, and call them
 - 4.4 **[Overload](Functions/Overload/)** — give several functions one name, and let the arguments choose between them
 - 4.6 **[Generic](Functions/Generic/)** — write one function that works for many types
-- 4.7 **[Callback](Callback/)** — pass a function to another function as an ordinary value
+- 4.7 **[Callback](Functions/Callback/)** — pass a function to another function as an ordinary value
 
 ### 5. Sequences
 
