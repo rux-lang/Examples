@@ -133,7 +133,7 @@ Algorithms over slices from the `Algorithms` package.
 
 Paths, files and directories.
 
-- 19.1 **[Path](Path/)** — split a path into its parts, and see why a path is not a string
+- 19.1 **[Path](Files/Path/)** — split a path into its parts, and see why a path is not a string
 - 19.4 **[File](File/)** — write text to a file and read it back, handling failure at every step
 - 19.5 **[Directory](Directory/)** — create, list, and remove directories
 - 19.7 **[Binary](Binary/)** — read and write fixed-width values and raw bytes
