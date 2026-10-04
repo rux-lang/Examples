@@ -11,7 +11,5 @@ Description = "Parsing JSON and walking the result"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Json = { Namespace = "Rux", Version = "*" }
-Text = { Namespace = "Rux", Version = "*" }
