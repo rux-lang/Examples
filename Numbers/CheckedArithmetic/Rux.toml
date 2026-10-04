@@ -1,0 +1,14 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "CheckedArithmetic"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "AddChecked, SubChecked and MulChecked: arithmetic that reports overflow"
+
+[Dependencies]
+Core = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
