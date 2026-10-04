@@ -72,6 +72,7 @@ Declaring types of your own.
 - 6.1 **[Struct](Types/Struct/)** — group related values into a struct with named fields
 - 6.2 **[Reference](Types/Reference/)** — borrow a value with `&T` instead of copying it
 - 6.3 **[MutableReference](Types/MutableReference/)** — let a function change the caller's value through `&var T`
+- 6.4 **[Method](Types/Method/)** — give a struct behaviour with `extend` and a `self` receiver
 - 6.8 **[Enum](Types/Enum/)** — name a fixed set of cases
 - 6.10 **[Variant](Types/Variant/)** — attach data to each case
 - 6.12 **[TypeAlias](Types/TypeAlias/)** — give an existing type a second name to make a signature read clearly
