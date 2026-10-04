@@ -7,19 +7,22 @@
 //
 // So there is `OsString`, which holds whatever the system holds, and `Path`,
 // which is a view of one with path meaning attached.
+//
+// Converting between text and system names can fail, so those conversions
+// return a fallible with a `TextError` on its failure side. `Main` is fallible
+// too, so `?` passes a failure on, ending the program with exit status 1.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::{ Print, PrintLine };
 import Path::{ OsString, Path, PreferredSeparator };
 import Text::TextError;
 
-func Main() -> int {
+func Main() -> ! TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
-    var textError = TextError::None;
 
     // Text goes in through a conversion, because it is a conversion — from
     // text into whatever this platform's names are made of.
-    var holder = OsString::FromText(allocator, "Bin/reports/summary.txt", @textError);
+    var holder = OsString::FromText(allocator, "Bin/reports/summary.txt")?;
     let path = Path::FromView(holder.View());
     PrintLine("length in units  {}", path.Length());
     PrintLine("is it empty      {}", path.IsEmpty());
@@ -27,26 +30,30 @@ func Main() -> int {
     // Walking the parts. A path is a sequence of components, and the separator
     // between them is the platform's business rather than yours — which is why
     // splitting on a hard-coded slash is a bug waiting for a different machine.
+    //
+    // `Next` returns an optional part, absent once the path is used up. Turning
+    // a part back into text may fail, and here a failure is shown as `[?]`
+    // rather than passed on, by matching both sides of the fallible.
     Print("components      ");
     var parts = path.Components();
-    var going = true;
-    while going {
+    while true {
         match parts.Next() {
-            .Some(part) => {
-                var partError = TextError::None;
-                match part.ToText(allocator, @partError) {
-                    .Some(text) => Print(" [{}]", text),
-                    .None => Print(" [?]")
+            part? => {
+                match part.ToText(allocator) {
+                    .Success(text) => Print(" [{}]", text),
+                    .Failure(_) => Print(" [?]")
                 }
             },
-            .None => going = false
+            none => {
+                break;
+            }
         }
     }
     PrintLine();
 
     // Comparison is by path rules rather than by text, so two spellings the
     // system considers the same compare equal.
-    var otherHolder = OsString::FromText(allocator, "Bin/reports/summary.txt", @textError);
+    var otherHolder = OsString::FromText(allocator, "Bin/reports/summary.txt")?;
     let other = Path::FromView(otherHolder.View());
     PrintLine("equal to itself  {}", path.Equals(other));
 
@@ -56,5 +63,4 @@ func Main() -> int {
     // The practical upshot: build paths through `Path`, not by joining strings
     // with slashes. Text conversion happens at the edges — once on the way in,
     // and once on the way out when something has to be shown to a person.
-    return 0;
 }

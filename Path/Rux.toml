@@ -11,8 +11,6 @@ Description = "Building and splitting filesystem paths"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
-FileSystem = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Path = { Namespace = "Rux", Version = "*" }
 Text = { Namespace = "Rux", Version = "*" }
