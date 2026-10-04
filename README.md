@@ -89,6 +89,7 @@ Everything a `match` arm can say.
 
 - 7.1 **[Guard](Patterns/Guard/)** — add an `if` condition to a match arm
 - 7.2 **[RangePattern](Patterns/RangePattern/)** — match a whole range of numbers in one arm
+- 7.4 **[StructPattern](Patterns/StructPattern/)** — take a struct-shaped variant case apart by field name
 
 ### 8. Optionals
 
