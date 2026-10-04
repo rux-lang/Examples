@@ -5,7 +5,6 @@
 // than running a fixed number of steps — a loop whose ending depends on the
 // person using it.
 import Allocator::{ Allocator, SystemAllocator };
-import Entropy::EntropyError;
 import Format::ParseInt64;
 import Io::{ Print, PrintLine, ReadLine };
 import Random::{ Pcg64Dxsm, PcgFromEntropy, UniformInRange };
@@ -14,18 +13,20 @@ import Text::StringBuilder;
 func ReadGuess(allocator: Allocator, value: *var int64) -> bool {
     Print("your guess: ");
     var builder = StringBuilder(allocator);
-    let outcome = ReadLine(builder);
-    if outcome.IsEnd() || outcome.IsError() {
-        builder.Release();
-        return false;
-    }
     var ok = false;
+    match ReadLine(builder) {
+        .Success(_) => {},
+        .Failure(_) => {
+            builder.Release();
+            return false;
+        }
+    }
     match ParseInt64(builder.View()) {
         .Success(parsed) => {
             *value = parsed;
             ok = true;
         },
-        .Error(_) => ok = false
+        .Failure(_) => ok = false
     }
     builder.Release();
     return ok;
@@ -37,9 +38,14 @@ func Main() -> int {
 
     // Seeded from entropy, so the answer differs every run. A fixed seed here
     // would make the game the same game every time — useful for testing it,
-    // useless for playing it.
-    var entropyError = EntropyError::None;
-    var generator = PcgFromEntropy(@entropyError);
+    // useless for playing it. Asking the system for entropy can fail, so the
+    // generator arrives as a fallible and the failure is handled first.
+    var generator = PcgFromEntropy() catch {
+        else => {
+            PrintLine("There is no entropy to pick a number with.");
+            return 1;
+        }
+    };
     let secret = UniformInRange<Pcg64Dxsm>(generator, 1u64, 100u64) as int64;
 
     PrintLine("I am thinking of a number between 1 and 100.");
@@ -68,8 +74,6 @@ func Main() -> int {
         } else {
             Print("lower");
         }
-        // Bound to a name rather than written inside the call — a text
-        // conditional passed directly as an argument does not survive.
         let plural = remaining == 1 ? "" : "es";
         PrintLine("  ({} guess{} left)", remaining, plural);
     }
