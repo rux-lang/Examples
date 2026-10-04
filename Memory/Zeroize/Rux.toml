@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Zeroize"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Wipe a secret with Zeroize, a clear the compiler will not remove"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
