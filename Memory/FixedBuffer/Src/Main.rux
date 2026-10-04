@@ -1,0 +1,51 @@
+// A `FixedBuffer` is an allocator over memory you already have: here, a 64-byte array on the
+// stack. It hands that memory out piece by piece, like an arena, but it never asks anyone for
+// more. When the buffer is full, `Allocate` fails with `AllocError::OutOfMemory`.
+//
+// That makes it the allocator for places where real allocation is not allowed or not
+// available, and a way to put a hard limit on how much some piece of code may use. Code
+// written against `Allocator` does not know the difference; it just sees a refusal sooner.
+//
+// The storage belongs to you, not to the buffer, so it must outlive the buffer and everything
+// handed out of it. As with an arena, `Reset` makes the whole buffer available again and
+// invalidates every address it gave out before.
+import Allocator::{ AllocError, Allocator, FixedBuffer, Layout };
+import Io::PrintLine;
+
+struct Point {
+    x: int64;
+    y: int64;
+}
+
+func Main() -> ! AllocError {
+    var storage: byte[64];
+    var buffer = FixedBuffer(@storage[0] as *var opaque, 64);
+    var handle = buffer.Handle();
+    let allocator: Allocator = handle;
+
+    // Each point needs 16 bytes, so four fit.
+    let layout = Layout::ForValue<Point>();
+    var made: int64 = 0;
+    loop {
+        match allocator.Allocate(layout) {
+            .Success(block) => {
+                made += 1;
+                let point = block as *var Point;
+                *point = Point { x: made, y: made * made };
+                PrintLine("point {} at ({}, {}), {} bytes left",
+                    made, point.x, point.y, buffer.BytesRemaining());
+            },
+            .Failure(error) => {
+                let full = error == AllocError::OutOfMemory;
+                PrintLine("point {} refused, out of memory: {}", made + 1, full);
+                break;
+            }
+        }
+    }
+
+    // After a reset the next request starts again at the front of `storage`.
+    buffer.Reset();
+    PrintLine("after reset, {} bytes left", buffer.BytesRemaining());
+    let again = allocator.Allocate(layout)?;
+    PrintLine("starts at storage[0]: {}", (again as uint) == (@storage[0] as uint));
+}
