@@ -52,6 +52,7 @@ Choosing and repeating.
 - 3.10 **[For](ControlFlow/For/)** — walk a range with `for`
 - 3.11 **[Label](ControlFlow/Label/)** — name a loop, so `break` can leave an outer one
 - 3.12 **[Match](ControlFlow/Match/)** — select a branch by value with `match`, and default with `else`
+- 3.13 **[MatchExpression](ControlFlow/MatchExpression/)** — use `match` as a value, not only as a statement
 
 ### 4. Functions
 
