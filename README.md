@@ -332,6 +332,7 @@ Talking to the operating system and the machine.
 - 24.2 **[CInterop](Platform/CInterop/)** — C-compatible types, pointers and handles
 - 24.3 **[Abi](Platform/Abi/)** — choose a calling convention with `#Abi`
 - 24.4 **[Asm](Platform/Asm/)** — write a function body in assembly
+- 24.5 **[AsmArm](Platform/AsmArm/)** — the same function in AArch64 assembly, chosen with `when`
 
 ### 25. Projects
 
