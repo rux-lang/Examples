@@ -1,0 +1,54 @@
+// Behind every enum case is a number. Usually nobody needs to know it, but sometimes the number is
+// the point: a web server answers 404 for "not found", and a program that reads or writes such
+// codes needs its cases to be exactly those numbers.
+//
+// An enum can say how its numbers are stored, with an underlying type after a colon, and which
+// number each case has. `as` converts between a case and its number, in both directions.
+import Io::PrintLine;
+
+// A case without a number of its own takes the one after the case before it, so `Created` is 201.
+// With no numbers given at all, the cases count up from zero.
+enum Status: uint16 {
+    Ok = 200,
+    Created,
+    NotFound = 404,
+    ServerError = 500
+}
+
+// A code read from outside should be checked before it becomes a `Status`, because `as` trusts it.
+func IsKnown(code: uint16) -> bool {
+    return match code {
+        200 => true,
+        201 => true,
+        404 => true,
+        500 => true,
+        else => false
+    };
+}
+
+func Main() -> int {
+    // From a case to its number.
+    PrintLine("Ok          is {}", Status::Ok as uint16);
+    PrintLine("Created     is {}", Status::Created as uint16);
+    PrintLine("NotFound    is {}", Status::NotFound as uint16);
+    PrintLine("ServerError is {}", Status::ServerError as uint16);
+
+    // From a number to a case.
+    let received: uint16 = 404;
+    let status = received as Status;
+    PrintLine("{} means not found: {}", received, status == Status::NotFound);
+
+    // Cases order by their numbers, so a range of codes is a pair of comparisons.
+    PrintLine("NotFound is an error: {}", status >= Status::NotFound);
+    PrintLine("Created is an error:  {}", Status::Created >= Status::NotFound);
+
+    // The surprise: `as` does not check. `418 as Status` compiles and runs, and gives a `Status`
+    // that is none of its four cases. A `match` on it would run no arm at all. So check first.
+    let strange: uint16 = 418;
+    PrintLine("{} is a known status: {}", received, IsKnown(received));
+    PrintLine("{} is a known status: {}", strange, IsKnown(strange));
+
+    // The numbers are now a promise to whoever reads them. Inserting a case without a number in
+    // the middle of the list would quietly renumber the ones after it.
+    return 0;
+}
