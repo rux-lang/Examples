@@ -1,64 +1,38 @@
-// The String lesson found two different lengths for the same text: bytes and
-// characters. There is a third, and it is the one a reader actually means.
+// The Encoding lesson found two ways to count the same text: code units and scalars. There is a
+// third, and it is the one a reader means. Text has three levels:
 //
-// Text has three levels. Bytes are how it is stored. Scalars — code points —
-// are the characters the encoding defines. Graphemes are what a person would
-// point at and call a single character, and one of those can be made of
-// several scalars.
+//     bytes       how UTF-8 stores it
+//     scalars     the characters Unicode numbers, one `char32` each
+//     graphemes   what a person would point at and call one character
+//
+// A grapheme can be made of several scalars. An accent may be its own scalar that attaches to
+// the letter before it, and a flag is two "regional indicator" letters that a screen draws as
+// one picture. The Unicode package knows where graphemes begin and end.
 import Io::PrintLine;
-import Text::StringView;
-import Unicode::{ CountGraphemes, IsAlphabetic, IsNumeric, IsWhiteSpace,
-    ToLowerSimple, ToUpperSimple };
+import Unicode::CountGraphemes;
+
+// The same text twice: as UTF-8 for the byte count, and as UTF-32, where one unit is one scalar.
+func Count(utf8: char8[..], utf32: char32[..]) {
+    PrintLine("{}  bytes {}, scalars {}, graphemes {}",
+        utf8, utf8.length, utf32.length, CountGraphemes(utf32));
+}
 
 func Main() -> int {
-    // Six characters, seven bytes, because ß takes two.
-    let view = StringView::FromValidated("Straße");
-    PrintLine("text        {}", view);
-    PrintLine("bytes       {}", view.Length());
-    PrintLine("characters  {}", view.ScalarCount());
-    PrintLine("");
+    // Plain ASCII: all three counts agree, which is why the difference is easy to miss.
+    Count("cafe", c32"cafe");
 
-    // The third level. These three scalars are `e`, a combining acute accent,
-    // and `!`. The accent is not a character on its own — it attaches to the
-    // `e` before it, so a reader sees `é!`: two things, not three.
-    let scalars: char32[3] = [ 'e', '\u{301}', '!' ];
-    PrintLine("scalars     {}", scalars.length);
-    PrintLine("graphemes   {}", CountGraphemes(scalars));
-    PrintLine("");
+    // `é` as one scalar: two bytes, but one scalar and one grapheme.
+    Count("caf\u{E9}", c32"caf\u{E9}");
 
-    // This is why "just index the string" goes wrong. Taking one byte can cut
-    // a character in half, and taking one scalar can separate a letter from
-    // the accent that belongs to it. Which level to count depends on the
-    // question: bytes for storage, scalars for encoding, graphemes for
-    // anything a person will see — a cursor, a column width, a character
-    // limit.
+    // `e` followed by U+0301, a combining acute accent. It looks the same as the line above,
+    // yet every count differs: six bytes, five scalars, four graphemes.
+    Count("cafe\u{301}", c32"cafe\u{301}");
 
-    // Case is not a per-character table either. Most of it looks simple:
-    PrintLine("upper 'a'   {}", ToUpperSimple('a'));
-    PrintLine("upper 'é'   {}", ToUpperSimple('é'));
-    PrintLine("lower 'A'   {}", ToLowerSimple('A'));
+    // The Ukrainian flag: two regional indicators, four bytes each, drawn as one grapheme.
+    Count("\u{1F1FA}\u{1F1E6}", c32"\u{1F1FA}\u{1F1E6}");
 
-    // And then there is ß, whose uppercase is "SS" — two characters from one.
-    // A function returning a single `char32` has nowhere to put the second, so
-    // it returns the letter unchanged rather than being wrong:
-    PrintLine("upper 'ß'   {}   (unchanged)", ToUpperSimple('ß'));
-
-    // That is what "Simple" means in the name. `ToUpperFull` exists for this,
-    // and writes into a buffer precisely because the answer may be longer than
-    // one character. Uppercasing text correctly is not a loop over characters.
-    PrintLine("");
-
-    // Character properties are questions about a scalar, and they are defined
-    // for all of Unicode rather than just ASCII.
-    PrintLine("'a' alphabetic   {}", IsAlphabetic('a'));
-    PrintLine("'ß' alphabetic   {}", IsAlphabetic('ß'));
-    PrintLine("'5' alphabetic   {}", IsAlphabetic('5'));
-    PrintLine("'5' numeric      {}", IsNumeric('5'));
-    PrintLine("' ' whitespace   {}", IsWhiteSpace(' '));
-
-    // The lesson underneath all of this: text is not an array of characters,
-    // however much it looks like one. It is bytes encoding scalars that group
-    // into graphemes, and code that assumes otherwise works perfectly until it
-    // meets someone's name.
+    // Which count is right depends on the question. Bytes measure storage, scalars are what an
+    // encoding works with, and graphemes are what a cursor steps over or a "maximum 20
+    // characters" rule should count.
     return 0;
 }

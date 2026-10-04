@@ -7,10 +7,8 @@ Name = "Unicode"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Characters, graphemes, and case beyond ASCII"
+Description = "Bytes, scalars and graphemes: three counts of the same text that can all differ"
 
 [Dependencies]
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
-Text = { Namespace = "Rux", Version = "*" }
 Unicode = { Namespace = "Rux", Version = "*" }
