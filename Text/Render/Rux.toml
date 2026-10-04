@@ -1,0 +1,16 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "Render"
+Version = "0.1.0"
+Type = "Executable"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Format into a String you keep, with Render returning String ! FormatError"
+
+[Dependencies]
+Allocator = { Namespace = "Rux", Version = "*" }
+Format = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
+Text = { Namespace = "Rux", Version = "*" }
