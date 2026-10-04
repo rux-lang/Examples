@@ -41,6 +41,7 @@ Combining values into new ones.
 Choosing and repeating.
 
 - 3.1 **[If](ControlFlow/If/)** — run code only when a condition holds, with `if` and `else`
+- 3.2 **[ElseIf](ControlFlow/ElseIf/)** — choose one of several branches with an `else if` chain
 - 3.3 **[Ternary](ControlFlow/Ternary/)** — pick one of two values inside an expression with `? :`
 - 3.6 **[Loop](ControlFlow/Loop/)** — repeat forever with `loop` until a `break` leaves
 - 3.9 **[Range](ControlFlow/Range/)** — describe a run of numbers with `..` and `..=`
