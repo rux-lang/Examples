@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "MinMax"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Min and Max of two values, and MinIndex and MaxIndex of a slice, including an empty one"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Algorithms = { Namespace = "Rux", Version = "*" }
