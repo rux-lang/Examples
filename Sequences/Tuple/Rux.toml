@@ -7,7 +7,7 @@ Name = "Tuple"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Grouping values without declaring a type"
+Description = "Tuples: grouping values without a declared type, and returning several results"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

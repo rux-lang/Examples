@@ -1,13 +1,14 @@
-// A tuple groups a few values without declaring a type for them. Its type is
-// written as the list of its members' types — `(int, bool)` — and a value is
-// written the same way, so nothing has to be declared before it is used.
+// A tuple groups a few values without declaring a type for them first. Its type is the list of
+// its members' types in parentheses — `(int32, bool)` — and a value is written the same way,
+// `(17, true)`. The members are reached by position: `.0` is the first, `.1` the second.
 //
-// The main use is returning more than one thing from a function.
+// The everyday use is returning more than one result from a function. A function has a single
+// return type, and a tuple lets that one type carry several values.
 import Io::PrintLine;
 
-// Two results from one call: the answer, and whether it means anything. There
-// is no way to divide by zero and still return a number, so this returns both.
-func Divide(numerator: int, denominator: int) -> (int, bool) {
+// Two results from one call: the quotient, and whether it means anything. There is no number to
+// return for a division by zero, so the second member says whether the first is real.
+func Divide(numerator: int32, denominator: int32) -> (int32, bool) {
     if denominator == 0 {
         return (0, false);
     }
@@ -15,47 +16,46 @@ func Divide(numerator: int, denominator: int) -> (int, bool) {
 }
 
 // The members need not share a type.
-func Origin() -> (float64, float64, char8[..]) {
-    return (0.0, 0.0, "origin");
+func Smallest(values: int32[..]) -> (int32, uint) {
+    var smallest = values[0];
+    var position: uint = 0;
+    for i in 1..values.length {
+        if values[i] < smallest {
+            smallest = values[i];
+            position = i;
+        }
+    }
+    return (smallest, position);
 }
 
 func Main() -> int {
     // Written out in full: the type, then the value.
-    let pair: (int, float64) = (1, 2.5);
-
-    // Members are reached by position, counting from zero.
+    let pair: (int32, float64) = (3, 2.5);
     PrintLine("pair.0 is {} and pair.1 is {}", pair.0, pair.1);
 
-    // Or the whole tuple can be unpacked into names in one step, which reads
-    // better than using `.0` and `.1` through a long function.
-    let (count, ratio) = pair;
-    PrintLine("count {} ratio {}", count, ratio);
-
-    // Unpacking is what makes multiple return values comfortable.
-    let (result, ok) = Divide(17, 5);
-    if ok {
-        PrintLine("17 / 5 is {}", result);
+    // Check the second member before trusting the first.
+    let good = Divide(17, 5);
+    if good.1 {
+        PrintLine("17 / 5 is {}", good.0);
+    }
+    let bad = Divide(1, 0);
+    if !bad.1 {
+        PrintLine("1 / 0 has no answer");
     }
 
-    // The second member is what says whether the first one means anything, so
-    // it has to be checked before the value is used.
-    let (bad, valid) = Divide(1, 0);
-    if !valid {
-        PrintLine("1 / 0 has no answer, and the value returned was {}", bad);
-    }
+    let temperatures: int32[5] = [12, 9, 4, 7, 11];
+    let coldest = Smallest(temperatures);
+    PrintLine("coldest {} at position {}", coldest.0, coldest.1);
 
-    let (x, y, label) = Origin();
-    PrintLine("{} at {}, {}", label, x, y);
+    // Tuples of the same type compare member by member.
+    let expected: (int32, bool) = (3, true);
+    PrintLine("good == expected   {}", good == expected);
+    PrintLine("bad == expected    {}", bad == expected);
 
-    // A tuple is a value like any other: it can be passed, returned, and
-    // compared, and it may contain another tuple.
-    let nested: ((int, int), char8[..]) = ((3, 4), "point");
-    let (position, name) = nested;
-    PrintLine("{} is at {}, {}", name, position.0, position.1);
-
-    // Tuples are structural: two tuples are the same type when their members
-    // are, and nothing names them. When a group of values starts being passed
-    // around and its members deserve names, that is the point to declare a
-    // struct instead — which is the next lesson.
+    // A tuple may hold another tuple. Reach inside one step at a time: `outer.0.1` does not
+    // parse, because the lexer reads `0.1` as a number.
+    let outer: ((int32, int32), char8[..]) = ((3, 4), "point");
+    let position = outer.0;
+    PrintLine("{} at {}, {}", outer.1, position.0, position.1);
     return 0;
 }
