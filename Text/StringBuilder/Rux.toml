@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "StringBuilder"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Build text step by step in one growing buffer, then hand it over as a String"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
