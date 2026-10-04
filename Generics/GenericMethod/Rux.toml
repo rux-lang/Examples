@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "GenericMethod"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Methods on a generic type, and a method with a type parameter of its own"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
