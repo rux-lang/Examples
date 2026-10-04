@@ -3,7 +3,7 @@
 See where infinity and NaN come from, why `NaN == NaN` is `false`, and how to test for them with
 `IsNaN` and `IsInfinite`.
 
-**You'll need:** [Float](https://rux-lang.dev/docs/learn/float), [Comparison](https://rux-lang.dev/docs/learn/comparison), [NumberLimit](https://rux-lang.dev/docs/learn/number-limit)
+**You'll need:** [Float](https://rux-lang.dev/docs/learn/float), [Comparison](https://rux-lang.dev/docs/learn/comparison), [NumberLimit](https://rux-lang.dev/docs/learn/number-limit), [FormatNumber](https://rux-lang.dev/docs/learn/format-number)
 
 ```sh
 rux run
@@ -15,6 +15,7 @@ rux run
 0 / 0        NaN
 Max * 2      Inf
 Inf - Inf    NaN
+rounded      Inf NaN
 Inf > Max    true
 Inf == Inf   true
 NaN == NaN   false

@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "FloatSpecial"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Infinity, NaN and negative zero: where they come from and how they compare"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
