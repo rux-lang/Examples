@@ -1,63 +1,55 @@
-// The Memory lesson used a pointer without explaining it: `Alloc` returned an
-// address, `as *var uint` said what lived there, and `values[i]` reached it.
-// This is that piece on its own.
+// A pointer is an address: a plain value that says where another value lives. `@score` takes
+// the address of `score`, and `*pointer` reaches the value at that address, to read it or to
+// write it.
 //
-// A pointer is an address. `@value` produces the address of something, and
-// indexing a pointer reaches what is at it — `p[0]` is the value itself, which
-// is why an allocated block indexes like an array.
-import Core::ConvertChecked;
+// Pointers split the same way bindings do. A `*int` may only read what it points at; a
+// `*var int` may also write. And the address of a `let` binding is always a read-only `*int`,
+// so a pointer can never be used to change something declared unchangeable.
+//
+// A reference (`&T`, from the Types part) also reaches another value, but the compiler checks
+// that it stays valid. A pointer is not checked: it can be stored, compared, and set to `null`,
+// which means "no address at all". The rest of this part is built on that freedom, and on the
+// care it asks for.
 import Io::PrintLine;
 
-// A `*var int` may be written through, so this changes the caller's variable
-// rather than a copy of it.
-func Bump(target: *var int) {
-    target[0] += 1;
+struct Point {
+    x: int;
+    y: int;
 }
 
 func Main() -> int {
-    var value: int = 41;
+    var score: int = 10;
 
-    // `*T` and `*var T` split the same way `let` and `var` do. A `*int` reads
-    // what it points at; a `*var int` may also write. This is the pointer
-    // equivalent of the immutability rule from the Variable lesson.
-    let reader: *int = @value;
-    PrintLine("read through *int    {}", reader[0]);
+    // Two pointers to one variable. Neither is a copy of `score`; both lead back to it.
+    let reader: *int = @score;
+    let writer: *var int = @score;
 
-    var writer: *var int = @value;
-    writer[0] = 42;
-    PrintLine("after writing        {}", value);
+    *writer = 25;
+    PrintLine("score is now     {}", score);
+    PrintLine("read via pointer {}", *reader);
 
-    // Because the address was passed rather than the value, the function
-    // changed `value` itself. Nothing was returned.
-    Bump(@value);
-    PrintLine("after Bump           {}", value);
+    // The address of a `let` binding is read-only. Asking for `*var int` here is an error:
+    // "'@limit' yields a read-only '*T'; declare 'limit' with 'var' for a '*var T'".
+    let limit: int = 100;
+    let limitPointer: *int = @limit;
+    PrintLine("limit is         {}", *limitPointer);
 
-    // That is what an out-parameter is, and it is how the conversion check
-    // promised back in the Convert lesson works. `as` was silent when a value
-    // did not fit; `ConvertChecked` writes the converted value through a
-    // pointer and returns whether anything was lost.
-    var narrowed: int8 = 0;
+    // A field is reached through a pointer with a plain `.`, without writing `*` first.
+    var point = Point { x: 1, y: 2 };
+    let cursor: *var Point = @point;
+    cursor.x = 7;
+    PrintLine("point is         ({}, {})", point.x, point.y);
 
-    // Note carefully which way round the answer reads: the flag is true when
-    // the conversion **failed**. Every checked operation in `Core` agrees on
-    // this, and it reads backwards the first time.
-    let lost100 = ConvertChecked<int, int8>(100, @narrowed);
-    PrintLine("100 into int8  lost {}  value {}", lost100, narrowed);
-
-    let lost300 = ConvertChecked<int, int8>(300, @narrowed);
-    PrintLine("300 into int8  lost {}  value {}", lost300, narrowed);
-
-    // 300 does not fit, so the flag is true and `narrowed` holds the wrapped
-    // 44 — the same 44 that `300 as int8` produced silently. The difference is
-    // that this time the program was told.
-    if lost300 {
-        PrintLine("so the program can react instead of carrying on with 44");
+    // `null` is the pointer that points nowhere. Comparing with `==` is safe; reaching through
+    // it with `*` is not, and the compiler will not stop you. Check before you reach.
+    var target: *int = null;
+    PrintLine("target is null   {}", target == null);
+    target = @score;
+    if target != null {
+        PrintLine("target now reads {}", *target);
     }
 
-    // A pointer can also point at nothing, which is what `null` means and what
-    // the Memory lesson checked for after `Alloc`. Reaching through a null
-    // pointer is not caught by the compiler.
-    let nothing: *int = null;
-    PrintLine("is it null?          {}", nothing == null);
+    // Two pointers are equal when they hold the same address.
+    PrintLine("same address     {}", target == reader);
     return 0;
 }
