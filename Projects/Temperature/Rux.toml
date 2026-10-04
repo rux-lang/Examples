@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Temperature"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Celsius and Fahrenheit conversion tables built from small functions"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
