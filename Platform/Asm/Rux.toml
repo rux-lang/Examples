@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Asm"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Write a function body in x86-64 assembly with asm func and #Abi"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Core = { Namespace = "Rux", Version = "*" }
