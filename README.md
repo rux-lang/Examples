@@ -198,6 +198,7 @@ Strings, characters, formatting, parsing and input.
 
 - 14.1 **[StringLiteral](Text/StringLiteral/)** — what a string literal is: read-only `char8` code units
 - 14.2 **[Encoding](Text/Encoding/)** — `c8`, `c16` and `c32` literals, and code units versus characters
+- 14.3 **[StringView](Text/StringView/)** — borrow text without copying it
 - 14.4 **[String](Text/String/)** — own text that lives as long as you need it
 - 14.7 **[Unicode](Text/Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
 - 14.9 **[Format](Text/Format/)** — control width and alignment when formatting values
