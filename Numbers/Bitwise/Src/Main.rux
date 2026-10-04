@@ -1,0 +1,52 @@
+// The bitwise operators treat an integer as a row of bits and work on each position separately.
+// `a & b` keeps a bit only where both have it, `a | b` where either has it, and `a ^ b` where
+// exactly one has it. `~a` flips every bit, so its result depends on the width: `~` of a `uint8`
+// flips eight bits, of a `uint32` thirty-two.
+//
+// Their everyday use is the mask: a value whose set bits pick out the positions you care about.
+// One byte can then hold eight yes-or-no flags, and four idioms cover almost everything done with
+// them: `|` sets a flag, `& ~` clears it, `^` flips it, and `&` tests it.
+//
+// Watch the precedence. `&`, `|` and `^` bind more loosely than `==`, so `flags & Write == 0` reads
+// as `flags & (Write == 0)` and is rejected for mixing a `uint8` with a `bool`. Parenthesize the
+// mask: `(flags & Write) == 0`.
+import Io::PrintLine;
+
+// One bit per permission. Written in binary, the masks show which bit each one owns.
+const Read: uint8 = 0b001;
+const Write: uint8 = 0b010;
+const Execute: uint8 = 0b100;
+
+func Main() -> int {
+    // The four operators, side by side.
+    let a: uint8 = 0b1100_1010;
+    let b: uint8 = 0b1010_0110;
+    PrintLine("a      {:08b}", a);
+    PrintLine("b      {:08b}", b);
+    PrintLine("a & b  {:08b}", a & b);
+    PrintLine("a | b  {:08b}", a | b);
+    PrintLine("a ^ b  {:08b}", a ^ b);
+    PrintLine("~a     {:08b}", ~a);
+    PrintLine("");
+
+    // Masks at work on a set of flags.
+    var flags: uint8 = Read;
+    PrintLine("start          {:03b}", flags);
+
+    flags |= Write;
+    PrintLine("set Write      {:03b}", flags);
+
+    flags ^= Execute;
+    PrintLine("flip Execute   {:03b}", flags);
+
+    flags &= ~Read;
+    PrintLine("clear Read     {:03b}", flags);
+
+    PrintLine("can write?     {}", (flags & Write) != 0);
+    PrintLine("can read?      {}", (flags & Read) != 0);
+
+    // A mask with several bits tests them together.
+    let both = Write | Execute;
+    PrintLine("write and run? {}", (flags & both) == both);
+    return 0;
+}
