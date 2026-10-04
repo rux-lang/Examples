@@ -42,6 +42,7 @@ func Main() -> int {
 
     // The caveat: an integer that fits no arm is not an error. Nothing runs, and the program
     // carries on after the match. Write an `else` arm whenever every value ought to be handled.
+    // (A match that produces a value is held to more than this, as the next lesson shows.)
     let missed: int32 = 99;
     match missed {
         1 => PrintLine("one"),
