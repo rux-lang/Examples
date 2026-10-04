@@ -7,7 +7,7 @@ Name = "Path"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Building and splitting filesystem paths"
+Description = "The components of a path, and why a path is not a string"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
