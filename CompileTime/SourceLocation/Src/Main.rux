@@ -1,5 +1,5 @@
-// `#source` tells a program where it is in its own source code: the file, the line, and the
-// function around it. Like `#target`, the compiler fills it in while compiling, so a read
+// `#source` tells a program where it is in its own source code: the file, the line and column,
+// and the function around it. Like `#target`, the compiler fills it in while compiling, so a read
 // costs nothing at run time — it is just a constant.
 //
 // The surprise is *which* place it describes. Every read of `#source` describes the expression
@@ -20,8 +20,8 @@ func LogAt(line: uint, message: char8[..]) {
 }
 
 func Main() -> int {
-    PrintLine("This read is at line {} of {}, in {}",
-        #source.line, #source.fileName, #source.function);
+    PrintLine("This read is at line {}, column {} of {}, in {}",
+        #source.line, #source.column, #source.fileName, #source.function);
 
     PrintLine("A helper that reads #source itself:");
     LogHere("first call");
