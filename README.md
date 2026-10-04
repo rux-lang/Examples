@@ -16,7 +16,7 @@ First programs: printing, values and their types.
 - 1.1 **[Hello](Basics/Hello/)** — print "Hello, World!", the minimal Rux application
 - 1.3 **[Variable](Basics/Variable/)** — name a value with `let`, and let the compiler infer its type
 - 1.10 **[Console](Basics/Console/)** — write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
-- 1.11 **[Const](Const/)** — name a value the compiler folds in, and see where it differs from `let`
+- 1.11 **[Const](Basics/Const/)** — name a value the compiler folds in, and see where it differs from `let`
 - 1.12 **[Convert](Convert/)** — convert between numeric types with `as`, and see what a value that does not fit becomes
 - **[Primitive](Primitive/)** — declare and print every primitive type, from `int8` to `char32` _(being split into the lessons above)_
 
