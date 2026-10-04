@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Toml"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Parse a TOML document, read typed values from its tables, and report where a bad one fails"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
