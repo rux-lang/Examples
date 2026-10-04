@@ -4,38 +4,57 @@
 # compiler is pre-1.0 and a rebuild can invalidate an example that passed
 # yesterday, which is only noticed by checking all of them.
 #
-#   ./Check.ps1          type-check every package
-#   ./Check.ps1 -Run     type-check, then run the ones that need no input
+#   ./Check.ps1                 type-check every package
+#   ./Check.ps1 -Run            type-check, then run the ones that need no input
+#   ./Check.ps1 -Filter Errors  only packages whose path contains "Errors"
+#
+# A package is any directory holding a Rux.toml, at any depth. A package nested
+# inside another package is a companion of that lesson and is checked by it,
+# not on its own.
 
 param(
-    [switch]$Run
+    [switch]$Run,
+    [string]$Filter = ''
 )
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 
 # Packages that read standard input, so running them unattended would block.
-$needsInput = @('Circle')
+$needsInput = @('Circle', 'Guess', 'Quadratic', 'Launch', 'Input')
+
+function Test-Companion([System.IO.DirectoryInfo]$directory) {
+    $parent = $directory.Parent
+    while ($parent -and $parent.FullName.Length -gt $root.Length) {
+        if (Test-Path (Join-Path $parent.FullName 'Rux.toml')) { return $true }
+        $parent = $parent.Parent
+    }
+    return $false
+}
+
+$packages = Get-ChildItem -Path $root -Filter 'Rux.toml' -Recurse -File |
+    Where-Object { $_.FullName -notmatch '[\\/](Bin|Temp|\.git)[\\/]' } |
+    ForEach-Object { $_.Directory } |
+    Where-Object { -not (Test-Companion $_) } |
+    Where-Object { $_.FullName.Substring($root.Length + 1) -like "*$Filter*" } |
+    Sort-Object FullName
 
 $failed = @()
-$packages = Get-ChildItem -Path $root -Directory |
-    Where-Object { Test-Path (Join-Path $_.FullName 'Rux.toml') } |
-    Sort-Object Name
-
 foreach ($package in $packages) {
     $name = $package.Name
+    $label = $package.FullName.Substring($root.Length + 1) -replace '\\', '/'
     Push-Location $package.FullName
     try {
         $output = & rux check 2>&1 | Out-String
         if ($LASTEXITCODE -eq 0) {
-            Write-Host ("{0,-12} check" -f $name) -NoNewline
+            Write-Host ("{0,-32} check" -f $label) -NoNewline
             if ($Run -and $needsInput -notcontains $name) {
                 $null = & rux run 2>&1 | Out-String
                 if ($LASTEXITCODE -eq 0) {
                     Write-Host "  run" -ForegroundColor Green
                 } else {
                     Write-Host "  run FAILED" -ForegroundColor Red
-                    $failed += $name
+                    $failed += $label
                 }
             } elseif ($Run) {
                 Write-Host "  run skipped (reads input)" -ForegroundColor DarkGray
@@ -43,10 +62,10 @@ foreach ($package in $packages) {
                 Write-Host ""
             }
         } else {
-            Write-Host ("{0,-12} FAILED" -f $name) -ForegroundColor Red
+            Write-Host ("{0,-32} FAILED" -f $label) -ForegroundColor Red
             $output -split "`n" | Where-Object { $_ -match 'error:' } |
                 Select-Object -First 3 | ForEach-Object { Write-Host "  $($_.Trim())" }
-            $failed += $name
+            $failed += $label
         }
     }
     finally {
