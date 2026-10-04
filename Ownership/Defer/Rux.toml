@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Defer"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Registering cleanup where the work starts, run in reverse order"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
