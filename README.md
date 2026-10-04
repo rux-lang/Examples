@@ -321,6 +321,7 @@ Code that runs or is chosen while compiling.
 - 23.3 **[BuildMode](CompileTime/BuildMode/)** — tell debug builds from release builds
 - 23.4 **[SourceLocation](CompileTime/SourceLocation/)** — the file and line of an expression
 - 23.5 **[CompileError](CompileTime/CompileError/)** — stop the build with `#Error`, or warn with `#Warn`
+- 23.6 **[Define](CompileTime/Define/)** — values passed to the build from the manifest or the command line
 
 ### 24. Platform
 

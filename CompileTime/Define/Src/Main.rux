@@ -1,0 +1,32 @@
+// `#target` and `#build` answer questions the compiler already knows. A define is a question you
+// answer yourself: a named value handed to the build, such as a feature switch or a customer's
+// name. Pass one on the command line with `--define Name=Value`, or list it in a `[Build.Defines]`
+// table in `Rux.toml`. The program reads it with `#config`:
+//
+// - `#config.Has("Name")` says whether the build defines `Name` at all.
+// - `#config.Get("Name")` gives its text, or an empty string when it is not defined.
+//
+// A define without a value, such as `--define Verbose`, holds the text "true". Both questions are
+// answered while compiling, so `when` can branch on them, and changing a define means rebuilding.
+import Core::{ #config };
+import Io::PrintLine;
+
+func Main() -> int {
+    // Has tells "not defined" apart from "defined as empty", which Get alone cannot.
+    when #config.Has("Name") {
+        let name = #config.Get("Name");
+    } else {
+        let name = "World";
+    }
+    PrintLine("Hello, {}!", name);
+
+    // A feature switch: the untaken branch is not part of the program at all.
+    when #config.Has("Verbose") {
+        PrintLine("Verbose is on (its value is \"{}\")", #config.Get("Verbose"));
+    } else {
+        PrintLine("Verbose is off; rebuild with --define Verbose to turn it on");
+    }
+
+    PrintLine("An undefined name reads as {} characters", #config.Get("Missing").length);
+    return 0;
+}
