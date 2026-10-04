@@ -7,7 +7,7 @@ Name = "Fallible"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "A value or an error, and handling both"
+Description = "A value or an error: T ! E"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

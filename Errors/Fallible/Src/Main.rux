@@ -1,45 +1,50 @@
-// An optional says a value is missing. A fallible says an operation failed and
-// carries what went wrong, which is what a caller needs in order to respond
-// differently to different failures.
+// An optional says that a value is missing, but never why. Often the why is exactly what the
+// caller needs: dividing 12 by 0 and dividing 13 by 4 both fail to give an exact answer, for
+// different reasons that deserve different replies.
 //
-// `int ! DivideError` reads "an `int`, or else a `DivideError`". It has two
-// channels: the success, holding the answer, and the failure, holding a value
-// describing the problem. The error type is whatever suits — often a variant
-// listing the ways this particular operation can go wrong.
+// `int ! DivideError` reads "an `int`, or else a `DivideError`". A fallible like this has two
+// channels. The success channel holds the answer. The failure channel holds an error, a value
+// describing what went wrong. The error type is whatever suits, and a variant is a natural fit:
+// one case for each way the operation can go wrong.
+//
+// The success needs no ceremony. `return value;` in a fallible function is the success, just as a
+// plain value returned from an `int?` function is a present one.
 import Io::PrintLine;
 
-// The failures this operation can have. Making it a variant rather than, say,
-// an error code means a case can carry detail: `NotExact` brings the remainder
-// with it.
+// The ways an exact division can go wrong. `NotExact` carries the remainder with it.
 variant DivideError {
     ByZero,
     NotExact(int)
 }
 
-// The signature says everything: it produces an `int`, or a `DivideError`.
-// `fail` leaves the function through the failure channel; an ordinary
-// `return` is the success.
+// The signature says it all: this produces an `int`, or a `DivideError`. `fail`, the subject of
+// the next lesson, leaves through the failure channel; an ordinary `return` is the success.
 func ExactDivide(numerator: int, denominator: int) -> int ! DivideError {
     if denominator == 0 {
         fail DivideError::ByZero;
     }
-    let remainder = numerator % denominator;
-    if remainder != 0 {
-        fail DivideError::NotExact(remainder);
+    if numerator % denominator != 0 {
+        fail DivideError::NotExact(numerator % denominator);
     }
     return numerator / denominator;
 }
 
+// To use the answer, find out which channel it came through. `.Success(value)` matches the answer
+// and binds it; `.Failure(error)` matches an error and binds that. The error is an ordinary
+// `DivideError`, so a second match picks out its case.
 func Report(numerator: int, denominator: int) {
-    // `.Success(value)` matches the answer and `.Failure(...)` the error.
-    // Patterns nest, so one match can reach straight inside the error and
-    // pick out each case of `DivideError`.
     match ExactDivide(numerator, denominator) {
-        .Success(value) => PrintLine("{} / {} is exactly {}", numerator, denominator, value),
-        .Failure(DivideError::ByZero) => PrintLine("{} / {} cannot be done: no dividing by zero",
-            numerator, denominator),
-        .Failure(DivideError::NotExact(remainder)) => PrintLine(
-            "{} / {} is not exact: {} left over", numerator, denominator, remainder)
+        .Success(value) => PrintLine("{} / {} = {}", numerator, denominator, value),
+        .Failure(error) => Explain(numerator, denominator, error)
+    }
+}
+
+func Explain(numerator: int, denominator: int, error: DivideError) {
+    match error {
+        DivideError::ByZero => PrintLine("{} / {} fails: no dividing by zero", numerator,
+            denominator),
+        DivideError::NotExact(remainder) => PrintLine("{} / {} fails: {} left over", numerator,
+            denominator, remainder)
     }
 }
 
@@ -48,22 +53,8 @@ func Main() -> int {
     Report(12, 0);
     Report(13, 4);
 
-    // Where the reason does not matter, `catch` recovers with a stand-in. Its
-    // arms see only the error; `else` takes every error alike.
-    let quotient = ExactDivide(13, 4) catch { else => 0 };
-    PrintLine("13 / 4 or zero    {}", quotient);
-
-    // A fallible cannot be dropped on the floor. A bare `ExactDivide(12, 4);`
-    // is a compile error, because it would silently ignore a failure — every
-    // fallible has to be matched, caught or passed on.
-
-    // Worth noticing, because it differs from matching a number: a match on a
-    // fallible must cover every case. Leaving out the `NotExact` arm above is
-    // a compile error — `match on 'int ! DivideError' is not exhaustive;
-    // missing .Failure(DivideError::NotExact(_))`. The Match lesson's integer
-    // example fell through silently instead, because there is no way to list
-    // every `int`. Here the compiler knows the whole list, so it holds you to
-    // it, and adding a case later makes every match that has not handled it
-    // fail rather than quietly ignore it.
+    // A fallible is not an `int` until it has been opened. `let half = ExactDivide(12, 2) / 2;`
+    // is rejected, and so is calling `ExactDivide(12, 4);` and ignoring what comes back: a
+    // failure can never be dropped without the code saying so.
     return 0;
 }
