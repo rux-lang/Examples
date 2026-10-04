@@ -1,70 +1,58 @@
-// Every value so far has been sized when the program was compiled: an `int` is
-// eight bytes, an array of twelve greetings is twelve. When the size is not
-// known until the program runs, the memory has to be asked for.
+// Every value so far had its size fixed when the program was compiled. When the amount of memory
+// is only known while the program runs, it has to be asked for, and this is the rawest way:
 //
-// This is the raw form, where you ask, use, and give back by hand. The
-// Allocator lesson later shows the same thing arranged so it is harder to get
-// wrong; this one shows what is underneath.
+//     Alloc(bytes)  hands back the address of a fresh block, or `null` if there is none to give
+//     Zero(p, n)    fills the block with zero bytes
+//     Free(p)       gives the block back
+//
+// The block arrives as `*var opaque`: "writable memory, contents unknown". A cast says what will
+// live there, and from then on the pointer indexes like an array: `values[i]` is the i-th element
+// after the address.
+//
+// Nothing here is checked for you. A `null` must be caught before use, the block must be freed
+// exactly once, and it must not be touched afterwards. The rest of this part is about tools that
+// make those rules harder to break.
 import Io::{ Print, PrintLine };
 import Memory::{ Alloc, Free, Zero };
 
 func Main() -> int {
-    // A count decided while running. `sizeof` gives the size of one element,
-    // so the total is the count times that.
+    // A count decided at run time. `sizeof(uint)` is the size of one element in bytes.
     let count: uint = 8;
     let size = count * sizeof(uint);
     PrintLine("asking for {} elements, {} bytes", count, size);
 
-    // `Alloc` hands back an address with no type attached — `*var opaque`,
-    // meaning "somewhere writable, contents unknown". The cast says what will
-    // live there. `var` is required: without it the memory could not be
-    // written, which would make the whole thing pointless.
     var values = Alloc(size) as *var uint;
 
-    // It can fail. There is no error to catch — the answer is `null`, and a
-    // program that does not check it will fault on first use.
+    // Allocation can fail, and the only sign is `null`. Check before the first use.
     if values == null {
         PrintLine("out of memory");
         return 1;
     }
-    PrintLine("got it at address {}", values as uint);
 
-    // Fresh memory holds whatever was there before. `Zero` makes it definite;
-    // reading it first would be reading someone else's leftovers.
+    // Registered right after the check, so every later path out of `Main` frees the block once.
+    defer Free(values);
+
+    // Fresh memory holds whatever was there before. `Zero` makes its contents definite.
     Zero(values, size);
-    Print("after Zero:   ");
+    Print("after Zero:");
     for i in 0..count {
-        Print("{} ", values[i]);
+        Print(" {}", values[i]);
     }
     PrintLine();
 
-    // With a type on the pointer, it indexes like an array — the same `[i]`,
-    // and the same counting from zero.
     for i in 0..count {
         values[i] = i * i;
     }
-    Print("squares:      ");
-    for i in 0..count {
-        Print("{} ", values[i]);
-    }
-    PrintLine();
-
+    Print("squares:   ");
     var total: uint = 0;
     for i in 0..count {
+        Print(" {}", values[i]);
         total += values[i];
     }
-    PrintLine("their total:  {}", total);
+    PrintLine();
+    PrintLine("total:      {}", total);
 
-    // Nothing reclaims this on its own. `Free` gives it back, and every path
-    // out of the function needs one — including the failure above, which
-    // returned before allocating and so had nothing to release.
-    Free(values);
-    PrintLine("freed");
-
-    // Two rules the compiler cannot enforce here, and the reason the later
-    // lessons exist. Using `values` after this point reads memory that is no
-    // longer yours, and calling `Free` on it twice corrupts the allocator.
-    // Neither is reported; both are why `Ownership` and `Allocator` are worth
-    // reading before writing much of this by hand.
+    // After the deferred `Free` runs, `values` still holds the old address, but the memory is no
+    // longer yours. Reading it, or freeing it again, is a bug that nothing reports.
     return 0;
 }
