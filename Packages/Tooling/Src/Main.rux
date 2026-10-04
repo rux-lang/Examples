@@ -1,0 +1,27 @@
+// `rux run` and `rux check` are not the only commands. A few more keep a package tidy, and all of
+// them are run from the package directory:
+//
+//     rux fmt           rewrite every source file and the manifest in the standard layout
+//     rux fmt --check   change nothing; list the files that `rux fmt` would rewrite, and fail
+//     rux lint          warn about what compiles but is still wrong, such as a `pub` item with no
+//                       documentation or a misspelled documentation tag
+//     rux test          build and run every executable package below `Tests/`
+//     rux doc           generate reference pages for the `pub` items, in `Bin/Docs/`
+//
+// `--check` exists for scripts and continuous integration: it makes formatting a pass-or-fail
+// question without touching anyone's files.
+//
+// This lesson has one test, in `Tests/LeapYear/`, for the small `Calendar` library beside `Src/`.
+// The program below uses the same library, so a passing test says something about the program.
+//
+// `rux pack` and `rux publish` also exist, for sharing a source library through the registry. They
+// need an account and change something public, so this course never runs them.
+import Calendar::DaysInMonth;
+import Io::PrintLine;
+
+func Main() -> int {
+    for year in 1900..=1904 {
+        PrintLine("February {} has {} days", year, DaysInMonth(year, 2));
+    }
+    return 0;
+}

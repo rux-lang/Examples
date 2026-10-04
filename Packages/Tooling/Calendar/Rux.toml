@@ -1,0 +1,10 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "Calendar"
+Version = "0.1.0"
+Type = "SourceLibrary"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Description = "Leap years and month lengths, the code under test in the Tooling lesson"

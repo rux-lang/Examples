@@ -319,6 +319,7 @@ Modules, packages, libraries and tools.
 - 22.7 **[StaticLibrary](Packages/StaticLibrary/)** — build a static library
 - 22.8 **[SharedLibrary](Packages/SharedLibrary/)** — build a shared library
 - 22.9 **[Documentation](Packages/Documentation/)** — document your code with `///` comments
+- 22.10 **[Tooling](Packages/Tooling/)** — format, lint, test and document with the `rux` tool
 
 ### 23. Compile time
 

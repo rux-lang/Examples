@@ -1,0 +1,24 @@
+// A test is an executable package below `Tests/`. `rux test` builds and runs each one, and a test
+// passes when its `Main` returns 0. Any other status fails it, so each check returns its own
+// number, and a failure says which check it was.
+//
+// `rux test` resolves a test's dependencies from local paths only, never from the registry, so a
+// test package depends on the code under test by path and checks it with plain conditions.
+import Calendar::{ DaysInMonth, IsLeapYear };
+
+func Main() -> int {
+    if !IsLeapYear(2024) {
+        return 1;
+    }
+    if IsLeapYear(2023) {
+        return 2;
+    }
+    // A century is not a leap year, unless it divides by 400.
+    if IsLeapYear(1900) || !IsLeapYear(2000) {
+        return 3;
+    }
+    if DaysInMonth(2024, 2) != 29 || DaysInMonth(2023, 2) != 28 || DaysInMonth(2023, 4) != 30 {
+        return 4;
+    }
+    return 0;
+}

@@ -1,0 +1,23 @@
+// The code under test. It lives in its own small library so that both the program and the test
+// package can depend on it.
+
+/// Whether `year` has a 29 February in the Gregorian calendar.
+/// @param year the year, counted in the usual way
+/// @returns true for every fourth year, except centuries not divisible by 400
+pub func IsLeapYear(year: int) -> bool {
+    return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+}
+
+/// How many days `month` has in `year`.
+/// @param year the year, which matters only for February
+/// @param month the month, from 1 for January to 12 for December
+/// @returns the number of days, from 28 to 31
+pub func DaysInMonth(year: int, month: int) -> int {
+    if month == 2 {
+        return IsLeapYear(year) ? 29 : 28;
+    }
+    if month == 4 || month == 6 || month == 9 || month == 11 {
+        return 30;
+    }
+    return 31;
+}
