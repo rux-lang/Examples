@@ -7,10 +7,9 @@ Name = "TreeMap"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Keys kept in order"
+Description = "A map that keeps its keys in order: ordered walks and ranges"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
 Collections = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
