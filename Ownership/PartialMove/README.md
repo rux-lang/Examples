@@ -1,8 +1,8 @@
 # PartialMove
 
-See why a single field cannot be moved out of a value, and take a tuple apart with `<-` instead.
+See why a single field cannot be moved out of a struct, and take the struct apart with `<-` to move it out instead.
 
-**You'll need:** [NoCopy](https://rux-lang.dev/docs/learn/no-copy), [Destructure](https://rux-lang.dev/docs/learn/destructure)
+**You'll need:** [NoCopy](https://rux-lang.dev/docs/learn/no-copy), [Destructure](https://rux-lang.dev/docs/learn/destructure), [StructPattern](https://rux-lang.dev/docs/learn/struct-pattern)
 
 ```sh
 rux run
@@ -10,8 +10,8 @@ rux run
 
 ```text
 unwrapping:
-    unwrapped the book from the paper
     paper destroyed
+    unwrapped the book
     reading the book
 end of Main:
     book destroyed

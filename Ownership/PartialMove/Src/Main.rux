@@ -1,18 +1,26 @@
 // A parcel is wrapping paper around a gift. It is tempting to move just the gift out and leave the
-// rest, but Rux refuses: a value is moved whole or not at all.
+// rest where it is, but Rux refuses: a field cannot be moved out of a value on its own.
 //
-//     return <-parcel.1;
+//     return <-parcel.gift;
 //
-// error: cannot move field '1' out of droppable value 'parcel'
+// error: cannot move field 'gift' out of droppable value 'parcel'
 //   note: partial moves would leave the aggregate with only some fields initialized
 //   help: move the complete aggregate or borrow or clone the component explicitly
 //
-// The same holds for a struct field or an array element. Half a parcel would be a value that is
-// partly alive, and the compiler could no longer say what to destroy when its scope ends.
+// Half a parcel would be a value that is partly alive, and the compiler could no longer say what
+// to destroy when its scope ends.
 //
-// To keep only one part, take the whole value apart instead. Destructuring a tuple with `<-`
-// moves every part into a binding of its own, so each part has exactly one owner again. Keep the
-// one you want by moving it on; the rest are destroyed when their bindings go out of scope.
+// What works is taking the whole value apart. A struct pattern with `<-` moves the parcel into
+// the pattern, and every field gets exactly one owner again: a field bound to a name belongs to
+// that binding, and a field bound to `_`, or left out of the pattern, belongs to nobody and is
+// destroyed on the spot. So the gift moves on and the wrapping is gone before the next line runs.
+//
+// Only a struct that is nothing more than its fields can be taken apart. Give `Parcel` its own
+// destructor and that destructor needs the whole parcel, so the same pattern is refused:
+//
+// error: cannot split 'Parcel' with a moving pattern, because it declares destructor '~Parcel'
+//   note: '~Parcel' runs on the whole value, so no part of it can be taken out on its own
+//   help: bind the whole value and read its fields, or match a value that stays with its owner
 import Io::PrintLine;
 
 struct Item {
@@ -27,17 +35,22 @@ extend Item {
     }
 }
 
-// The parcel is a tuple of wrapping and gift. Both parts move out of it, the gift moves on to the
-// caller, and the wrapping is left behind to be destroyed as the function returns.
-func Unwrap(parcel: (Item, Item)) -> Item {
-    let (wrapping, gift) <- parcel;
-    PrintLine("    unwrapped the {} from the {}", gift.name, wrapping.name);
+// No destructor of its own, so a moving pattern may take it apart.
+struct Parcel {
+    wrapping: Item;
+    gift: Item;
+}
+
+// The gift moves out to the caller. The wrapping is bound to `_`, so it is destroyed at the `let`.
+func Unwrap(parcel: Parcel) -> Item {
+    let Parcel { wrapping: _, gift: gift } <- parcel;
+    PrintLine("    unwrapped the {}", gift.name);
     return <-gift;
 }
 
 func Main() -> int {
     PrintLine("unwrapping:");
-    let gift = Unwrap((Item { name: "paper" }, Item { name: "book" }));
+    let gift = Unwrap(Parcel { wrapping: Item { name: "paper" }, gift: Item { name: "book" } });
     PrintLine("    reading the {}", gift.name);
 
     PrintLine("end of Main:");

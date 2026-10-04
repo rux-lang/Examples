@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "PartialMove"
 Version = "0.1.0"
 Type = "Executable"
+Description = "Moving one field out by taking a struct apart, and what is destroyed afterwards"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Why one field cannot be moved out, and taking a value apart instead"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
