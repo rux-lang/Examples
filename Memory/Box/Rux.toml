@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "Box"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Own one allocated value with Box, released when the box is destroyed"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
