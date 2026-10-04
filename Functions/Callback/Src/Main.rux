@@ -1,38 +1,44 @@
-// Functions have been called by name all along. They can also be handed around
-// as values: stored in a binding, passed to another function, and called from
-// there.
+// Functions have been called by name all along. They are also values: one can
+// be stored in a binding, passed to another function, and called from there.
+// A function handed over to be called later is a *callback*.
 //
-// That is what lets one function be given the *part that varies*. Sorting
-// takes a comparison; a hash map takes a hash; searching takes a test. Each is
-// written once and told what to do at the point of use.
-import Io::PrintLine;
+// That lets one function be given the part that varies. `ShowTable` below
+// knows how to print a row of results but not what to compute; each caller
+// tells it, by passing a function.
+import Io::{ Print, PrintLine };
 
-func Double(value: int) -> int {
+func Double(value: int32) -> int32 {
     return value * 2;
 }
 
-func Square(value: int) -> int {
+func Square(value: int32) -> int32 {
     return value * value;
 }
 
-func IsEven(value: int) -> bool {
+func IsEven(value: int32) -> bool {
     return value % 2 == 0;
 }
 
-// The parameter type is the shape of the function: what it takes, what it
-// gives back. Anything matching that shape may be passed.
-func ApplyAll(values: var int[..], operation: func(int) -> int) {
-    for i in 0..values.length {
-        values[i] = operation(values[i]);
+// The parameter's type is the shape of the function: what it takes and what it
+// gives back. `func(int32) -> int32` accepts any function with exactly that
+// shape, whatever its name.
+func ShowTable(last: int32, operation: func(int32) -> int32) {
+    for i in 1..=last {
+        Print("{} ", operation(i));
     }
+    PrintLine();
+}
+
+func ApplyTwice(operation: func(int32) -> int32, value: int32) -> int32 {
+    return operation(operation(value));
 }
 
 // A function taking a test rather than a value can answer any question that
 // can be written as one.
-func CountWhere(values: int[..], test: func(int) -> bool) -> uint {
-    var found: uint = 0;
-    for i in 0..values.length {
-        if test(values[i]) {
+func CountWhere(last: int32, test: func(int32) -> bool) -> int32 {
+    var found: int32 = 0;
+    for i in 1..=last {
+        if test(i) {
             found += 1;
         }
     }
@@ -40,30 +46,30 @@ func CountWhere(values: int[..], test: func(int) -> bool) -> uint {
 }
 
 func Main() -> int {
-    var numbers: int[5] = [ 1, 2, 3, 4, 5 ];
+    // `Double` is passed, not called — no parentheses after it. `ShowTable`
+    // does the calling, once per number.
+    ShowTable(5, Double);
+    ShowTable(5, Square);
 
-    // `Double` is passed, not called — no parentheses. `ApplyAll` does the
-    // calling, once per element.
-    ApplyAll(numbers[..], Double);
-    PrintLine("doubled  {} {} {} {} {}",
-        numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]);
+    PrintLine("ApplyTwice(Double, 3)  {}", ApplyTwice(Double, 3));
+    PrintLine("ApplyTwice(Square, 3)  {}", ApplyTwice(Square, 3));
+    PrintLine("CountWhere(10, IsEven) {}", CountWhere(10, IsEven));
 
-    // The same function, given a different operation. Nothing about `ApplyAll`
-    // changed.
-    ApplyAll(numbers[..], Square);
-    PrintLine("squared  {} {} {} {} {}",
-        numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]);
+    // A function value can be held in a binding, with its type written out in
+    // full. A `var` binding can be pointed at another function later; either
+    // way it is called exactly like the function it holds.
+    var chosen: func(int32) -> int32 = Double;
+    PrintLine("chosen(21)             {}", chosen(21));
+    chosen = Square;
+    PrintLine("chosen(21)             {}", chosen(21));
 
-    PrintLine("even     {}", CountWhere(numbers[..], IsEven));
-
-    // A function value can also be held in a binding, and its type written out
-    // in full. The binding is called exactly like the function it holds.
-    let chosen: func(int) -> int = Double;
-    PrintLine("chosen   {}", chosen(21));
-
-    // This is what the collections were doing. `HashMap` was handed `HashInt32`
-    // and `EqualsInt32`, `TreeMap` was handed `CompareInt32`, and `Algorithm`
-    // handed a predicate to `IndexWhere` and a step to `Fold` — all of them
-    // ordinary functions, passed by name.
+    // Watch out: the shape must match exactly. `ShowTable(5, IsEven)` is
+    // refused, because `IsEven` returns `bool`:
+    //
+    //     error: argument 2 to 'ShowTable' has type 'func(int32) -> bool8',
+    //            but parameter 'operation' requires 'func(int32) -> int32'
+    //
+    // Writing `ShowTable(5, Double(3))` is the other common slip: that calls
+    // `Double` and passes its `int32` result, not the function.
     return 0;
 }

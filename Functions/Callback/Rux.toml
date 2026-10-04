@@ -7,7 +7,7 @@ Name = "Callback"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Passing a function as a value"
+Description = "Passing a named function as a value to another function"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
