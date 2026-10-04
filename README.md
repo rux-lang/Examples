@@ -157,6 +157,7 @@ Describing behaviour that many types share.
 - 12.3 **[InterfaceParameter](Interfaces/InterfaceParameter/)** — write a function that accepts any type implementing an interface
 - 12.4 **[Display](Interfaces/Display/)** — make your own type printable with `{}`
 - 12.5 **[Equatable](Interfaces/Equatable/)** — define what it means for two of your values to be equal
+- 12.6 **[Comparable](Interfaces/Comparable/)** — define an order for your own type
 - 12.8 **[OperatorOverload](Interfaces/OperatorOverload/)** — define `==`, `+` and the other operators for your own type
 - 12.11 **[Iterator](Interfaces/Iterator/)** — implement `Next` so a type of your own can be used with `for`
 
