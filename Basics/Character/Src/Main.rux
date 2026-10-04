@@ -32,21 +32,24 @@ func Main() -> int {
     // UTF-8 text and a `char16` one unit of UTF-16 text. Those are pieces of an encoding, and a
     // piece is a whole character only for the code points small enough to fit in one: plain
     // ASCII for `char8`, and most living scripts for `char16`.
-    let unit8: char8 = c8'R';
-    let unit16: char16 = c16'Ж';
-    let scalar32: char32 = c32'€';
-    let scalar64: char64 = c64'😀';
+    let unit8 = c8'R';
+    let unit16 = c16'Ж';
+    let scalar32 = c32'€';
+    let scalar64 = c64'😀';
     PrintLine("char8     {}", unit8);
     PrintLine("char16    {}", unit16);
     PrintLine("char32    {}", scalar32);
     PrintLine("char64    {}", scalar64);
 
-    // An unprefixed literal is always a `char32`, so a narrower type needs the prefix:
+    // Without a prefix, a literal is a `char32` unless its binding names a narrower type; then it
+    // takes that type, so `let initial: char8 = 'R';` works too. Either way the character has to
+    // fit in one unit, and one that does not is refused:
     //
-    //     let initial: char8 = 'R';
-    //         error: cannot assign 'char32' to 'char8'
+    //     let accent = c8'é';
+    //         error: character 'é' (U+00E9) does not fit one 'char8' code unit
+    //         help: write a string literal such as c8"é", or a byte such as 0xE9u8
     //
-    // Keep `c8` literals to plain ASCII. A character outside it needs more than one byte of
-    // UTF-8, and one `char8` can only ever hold one of those bytes.
+    // é takes two bytes of UTF-8, and one `char8` holds only one of them. Text that needs several
+    // units is a string, which has a lesson of its own.
     return 0;
 }
