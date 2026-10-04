@@ -1,0 +1,26 @@
+// `int8::Max`, `#target` and `Assert` have always come from `Core`, so they can look like part of
+// the language. They are not. The compiler knows how to implement them, but a program reaches them
+// only through *declarations*, and `Core` is simply the package that usually provides those
+// declarations. An `intrinsic` declaration names something the compiler supplies and gives its
+// type, with no body.
+//
+// This lesson takes the declarations from `Basis`, a small provider package beside this one,
+// instead of from `Core`. Open `Basis/Src/Basis.rux`: it is a handful of lines, and the program
+// below works the same as it would with `Core`.
+//
+// Only real intrinsics can be declared this way. The compiler rejects `intrinsic type int7`, and
+// a declaration must match what the compiler implements, so writing a provider is a way to replace
+// `Core`, not a way to invent new language features.
+import Basis::{ #target, Assert, float64, int8 };
+import Io::PrintLine;
+
+func Main() -> int {
+    PrintLine("int8 runs from {} to {}", int8::Min, int8::Max);
+    PrintLine("float64 can hold {}", float64::Infinity);
+    PrintLine("Pointers on this target are {} bits wide", #target.pointerBits);
+
+    let level: int8 = 100;
+    Assert(level < int8::Max, "the level must leave room to grow");
+    PrintLine("Level {} passed the check", level);
+    return 0;
+}

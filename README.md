@@ -322,6 +322,7 @@ Code that runs or is chosen while compiling.
 - 23.4 **[SourceLocation](CompileTime/SourceLocation/)** — the file and line of an expression
 - 23.5 **[CompileError](CompileTime/CompileError/)** — stop the build with `#Error`, or warn with `#Warn`
 - 23.6 **[Define](CompileTime/Define/)** — values passed to the build from the manifest or the command line
+- 23.7 **[Intrinsic](CompileTime/Intrinsic/)** — declarations the compiler implements itself
 
 ### 24. Platform
 
