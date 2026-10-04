@@ -1,0 +1,63 @@
+// A typed pattern can name more than one member. The arm `box: Square | Rectangle =>` matches
+// when the active member is either of the two, and `box` is then a *smaller sum*: it is still
+// one of several types, but only the ones the arm let through.
+//
+// That is useful when some members are handled the same way. A circle has no corners and a
+// square and a rectangle both have four, so the corner count needs two arms, not three. And when
+// the shared members need their own work, the smaller sum can be handed on whole to a function
+// that takes exactly those members, and matched again there.
+//
+// An arm after a subset may not repeat a member the subset already took. Add `s: Square =>`
+// after the `box` arm in `Describe` and the compiler refuses the arm that can never run:
+//     error: match arm is unreachable because earlier arms already match every value it matches
+import Io::PrintLine;
+
+struct Circle {
+    radius: float64;
+}
+
+struct Square {
+    side: float64;
+}
+
+struct Rectangle {
+    width: float64;
+    height: float64;
+}
+
+type Shape = Circle | Square | Rectangle;
+
+// A subset needs no binding either: `_: Square | Rectangle` only asks the question.
+func Corners(shape: Shape) -> int {
+    return match shape {
+        _: Circle => 0,
+        _: Square | Rectangle => 4
+    };
+}
+
+// This function only ever sees boxes, so it matches two members and no more.
+func BoxArea(box: Square | Rectangle) -> float64 {
+    return match box {
+        s: Square => s.side * s.side,
+        r: Rectangle => r.width * r.height
+    };
+}
+
+func Describe(shape: Shape) {
+    match shape {
+        c: Circle => PrintLine("circle, radius {}, {} corners", c.radius, Corners(shape)),
+        box: Square | Rectangle => PrintLine("box, area {}, {} corners", BoxArea(box),
+            Corners(shape))
+    }
+}
+
+func Main() -> int {
+    let wheel: Shape = Circle { radius: 1.5 };
+    let tile: Shape = Square { side: 2.0 };
+    let door: Shape = Rectangle { width: 1.0, height: 2.5 };
+
+    Describe(wheel);
+    Describe(tile);
+    Describe(door);
+    return 0;
+}
