@@ -7,11 +7,10 @@ Name = "Binary"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Reading and writing raw bytes"
+Description = "Fixed-width binary records, and refusing a record the file cut short"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 FileSystem = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Path = { Namespace = "Rux", Version = "*" }
