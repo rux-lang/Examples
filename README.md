@@ -227,6 +227,7 @@ Numbers in depth.
 - 16.2 **[NumberLimit](Numbers/NumberLimit/)** — the smallest and largest value each number type can hold
 - 16.3 **[FloatSpecial](Numbers/FloatSpecial/)** — infinity and NaN, and how they compare
 - 16.4 **[Bitwise](Numbers/Bitwise/)** — `&`, `
+- 16.5 **[Shift](Numbers/Shift/)** — move bits left and right with `<<`, `>>` and `>>>`
 - 16.11 **[Math](Numbers/Math/)** — roots, powers, logarithms, trigonometry, and rounding
 
 ### 17. Collections
