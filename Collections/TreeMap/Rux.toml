@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "TreeMap"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "A map that keeps its keys in order: ordered walks and ranges"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
