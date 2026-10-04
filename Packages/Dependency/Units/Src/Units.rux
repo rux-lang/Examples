@@ -1,0 +1,7 @@
+// A small library of our own, kept in a directory beside the program that uses it. Nothing about it
+// is published anywhere: the program finds it by its path.
+pub const KilometresPerMile: float64 = 1.609344;
+
+pub func ToMiles(kilometres: float64) -> float64 {
+    return kilometres / KilometresPerMile;
+}

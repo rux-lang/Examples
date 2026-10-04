@@ -1,0 +1,32 @@
+// A package names what it needs in the `[Dependencies]` section of its `Rux.toml`. Each line's key
+// is the import name, the first segment of every `import` that reaches into that package. This
+// program uses both kinds of dependency there are:
+//
+//     Io = { Namespace = "Rux", Version = "*" }
+//     Math = { Namespace = "Rux", Version = "*" }
+//     Units = { Path = "Units" }
+//
+// A registry dependency names a namespace and a version requirement. `rux install` downloads a
+// matching version into the package cache on this machine, and builds then read it from there,
+// without going online again. `*` accepts any version; `^0.1.0` would accept 0.1.x but not 0.2.0,
+// and `>=1.2.0, <2.0.0` spells a range out.
+//
+// A path dependency names a directory holding a `Rux.toml`, relative to this manifest. The source
+// there is compiled with this program, edits to it are seen on the next build, and nothing needs
+// installing. A package with a path dependency cannot be published, because the path means
+// nothing on anyone else's machine.
+//
+// Once declared, the two kinds look the same in the code.
+import Io::PrintLine;
+import Math::{ Hypot, Round };
+import Units::ToMiles;
+
+func Main() -> int {
+    // Three kilometres east, then four north: how far from the start, as the crow flies?
+    let kilometres = Hypot(3.0, 4.0);
+    let miles = Round(ToMiles(kilometres) * 100.0) / 100.0;
+
+    PrintLine("straight line {} km", kilometres);
+    PrintLine("which is      {} miles", miles);
+    return 0;
+}
