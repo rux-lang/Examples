@@ -7,7 +7,7 @@ Name = "Console"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Writing to the console with Print and PrintLine"
+Description = "Writing to the console with Print and PrintLine, and filling {} placeholders"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

@@ -1,49 +1,49 @@
-// Everything printed so far has gone through these two functions. `PrintLine`
-// finishes the line it writes; `Print` leaves the cursor where it is, so the
-// next call continues on the same line.
+// Every lesson so far has printed with `PrintLine`. This one looks at it closely, together with its
+// partner `Print`. The difference between them is one thing: `PrintLine` ends the line it writes,
+// and `Print` leaves the cursor where it stopped, so the next output carries on the same line.
 import Io::{ Print, PrintLine };
 
 func Main() -> int {
-    // Three calls, one line, because only the last one ends it.
+    // Three calls, one line, because only the last call ends it.
     Print("one ");
     Print("two ");
     PrintLine("three");
 
-    // Called with nothing at all, `PrintLine` writes just the line ending,
-    // which is how a blank line is produced.
+    // A `\n` inside the text is a line break too, so `PrintLine` is `Print` with one added.
+    Print("four\nfive\n");
+
+    // With nothing to print, `PrintLine` writes only the line ending: a blank line.
     PrintLine();
 
-    // A value can be handed over on its own, with no surrounding text.
-    let answer = 42;
-    PrintLine(answer);
+    // A value can be printed on its own, with no text around it.
+    PrintLine(42);
+    PrintLine(2.5);
+    PrintLine(true);
 
-    // More often the value goes inside a message. Each `{}` is filled by the
-    // next argument, in the order they are written.
+    // More often the value goes inside a message. Each `{}` is filled by the next argument, in
+    // the order they are written, and any kind of value can fill one.
     let name = "Rux";
-    let version = 4;
-    PrintLine("{} 0.{}.0", name, version);
+    let major = 0;
+    let minor = 4;
+    PrintLine("{} version {}.{}", name, major, minor);
 
-    // The same argument list works for `Print`, which is how a line gets
-    // assembled a piece at a time — the loop below builds one row of output
-    // and only then ends it.
-    for i in 1..=5 {
-        Print("{} ", i);
-    }
-    PrintLine();
+    // `Print` takes placeholders as well, so a line can be built from pieces.
+    Print("{} + {} = ", 2, 3);
+    PrintLine("{}", 2 + 3);
 
-    // A `{}` may also carry a format spec after a colon, which the Primitive
-    // and Operator lessons used for number bases and decimal places. Width and
-    // alignment work the same way, and the Format lesson covers the rest.
-    PrintLine("|{:>8}|", "right");
-    PrintLine("|{:<8}|", "left");
-    PrintLine("|{:^8}|", "center");
+    // To print a brace itself in text that has placeholders, double it. Text passed with no
+    // arguments at all is printed exactly as written, so there a brace is single.
+    PrintLine("{{}} marks a place for {}", "a value");
+    PrintLine("{} with nothing to fill it");
 
-    // Both functions return an `IoError` describing whether the write got
-    // through. Console output is not usually worth checking, so the examples
-    // ignore it, but the value is there when writing somewhere that can fail.
-
-    // Reading input is the other half of console work, and it needs more than
-    // this lesson has: a place to put the text and something to allocate that
-    // place. It waits for the String and Allocator lessons.
+    // Watch the count. A placeholder with no argument, or an argument with no placeholder, makes
+    // the whole call print nothing at all:
+    //
+    //     PrintLine("{} and {}", 1);
+    //
+    // Nothing stops the program, because the problem is reported through the value both
+    // functions return, and these lessons leave that value unread. Console output is rarely worth
+    // checking; reading such a value is what the Optionals part is about. Width, alignment and
+    // decimal places inside `{}` wait for the Format lesson.
     return 0;
 }
