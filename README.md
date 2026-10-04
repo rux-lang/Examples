@@ -47,6 +47,7 @@ Choosing and repeating.
 - 3.5 **[DoWhile](ControlFlow/DoWhile/)** — run the body first and test afterwards, so it runs at least once
 - 3.6 **[Loop](ControlFlow/Loop/)** — repeat forever with `loop` until a `break` leaves
 - 3.7 **[Break](ControlFlow/Break/)** — leave a loop early when the answer is found
+- 3.8 **[Continue](ControlFlow/Continue/)** — skip the rest of one iteration and carry on with the next
 - 3.9 **[Range](ControlFlow/Range/)** — describe a run of numbers with `..` and `..=`
 - 3.12 **[Match](ControlFlow/Match/)** — select a branch by value with `match`, and default with `else`
 
