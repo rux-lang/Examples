@@ -13,7 +13,7 @@ read in any order once their prerequisites are done; Part 25 holds complete smal
 
 First programs: printing, values and their types.
 
-- 1.1 **[Hello](Hello/)** — print "Hello, World!", the minimal Rux application
+- 1.1 **[Hello](Basics/Hello/)** — print "Hello, World!", the minimal Rux application
 - 1.3 **[Variable](Variable/)** — name a value with `let`, and let the compiler infer its type
 - 1.10 **[Console](Console/)** — write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
 - 1.11 **[Const](Const/)** — name a value the compiler folds in, and see where it differs from `let`
