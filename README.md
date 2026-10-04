@@ -181,7 +181,7 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 - 25.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, and handle the cases the discriminant decides _(after Text)_
 - 25.10 **[Statistics](Projects/Statistics/)** — compute the mean, spread, and extremes of a set of numbers _(after Algorithms)_
 - 25.11 **[Guess](Projects/Guess/)** — a number guessing game with seven tries _(after Utilities)_
-- 25.12 **[Age](Age/)** — work out someone's age from their date of birth, in years, months and days _(after Utilities)_
+- 25.12 **[Age](Projects/Age/)** — work out someone's age from their date of birth, in years, months and days _(after Utilities)_
 - 25.13 **[Password](Password/)** — build a random password by drawing letters and digits from an alphabet _(after Utilities)_
 - 25.14 **[Launch](Launch/)** — a countdown and a launch _(after Utilities)_
 - 25.16 **[Melody](Melody/)** — play a tune through the console speaker with the platform's beep _(after Platform)_
