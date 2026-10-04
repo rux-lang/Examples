@@ -1,0 +1,15 @@
+// A second file, adding a second module beside the first one under the same `Shape` parent.
+//
+// It declares `Area` and `Perimeter` again. That is not a clash: a module is a namespace, so
+// `Shape::Circle::Area` and `Shape::Rectangle::Area` are two different names.
+module Shape::Circle {
+    const Pi: float64 = 3.14159;
+
+    func Area(radius: float64) -> float64 {
+        return Pi * radius * radius;
+    }
+
+    func Perimeter(radius: float64) -> float64 {
+        return 2.0 * Pi * radius;
+    }
+}

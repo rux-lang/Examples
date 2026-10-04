@@ -7,7 +7,7 @@ Name = "Module"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Splitting a package across several source files"
+Description = "Source files, modules and imports inside one package"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

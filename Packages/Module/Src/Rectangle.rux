@@ -1,0 +1,14 @@
+// This file adds a module called `Shape::Rectangle` to the package. The file's own name means
+// nothing to the compiler; the `module` declaration is what decides where these functions live.
+//
+// The path is written relative to the package. Seen from an import, the full name starts with the
+// package name, as every import does: `Module::Shape::Rectangle`.
+module Shape::Rectangle {
+    func Area(width: int, height: int) -> int {
+        return width * height;
+    }
+
+    func Perimeter(width: int, height: int) -> int {
+        return 2 * (width + height);
+    }
+}
