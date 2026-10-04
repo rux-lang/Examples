@@ -1,0 +1,69 @@
+// Two types that look almost the same, and mean different things:
+//
+//     (*var int)?   an optional pointer: either an address, or `none`
+//     *var int?     a pointer to an optional: always an address, of a slot that holds an `int?`
+//
+// A `?` belongs to the type just before it, as every suffix does, so `*var int?` reads as
+// `*var (int?)`. Parentheses put the `?` on the pointer instead.
+//
+// An optional pointer is the honest way to say "maybe an address". A function that returns a
+// bare pointer and uses `null` for "not found" leaves the check to memory; one that returns
+// `(*var int)?` cannot be used until a `match` or `??` has dealt with `none`.
+//
+// A pointer to an optional is just a pointer, used to read or replace an optional that lives
+// somewhere else, the same way a `*var int` reaches an `int`.
+import Io::PrintLine;
+
+// Where is `wanted`? The answer is an address the caller can write through, or `none`.
+func Find(values: var int[..], wanted: int) -> (*var int)? {
+    for i in 0..values.length {
+        if values[i] == wanted {
+            return @values[i];
+        }
+    }
+    return none;
+}
+
+// Keeps the largest value seen so far in the caller's `int?`, which starts out empty.
+func KeepLargest(best: *var int?, value: int) {
+    let current = *best ?? value;
+    *best = value > current ? value : current;
+}
+
+func Main() -> int {
+    var scores: int[4] = [7, 3, 9, 3];
+
+    // Absence has to be handled before the address can be used.
+    match Find(scores[..], 3) {
+        found? => {
+            *found = 30;
+            PrintLine("found 3, changed it to {}", scores[1]);
+        },
+        none => {
+            PrintLine("3 is not there");
+        }
+    }
+    match Find(scores[..], 5) {
+        found? => {
+            *found = 50;
+        },
+        none => {
+            PrintLine("5 is not there");
+        }
+    }
+
+    // Writing through a pointer to an optional.
+    var best: int? = none;
+    PrintLine("best before: {}", best ?? -1);
+    for score in scores {
+        KeepLargest(@best, score);
+    }
+    PrintLine("best after:  {}", best ?? -1);
+
+    // `null` and `none` are different. A `null` pointer wrapped in an optional is present: the
+    // optional holds a pointer, which happens to point nowhere. Use `none` to mean "no pointer".
+    let nowhere: *var int = null;
+    let wrapped: (*var int)? = nowhere;
+    PrintLine("null wrapped is present: {}", wrapped is *var int);
+    return 0;
+}
