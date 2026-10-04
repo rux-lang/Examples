@@ -11,5 +11,4 @@ Description = "Allocating from an arena or a box"
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }

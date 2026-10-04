@@ -5,10 +5,15 @@
 // interface. Anything wanting memory takes one as a parameter, which means the
 // caller decides where the memory comes from — and different strategies become
 // interchangeable.
+//
+// Asking for memory can fail, so a call that asks returns a fallible: the
+// value, or an `AllocError` saying why not. `Main` is fallible too, which lets
+// each step pass a failure on with `?`; a failure ends the program with exit
+// status 1.
 import Allocator::{ AllocError, Allocator, Arena, Box, SystemAllocator };
 import Io::PrintLine;
 
-func Main() -> int {
+func Main() -> ! AllocError {
     // The system allocator is the one behind `Alloc` and `Free`. Note the two
     // steps: build the concrete type, then name it at the interface type. The
     // annotation is what performs the conversion, exactly as in Interface.
@@ -35,11 +40,10 @@ func Main() -> int {
     // takes the allocator to use, so the same box works on the system
     // allocator or the arena without knowing which it has.
     //
-    // The last argument is an out-parameter for the failure, using the pointer
-    // form from the Pointer lesson.
-    var error = AllocError::None;
-    var first = Box::Create<int>(scratch, 10, @error);
-    var second = Box::Create<int>(scratch, 20, @error);
+    // `Create` returns the box or an `AllocError`, and `?` passes a failure on
+    // out of `Main`.
+    var first = Box::Create<int>(scratch, 10)?;
+    var second = Box::Create<int>(scratch, 20)?;
 
     // One 256-byte block was taken from the system, and both boxes came out of
     // it — one system allocation for two values.
@@ -61,5 +65,4 @@ func Main() -> int {
     // against `Allocator` can be handed the system allocator in production, an
     // arena for work that ends all at once, or a fixed buffer in a place where
     // allocation is not allowed at all — without changing a line of it.
-    return 0;
 }
