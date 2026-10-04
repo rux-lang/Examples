@@ -136,7 +136,7 @@ Paths, files and directories.
 - 19.1 **[Path](Files/Path/)** — split a path into its parts, and see why a path is not a string
 - 19.4 **[File](Files/File/)** — write text to a file and read it back, handling failure at every step
 - 19.5 **[Directory](Files/Directory/)** — create, list, and remove directories
-- 19.7 **[Binary](Binary/)** — read and write fixed-width values and raw bytes
+- 19.7 **[Binary](Files/Binary/)** — read and write fixed-width values and raw bytes
 
 ### 20. Utilities
 
