@@ -74,7 +74,7 @@ A value that may be absent: `T?`.
 Operations that can fail: `T ! E`.
 
 - 9.1 **[Fallible](Errors/Fallible/)** — return either a value or an error with `T ! E`
-- 9.8 **[Propagate](Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
+- 9.8 **[Propagate](Errors/Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 
 ### 11. Ownership
 
