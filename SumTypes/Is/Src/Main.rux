@@ -3,6 +3,7 @@
 // sum in parentheses, `value is (Plus | Minus)`, and it is true when the active member is any one
 // of them. The parentheses are required: `token is Plus | Minus` is refused with
 //       error: a sum type after 'is' must be grouped
+//       help: write 'value is (Plus | Minus)'
 //
 // Two things `is` does not do:
 //
@@ -35,15 +36,16 @@ struct Minus {}
 type Token = Number | Name | Plus | Minus;
 
 func Main() -> int {
-    // Each token is annotated as a `Token` first, so the array below holds sums, not numbers.
-    let a: Token = Name { text: "price" };
-    let b: Token = Plus {};
-    let c: Token = Number { value: 2 };
-    let d: Token = Minus {};
-    let e: Token = Name { text: "discount" };
-    let f: Token = Plus {};
-    let g: Token = Number { value: 1 };
-    let tokens: Token[7] = [a, b, c, d, e, f, g];
+    // The annotation makes every element a `Token`, so one array holds all four member types.
+    let tokens: Token[7] = [
+        Name { text: "price" },
+        Plus {},
+        Number { value: 2 },
+        Minus {},
+        Name { text: "discount" },
+        Plus {},
+        Number { value: 1 }
+    ];
 
     var numbers = 0;
     var operators = 0;
@@ -59,8 +61,8 @@ func Main() -> int {
     PrintLine("{} numbers, {} operators", numbers, operators);
 
     // The result is an ordinary boolean, so it can be stored and printed like one.
-    let startsWithName = a is Name;
+    let startsWithName = tokens[0] is Name;
     PrintLine("starts with a name: {}", startsWithName);
-    PrintLine("ends with a number: {}", g is Number);
+    PrintLine("ends with a number: {}", tokens[6] is Number);
     return 0;
 }
