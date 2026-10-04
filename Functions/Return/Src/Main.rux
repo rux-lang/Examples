@@ -1,0 +1,79 @@
+// `return` does two things at once: it hands back the result, and it leaves
+// the function on the spot. Nothing after it runs. That makes it a way to
+// answer early — as soon as the function knows the answer — instead of
+// carrying a result down to the last line.
+//
+// And some functions have no result at all. They are called for what they do,
+// such as printing, and leave the `->` and the result type off entirely.
+import Io::{ Print, PrintLine };
+
+// Each `if` answers one case and leaves. By the time the last line is reached,
+// the earlier cases have been ruled out, so it needs no condition of its own.
+func Sign(value: int) -> int {
+    if value > 0 {
+        return 1;
+    }
+    if value < 0 {
+        return -1;
+    }
+    return 0;
+}
+
+// A leap year in three rules, most specific first. Every rule that decides the
+// answer returns at once, so no `else` is needed anywhere.
+func IsLeapYear(year: int) -> bool {
+    if year % 400 == 0 {
+        return true;
+    }
+    if year % 100 == 0 {
+        return false;
+    }
+    return year % 4 == 0;
+}
+
+// `return` inside a loop leaves the loop and the function together — further
+// than `break` goes. The line after the loop runs only if nothing was found.
+func SmallestDivisor(number: int) -> int {
+    for candidate in 2..number {
+        if number % candidate == 0 {
+            return candidate;
+        }
+    }
+    return number;
+}
+
+// No `->`, so no result. A bare `return;` still leaves early; falling off the
+// closing brace is the ordinary way out.
+func Countdown(from: int) {
+    if from < 1 {
+        PrintLine("nothing to count");
+        return;
+    }
+    for i in 0..from {
+        Print("{} ", from - i);
+    }
+    PrintLine("liftoff");
+}
+
+func Main() -> int {
+    PrintLine("Sign(-4) {}   Sign(0) {}   Sign(9) {}", Sign(-4), Sign(0), Sign(9));
+    PrintLine("IsLeapYear(2024) {}", IsLeapYear(2024));
+    PrintLine("IsLeapYear(1900) {}", IsLeapYear(1900));
+    PrintLine("IsLeapYear(2000) {}", IsLeapYear(2000));
+    PrintLine("SmallestDivisor(91) {}", SmallestDivisor(91));
+    PrintLine("SmallestDivisor(97) {}", SmallestDivisor(97));
+
+    // A function without a result is called as a statement on its own.
+    Countdown(5);
+    Countdown(0);
+
+    // The compiler checks that a function with a result returns one on every
+    // path. Leave out the final `return 0;` in `Sign` and it says:
+    //
+    //     error: function 'Sign' must return a value of type 'int' on every
+    //            control-flow path
+    //
+    // The opposite mistake, `return 5;` in a function with no `->`, is also
+    // refused: 'return' cannot have a value in a function with no return type.
+    return 0;
+}
