@@ -7,7 +7,7 @@ Name = "Function"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Declaring and calling functions, including recursion"
+Description = "Declaring functions with parameters and a result, and calling them"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

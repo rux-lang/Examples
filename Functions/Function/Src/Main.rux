@@ -1,70 +1,63 @@
-// A function names a piece of work so it can be run from more than one place.
-// `Main` has been one since the first lesson; these are the rest of the shape.
+// A function gives a piece of work a name, so it can be written once and run
+// from as many places as need it. `Main` has been one since the first lesson;
+// this lesson writes others and calls them from `Main`.
+//
+// The shape is always the same: `func`, a name, the parameters in parentheses,
+// `->` and the type of the result, then a body that hands the result back with
+// `return`.
 import Io::PrintLine;
 
-// Parameters are typed, and so is the result. This one takes two `int` values
-// and gives one back.
+// Every parameter is written `name: type`, separated by commas. A call must
+// supply one argument for each, in the same order.
 func Add(left: int, right: int) -> int {
     return left + right;
 }
 
-// A function that returns nothing leaves the `->` off entirely. It is called
-// for what it does, not for what it produces.
-func Announce(label: char8[..]) {
-    PrintLine("-- {} --", label);
+func Square(value: int) -> int {
+    return value * value;
 }
 
-// Parameters are immutable inside the body, the same as a `let`. Assigning to
-// `n` here would be an error; a local `var` holds the running value instead.
-func Triple(n: int) -> int {
-    var result = n;
-    result += n;
-    result += n;
-    return result;
+// The result type is whatever the work produces. Here two `float64` values go
+// in and one `float64` comes out.
+func Average(first: float64, second: float64) -> float64 {
+    return (first + second) / 2.0;
 }
 
-// A function may call itself. Each call gets its own parameters, so `n` here is
-// a different `n` on every level, and the `if` is what stops the descent.
-//
-// This is the factorial from the Range lesson written a second way: that one
-// repeated with a loop, this one repeats by calling inward and multiplying on
-// the way back out.
-func Factorial(n: int) -> int {
-    if n <= 1 {
-        return 1;
-    }
-    return n * Factorial(n - 1);
+func CelsiusToFahrenheit(celsius: float64) -> float64 {
+    return celsius * 9.0 / 5.0 + 32.0;
 }
 
-// `return` leaves immediately, so a function can answer as soon as it knows and
-// need not carry a result to the bottom.
-func Sign(value: int) -> char8[..] {
-    if value > 0 {
-        return "positive";
+// Parameters are immutable inside the body, exactly like `let` bindings, so a
+// running value needs a local `var` of its own.
+func SumUpTo(last: int) -> int {
+    var total = 0;
+    for i in 1..=last {
+        total += i;
     }
-    if value < 0 {
-        return "negative";
-    }
-    return "zero";
+    return total;
 }
 
 func Main() -> int {
-    Announce("arithmetic");
-    PrintLine("Add(2, 3)     {}", Add(2, 3));
-    PrintLine("Triple(7)     {}", Triple(7));
+    PrintLine("Add(2, 3)                    {}", Add(2, 3));
+    PrintLine("Square(7)                    {}", Square(7));
+    PrintLine("Average(4.0, 7.0)            {}", Average(4.0, 7.0));
+    PrintLine("CelsiusToFahrenheit(100.0)   {}", CelsiusToFahrenheit(100.0));
+    PrintLine("SumUpTo(10)                  {}", SumUpTo(10));
 
-    // The result of one call is an ordinary value, so it can go straight into
-    // the next call.
-    PrintLine("Add(Add(1,2),4) {}", Add(Add(1, 2), 4));
+    // A call is an ordinary value. It can be bound to a name...
+    let side = Add(4, 5);
+    PrintLine("side                         {}", side);
 
-    Announce("recursion");
-    for i in 1..=6 {
-        PrintLine("Factorial({}) {}", i, Factorial(i));
-    }
+    // ...or passed straight into another call. The inner call runs first.
+    PrintLine("Square(Add(1, 2))            {}", Square(Add(1, 2)));
+    PrintLine("Add(Square(3), Square(4))    {}", Add(Square(3), Square(4)));
 
-    Announce("early return");
-    PrintLine("Sign(-4)      {}", Sign(-4));
-    PrintLine("Sign(0)       {}", Sign(0));
-    PrintLine("Sign(9)       {}", Sign(9));
+    // Arguments must match the parameter types. `Square(2.5)` is rejected,
+    // because `2.5` is a `float64` and `Square` takes an `int` — the value is
+    // not converted for you. And assigning to a parameter inside its function
+    // is an error:
+    //
+    //     func Bump(n: int) -> int { n = n + 1; return n; }
+    //         error: cannot modify immutable variable 'n'
     return 0;
 }
