@@ -279,6 +279,7 @@ Paths, files and directories.
 - 19.6 **[Metadata](Files/Metadata/)** — ask a file for its size and kind
 - 19.7 **[Binary](Files/Binary/)** — read and write fixed-width values and raw bytes
 - 19.8 **[BufferedIo](Files/BufferedIo/)** — buffer writes and flush them
+- 19.9 **[AtomicFile](Files/AtomicFile/)** — replace a file's contents all at once or not at all
 
 ### 20. Utilities
 
