@@ -32,8 +32,7 @@ func Show(allocator: Allocator, label: char8[..], path: Path) -> ! IoError {
     var buffer: char8[64];
     ReadExact(file, buffer[..size])?;
     file.Close()?;
-    let text: char8[..] = buffer[..size];
-    PrintLine("{:16} {}", label, text);
+    PrintLine("{:16} {}", label, buffer[..size]);
 }
 
 func Main() -> ! IoError | TextError {

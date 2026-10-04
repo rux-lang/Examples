@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "AtomicFile"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "Replacing a file whole with WriteAtomically, and what that guarantees"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
