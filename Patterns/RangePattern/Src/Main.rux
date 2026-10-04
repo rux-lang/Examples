@@ -8,8 +8,11 @@
 // comparisons, and a ladder of ranges reads like the table it came from.
 //
 // Both ends must be literal numbers. A named constant is not accepted as an end, because a bare
-// name in a pattern means "bind a new variable" — the compiler says so and stops. Ranges work on
-// integers only; characters are matched one at a time (see the CharacterPattern lesson).
+// name in a pattern means "bind a new variable". With `const Low = 100;`, the arm `Low..=199 =>`
+// stops with
+//     error: pattern 'Low' cannot bind a new variable because 'Low' already names a constant
+// Ranges work on integers only; characters are matched one at a time (see the CharacterPattern
+// lesson).
 import Io::PrintLine;
 
 // Inclusive ranges, `..=`, suit a table whose rows name their first and last value.
@@ -38,6 +41,18 @@ func Size(count: int32) -> char8[..] {
     };
 }
 
+// A range takes a guard like any other pattern. The arm is chosen only when the age is in the range
+// *and* the condition holds; otherwise the match moves on, so a non-student of 20 pays full fare.
+func Fare(age: int32, student: bool) -> int32 {
+    return match age {
+        0..=5 => 0,
+        6..=17 => 5,
+        18..=25 if student => 5,
+        65..=120 => 6,
+        else => 10
+    };
+}
+
 func Main() -> int {
     let codes: int32[4] = [204, 302, 404, 99];
     for index in 0..4 {
@@ -48,5 +63,9 @@ func Main() -> int {
     for index in 0..5 {
         PrintLine("{} is {}", counts[index], Size(counts[index]));
     }
+
+    PrintLine("fares: age 4 pays {}, 12 pays {}, 70 pays {}", Fare(4, false), Fare(12, false),
+        Fare(70, false));
+    PrintLine("age 20 pays {} as a student, {} otherwise", Fare(20, true), Fare(20, false));
     return 0;
 }
