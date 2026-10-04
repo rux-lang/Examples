@@ -4,6 +4,11 @@
 // The catch is that a number wider than one byte has to be laid out in some
 // order, and machines do not agree on which. That choice is the whole subject
 // of this lesson: get it wrong and the file reads back as nonsense.
+//
+// The file steps can fail, so `Main` is fallible and passes any failure on with
+// `?`, ending the program with exit status 1. As in the File lesson, the
+// failure is an `IoError` from the file system or a `TextError` from turning
+// text into a filename.
 import Allocator::{ Allocator, SystemAllocator };
 import Core::{ LoadLittleEndian, StoreBigEndian, StoreLittleEndian, TargetIsLittleEndian };
 import FileSystem::{ DeleteFile, File, OpenOptions };
@@ -19,7 +24,7 @@ func ShowBytes(label: char8[..], bytes: uint8[..]) {
     PrintLine();
 }
 
-func Main() -> int {
+func Main() -> ! IoError | TextError {
     // A value chosen so every byte is different and recognisable.
     let value: uint32 = 305419896u32;
     PrintLine("the value       {:#x}", value);
@@ -43,39 +48,27 @@ func Main() -> int {
 
     var system = SystemAllocator();
     let allocator: Allocator = system;
-    var error = IoError::Ok();
-    var textError = TextError::None;
-    var holder = OsString::FromText(allocator, "Bin/example.bin", @textError);
+    var holder = OsString::FromText(allocator, "Bin/example.bin")?;
     let path = Path::FromView(holder.View());
 
     // Writing the bytes themselves. Nothing is converted to text, so four
     // bytes on disk hold a number that would take ten characters written out.
-    var writing = File::Open(allocator, path, OpenOptions::Writing(), @error);
-    if !writing.IsOpen() {
-        PrintLine("could not open for writing");
-        return 1;
-    }
-    var taken: uint = 0;
+    var writing = File::Open(allocator, path, OpenOptions::Writing())?;
     var asChars: char8[4];
     for i in 0..4u {
         asChars[i] = little[i] as char8;
     }
     let payload: char8[..] = asChars[..4];
-    writing.Write(payload, @taken);
-    writing.Close();
+    let taken = writing.Write(payload)?;
+    writing.Close()?;
     PrintLine("wrote           {} bytes", taken);
 
     // Reading them back and reassembling the number, using the same order it
     // was written in.
-    var reading = File::Open(allocator, path, OpenOptions::Reading(), @error);
-    if !reading.IsOpen() {
-        PrintLine("could not open for reading");
-        return 1;
-    }
+    var reading = File::Open(allocator, path, OpenOptions::Reading())?;
     var raw: char8[4];
-    var filled: uint = 0;
-    reading.Read(raw[..4], @filled);
-    reading.Close();
+    let filled = reading.Read(raw[..4])?;
+    reading.Close()?;
 
     var recovered: uint32 = 0u32;
     var recoveredBytes: uint8[4];
@@ -90,6 +83,5 @@ func Main() -> int {
     // That is the failure mode worth remembering: mismatched byte order does
     // not error, it just gives the wrong answer.
 
-    DeleteFile(allocator, path);
-    return 0;
+    DeleteFile(allocator, path)?;
 }
