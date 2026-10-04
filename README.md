@@ -223,6 +223,7 @@ Pointers, raw memory and allocators.
 
 Numbers in depth.
 
+- 16.1 **[WideInteger](Numbers/WideInteger/)** — 128-, 256- and 512-bit integers
 - 16.11 **[Math](Numbers/Math/)** — roots, powers, logarithms, trigonometry, and rounding
 
 ### 17. Collections

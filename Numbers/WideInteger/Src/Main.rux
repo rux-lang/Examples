@@ -1,0 +1,49 @@
+// `int128`, `int256` and `int512`, and their unsigned twins `uint128` to `uint512`, are integers
+// wider than any machine register. The compiler spreads each one over several machine words and
+// carries between them, so a wide integer is slower than an `int64` but every bit as exact. Use
+// one when a number really can outgrow 64 bits: a large factorial, a 128-bit identifier, the
+// arithmetic inside cryptography.
+//
+// Everything you know about integers still applies: the same operators, the same `Min` and `Max`,
+// the same wrap-around at the edges. Two things are worth knowing. A literal bigger than 64 bits
+// needs a wide type to land in, given by an annotation or a suffix such as `u128` or `i256`. And a
+// narrower integer never becomes a wide one by itself: `int32` widens to `int64` silently, but
+// `int64` to `int128` must be written with `as`.
+import Core::{ int128, int64, uint128, uint256, uint512, uint64 };
+import Io::PrintLine;
+
+func Main() -> int {
+    // 2^64 is one more than the largest `uint64`, so it needs a wider home.
+    PrintLine("uint64 max   {}", uint64::Max);
+    let next: uint128 = 18446744073709551616;
+    PrintLine("one more     {}", next);
+
+    // A suffix types the literal on the spot, and hex digits and `_` separators work at any width.
+    let avogadro = 602214076000000000000000u128;
+    let mask = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFFu128;
+    PrintLine("avogadro     {}", avogadro);
+    PrintLine("mask is max  {}", mask == uint128::Max);
+
+    // A `uint64` can hold 20! but not 21!. A `uint128` reaches 34!.
+    var factorial: uint128 = 1;
+    for n in 1..=34 {
+        factorial *= n as uint128;
+    }
+    PrintLine("34!          {}", factorial);
+
+    // The left side of a shift decides its type, so it carries the suffix. A plain `1 << 200`
+    // would be an `int`, which has no bit 200.
+    let power = 1u256 << 200;
+    PrintLine("2^200        {}", power);
+
+    // Crossing into a wide type is explicit, even when nothing can be lost.
+    let balance: int64 = -42;
+    let wide = balance as int128;
+    PrintLine("widened      {}", wide * 1_000_000_000_000_000_000_000i128);
+
+    // The edges behave like every other integer's: one past the maximum wraps to the minimum.
+    PrintLine("int128 max   {}", int128::Max);
+    PrintLine("max + 1      {}", int128::Max + 1);
+    PrintLine("uint512 max  {}", uint512::Max);
+    return 0;
+}
