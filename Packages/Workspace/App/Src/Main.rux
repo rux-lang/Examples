@@ -1,0 +1,29 @@
+// A project often grows into several packages that are worked on together: a program and the
+// libraries it is built from. A workspace keeps them in one tree under a single root manifest.
+//
+// The root `Rux.toml` of this lesson has no `[Package]` section. It has `[Workspace]` instead,
+// listing every member by its directory:
+//
+//     [Workspace]
+//     Packages = [
+//         "App",
+//         "Temperature",
+//     ]
+//
+// The list is explicit. There are no wildcards, and a member must sit inside the root, so adding
+// a package to the project means adding a line here. A workspace is not a package: it declares no
+// dependencies, has no source of its own and builds nothing, so the program is run from its own
+// member directory.
+//
+// Membership does not create dependencies either. This program still names the library in its
+// own manifest, `Temperature = { Path = "../Temperature" }`, exactly as a lone package would.
+import Io::PrintLine;
+import Temperature::ToFahrenheit;
+
+func Main() -> int {
+    let readings: float64[4] = [-40.0, 0.0, 21.5, 100.0];
+    for celsius in readings {
+        PrintLine("{} C = {} F", celsius, ToFahrenheit(celsius));
+    }
+    return 0;
+}

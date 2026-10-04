@@ -314,6 +314,7 @@ Modules, packages, libraries and tools.
 - 22.2 **[Visibility](Packages/Visibility/)** — choose what a package shows to others with `pub`
 - 22.3 **[Package](Packages/Package/)** — what a manifest says about a package
 - 22.4 **[Dependency](Packages/Dependency/)** — depend on another package
+- 22.5 **[Workspace](Packages/Workspace/)** — build several packages together
 
 ### 23. Compile time
 
