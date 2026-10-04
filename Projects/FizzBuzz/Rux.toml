@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "FizzBuzz"
 Version = "0.1.0"
 Type = "Executable"
-Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Description = "The classic counting game, built from if, % and for"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
