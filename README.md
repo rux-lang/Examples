@@ -127,7 +127,7 @@ Containers from the `Collections` package.
 
 Algorithms over slices from the `Algorithms` package.
 
-- **[Algorithm](Algorithm/)** — sort, search, and fold over the containers built so far _(being split into the lessons above)_
+- **[Algorithm](Algorithms/Algorithm/)** — sort, search, and fold over the containers built so far _(being split into the lessons above)_
 
 ### 19. Files
 
