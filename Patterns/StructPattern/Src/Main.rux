@@ -2,11 +2,13 @@
 // height: int32; }`. The pattern for such a case looks like the literal that builds it, with
 // names where the values were: `.Rectangle { width, height } =>`.
 //
-// Each field in the pattern binds a variable. Three spellings cover what you usually need:
+// Each field in the pattern binds a variable or tests a value. Four spellings cover what you
+// usually need:
 //
 //     .Circle { radius }                bind the field to a variable of the same name
 //     .Circle { radius: r }             bind the field to a name of your choosing
 //     .Rectangle { width, height: _ }   ignore a field you do not need
+//     .Circle { radius: 0 }             match only when the field holds this value
 //
 // Fields are found by name, so their order in the pattern does not matter. What does matter is
 // that every field is mentioned: leave one out and the compiler stops with
@@ -39,14 +41,27 @@ func Width(shape: Shape) -> int32 {
     };
 }
 
+// Testing. A literal in a field picks out the cases holding that value. Arms are tried in order, so
+// the circle with a `0` comes first and the plain circle arm below it catches every other radius.
+func Kind(shape: Shape) -> char8[..] {
+    return match shape {
+        .Circle { radius: 0 } => "dot",
+        .Circle { radius: _ } => "circle",
+        .Rectangle { width: _, height: _ } => "rectangle",
+        .Triangle { base: _, height: _ } => "triangle"
+    };
+}
+
 func Main() -> int {
-    let shapes: Shape[3] = [
+    let shapes: Shape[4] = [
         Shape::Circle { radius: 5 },
         Shape::Rectangle { width: 4, height: 6 },
-        Shape::Triangle { base: 10, height: 3 }
+        Shape::Triangle { base: 10, height: 3 },
+        Shape::Circle { radius: 0 }
     ];
-    for index in 0..3 {
-        PrintLine("width {:2}, area {}", Width(shapes[index]), Area(shapes[index]));
+    for index in 0..4 {
+        PrintLine("{:9} width {:2}, area {}", Kind(shapes[index]), Width(shapes[index]),
+            Area(shapes[index]));
     }
     return 0;
 }

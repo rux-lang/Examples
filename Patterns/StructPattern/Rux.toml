@@ -6,8 +6,8 @@ MinRux = "0.4.0"
 Name = "StructPattern"
 Version = "0.1.0"
 Type = "Executable"
+Description = "Struct patterns: binding, renaming, ignoring and testing a variant case's named fields"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Struct patterns: binding, renaming and ignoring a variant case's named fields"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }
