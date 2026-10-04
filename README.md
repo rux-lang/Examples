@@ -203,6 +203,7 @@ Strings, characters, formatting, parsing and input.
 - 14.5 **[StringBuilder](Text/StringBuilder/)** — build text a piece at a time
 - 14.6 **[Utf8](Text/Utf8/)** — check and decode UTF-8 bytes
 - 14.7 **[Unicode](Text/Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
+- 14.8 **[UnicodeCase](Text/UnicodeCase/)** — change case beyond ASCII, where one letter can become two
 - 14.9 **[Format](Text/Format/)** — control width and alignment when formatting values
 
 ### 15. Memory
