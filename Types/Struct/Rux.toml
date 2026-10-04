@@ -7,7 +7,7 @@ Name = "Struct"
 Version = "0.1.0"
 Type = "Executable"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
-Description = "Declaring a struct, its methods, and its constructor"
+Description = "Grouping named fields into a type of its own, and building it with a struct literal"
 
 [Dependencies]
 Io = { Namespace = "Rux", Version = "*" }

@@ -1,70 +1,52 @@
-// A tuple groups values by position. A struct groups them by name, and gives
-// the group a type of its own — so `width` and `height` cannot be swapped by
-// accident the way `.0` and `.1` can.
+// A tuple groups values by position. A struct groups them by name, and gives the group a type of
+// its own: a `Point` is not just any two numbers, and its `x` cannot be mistaken for its `y` the
+// way `.0` can be mistaken for `.1`.
+//
+// This lesson is only about the data: declaring the fields, building a value with a struct
+// literal, and reading and writing the fields. Functions that belong to a struct come a few
+// lessons later.
 import Io::PrintLine;
 
-// Fields are declared with their types, each ending in a semicolon.
-struct Rectangle {
-    width: float64;
-    height: float64;
+// A declaration lists the fields, each with its type and a closing semicolon.
+struct Point {
+    x: int;
+    y: int;
 }
 
-// `extend` adds functions to a type. The type and its methods are declared
-// separately, so a struct is only ever a list of fields.
-extend Rectangle {
-    // A function inside `extend Rectangle` that takes no `self`, is named
-    // `Rectangle`, and returns a `Rectangle`, is a constructor. It is called as
-    // `Rectangle(3.0, 4.0)`.
-    func Rectangle(width: float64, height: float64) -> Rectangle {
-        return Rectangle { width: width, height: height };
-    }
+// A field may have any type, including another struct.
+struct Box {
+    corner: Point;
+    width: int;
+    height: int;
+}
 
-    // A method takes the value it works on as a first parameter called `self`.
-    // `&Rectangle` is a read-only borrow: this may look at the rectangle but
-    // not change it.
-    func Area(self: &Rectangle) -> float64 {
-        return self.width * self.height;
-    }
-
-    func Perimeter(self: &Rectangle) -> float64 {
-        return 2.0 * (self.width + self.height);
-    }
-
-    // `&var Rectangle` borrows it for writing, which is what a method that
-    // changes the value needs. The caller must hold it in a `var`.
-    func Scale(self: &var Rectangle, factor: float64) {
-        self.width *= factor;
-        self.height *= factor;
-    }
+// A struct is a type like any other, so a function can take one and give one back.
+func Shifted(point: Point, dx: int, dy: int) -> Point {
+    return Point { x: point.x + dx, y: point.y + dy };
 }
 
 func Main() -> int {
-    // A struct can be built by naming every field.
-    let plain = Rectangle { width: 3.0, height: 4.0 };
-    PrintLine("plain      {} x {}   area {}", plain.width, plain.height, plain.Area());
+    // A struct literal is the type's name and a value for every field. The fields may come in
+    // any order, but none may be left out: `Point { x: 1 }` is rejected for missing `y`.
+    let origin = Point { x: 0, y: 0 };
+    let corner = Point { y: 2, x: 5 };
+    PrintLine("origin  ({}, {})", origin.x, origin.y);
+    PrintLine("corner  ({}, {})", corner.x, corner.y);
 
-    // Or through the constructor, which is the same thing with the field names
-    // written once, inside the type, instead of at every call.
-    let built = Rectangle(2.0, 5.0);
-    PrintLine("built      {} x {}   area {}", built.width, built.height, built.Area());
-    PrintLine("perimeter  {}", built.Perimeter());
+    // A field holding a struct is read by chaining the dots.
+    let box = Box { corner: corner, width: 4, height: 3 };
+    PrintLine("box     at ({}, {}), {} by {}", box.corner.x, box.corner.y, box.width, box.height);
 
-    // A method that writes needs a `var` to work on. `plain` above is a `let`,
-    // so calling `Scale` on it would be rejected the same way assigning to it
-    // would be.
-    var growing = Rectangle(1.0, 2.0);
-    growing.Scale(3.0);
-    PrintLine("scaled     {} x {}", growing.width, growing.height);
+    // A field is assigned like a variable, and the same rule applies: the binding must be a
+    // `var`. Under `let` the whole struct is read-only, every field included.
+    var cursor = Point { x: 1, y: 1 };
+    cursor.x = 10;
+    cursor.y += 5;
+    PrintLine("cursor  ({}, {})", cursor.x, cursor.y);
 
-    // Assigning a struct copies it. `copy` and `growing` are two rectangles
-    // from here on, and changing one leaves the other alone.
-    var copy = growing;
-    copy.Scale(2.0);
-    PrintLine("copy       {} x {}", copy.width, copy.height);
-    PrintLine("original   {} x {}", growing.width, growing.height);
-
-    // That is true because both fields are `float64`. A struct holding
-    // something it owns — memory, a file — copies differently, and that is
-    // what the Ownership lesson is about.
+    // `Shifted` was handed a copy of `cursor` and built a new point, so `cursor` is unchanged.
+    let moved = Shifted(cursor, -3, 4);
+    PrintLine("moved   ({}, {})", moved.x, moved.y);
+    PrintLine("cursor  ({}, {})", cursor.x, cursor.y);
     return 0;
 }
