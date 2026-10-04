@@ -1,0 +1,66 @@
+// Sometimes a program only needs to know *which* member a sum holds, not what is inside it.
+// `value is T` answers that with a plain `bool`: true when the active member is `T`. Put a smaller
+// sum in parentheses, `value is (Plus | Minus)`, and it is true when the active member is any one
+// of them. The parentheses are required: `token is Plus | Minus` is refused with
+//       error: a sum type after 'is' must be grouped
+//
+// Two things `is` does not do:
+//
+// - It does not narrow. Inside `if token is Number { ... }`, `token` is still the whole sum, so
+//   `token.value` is rejected:
+//       error: type 'Minus | Name | Number | Plus' has no field 'value'
+//   To use what is inside, bind it with a typed pattern in a `match`.
+//
+// - It does not quietly answer `false`. A test that could never be true is a mistake, and the
+//   compiler says so. `token is bool` is refused because `bool` is not one of the members:
+//       error: type 'bool8' is not a member or subset of sum 'Minus | Name | Number | Plus'
+//   On a value that is not a sum at all, `is` compares exact types, and a mismatch is an error
+//   too. The counter `numbers` is an `int`, so `numbers is bool` gives
+//       error: 'is bool8' can never be true for a value of type 'int'
+import Io::PrintLine;
+
+// The pieces of the expression `price + 2 - discount + 1`, as a tokenizer might hand them over.
+struct Number {
+    value: int32;
+}
+
+struct Name {
+    text: char8[..];
+}
+
+struct Plus {}
+
+struct Minus {}
+
+type Token = Number | Name | Plus | Minus;
+
+func Main() -> int {
+    // Each token is annotated as a `Token` first, so the array below holds sums, not numbers.
+    let a: Token = Name { text: "price" };
+    let b: Token = Plus {};
+    let c: Token = Number { value: 2 };
+    let d: Token = Minus {};
+    let e: Token = Name { text: "discount" };
+    let f: Token = Plus {};
+    let g: Token = Number { value: 1 };
+    let tokens: Token[7] = [a, b, c, d, e, f, g];
+
+    var numbers = 0;
+    var operators = 0;
+    for token in tokens {
+        // `is` only asks; the token is untouched and keeps its type.
+        if token is Number {
+            numbers++;
+        }
+        if token is (Plus | Minus) {
+            operators++;
+        }
+    }
+    PrintLine("{} numbers, {} operators", numbers, operators);
+
+    // The result is an ordinary boolean, so it can be stored and printed like one.
+    let startsWithName = a is Name;
+    PrintLine("starts with a name: {}", startsWithName);
+    PrintLine("ends with a number: {}", g is Number);
+    return 0;
+}
