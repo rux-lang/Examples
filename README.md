@@ -17,6 +17,7 @@ First programs: printing, values and their types.
 - 1.2 **[Comment](Basics/Comment/)** — explain code with `//` and `/* */` comments, which can nest
 - 1.3 **[Variable](Basics/Variable/)** — name a value with `let`, and let the compiler infer its type
 - 1.4 **[Mutable](Basics/Mutable/)** — declare a binding with `var` so it can be reassigned
+- 1.5 **[Integer](Basics/Integer/)** — whole numbers: signed and unsigned widths, `int` and `uint`
 - 1.10 **[Console](Basics/Console/)** — write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
 - 1.11 **[Const](Basics/Const/)** — name a value the compiler folds in, and see where it differs from `let`
 - 1.12 **[Convert](Basics/Convert/)** — convert between numeric types with `as`, and see what a value that does not fit becomes

@@ -1,0 +1,49 @@
+// An integer is a whole number stored in a fixed number of bits, and the type's name says how
+// many. `int8`, `int16`, `int32`, `int64`, `int128`, `int256` and `int512` are signed: they hold
+// negative and positive numbers. `uint8` through `uint512` are unsigned: they hold only zero and
+// up, and spend the bit a signed type uses for the sign on reaching twice as far.
+//
+// Every integer type knows its own limits, as `Min` and `Max`. Those two names are declared in the
+// standard `Core` package, so this lesson imports each type it asks about, and its Rux.toml lists
+// `Core` as a dependency next to `Io`.
+import Core::{ int, int128, int16, int32, int64, int8 };
+import Core::{ uint, uint16, uint32, uint512, uint64, uint8 };
+import Io::PrintLine;
+
+func Main() -> int {
+    // Signed: each extra byte of width multiplies the range by 256.
+    PrintLine("int8     {} to {}", int8::Min, int8::Max);
+    PrintLine("int16    {} to {}", int16::Min, int16::Max);
+    PrintLine("int32    {} to {}", int32::Min, int32::Max);
+    PrintLine("int64    {} to {}", int64::Min, int64::Max);
+
+    // Unsigned: the same widths, starting at zero.
+    PrintLine("uint8    {} to {}", uint8::Min, uint8::Max);
+    PrintLine("uint16   {} to {}", uint16::Min, uint16::Max);
+    PrintLine("uint32   {} to {}", uint32::Min, uint32::Max);
+    PrintLine("uint64   {} to {}", uint64::Min, uint64::Max);
+
+    // The wide types are for numbers no machine register holds, such as the ones cryptography
+    // and exact arithmetic work with. They are ordinary integers all the same.
+    PrintLine("int128   max {}", int128::Max);
+    PrintLine("uint512  max {}", uint512::Max);
+
+    // `int` and `uint` have no number in their name because the target machine picks their
+    // width: they are as wide as a memory address, 64 bits on today's desktop systems. A whole
+    // number with no type written is an `int`, which is why `Main` returns one.
+    PrintLine("int      {} bits", int::Bits);
+    PrintLine("uint     {} bits", uint::Bits);
+
+    // `byte` is another name for `uint8`, used when a value is raw storage rather than a number.
+    let level: byte = 200;
+    PrintLine("byte     {}", level);
+
+    // A value has to fit the type it is given, and the compiler checks every literal:
+    //
+    //     let tooBig: uint8 = 256;
+    //         error: integer literal is out of range for type 'uint8'
+    //
+    // And `Min`, `Max` and `Bits` exist only once their type is imported from `Core`. Without
+    // the import the compiler reports "'Max' not found in extend for type 'int8'".
+    return 0;
+}
