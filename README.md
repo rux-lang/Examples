@@ -284,7 +284,6 @@ Time, randomness, hashing and identifiers.
 - 20.2 **[Stopwatch](Utilities/Stopwatch/)** — measure how long something takes
 - 20.3 **[Date](Utilities/Date/)** — calendar dates, parsing them, and leap years
 - 20.5 **[Random](Utilities/Random/)** — a reproducible random number generator
-- **[Time](Utilities/Time/)** — measure elapsed time, work with durations, and format a calendar date _(being split into the lessons above)_
 
 ### 21. Data formats
 
