@@ -1,0 +1,52 @@
+// A literal pattern matches one value. A range pattern matches a whole run of them, written with
+// the same two operators as a range in a `for` loop:
+//
+//     200..=299   from 200 up to and including 299
+//     0..10       from 0 up to, but not including, 10
+//
+// That turns "is the value between these two numbers?" into a single arm instead of a pair of
+// comparisons, and a ladder of ranges reads like the table it came from.
+//
+// Both ends must be literal numbers. A named constant is not accepted as an end, because a bare
+// name in a pattern means "bind a new variable" — the compiler says so and stops. Ranges work on
+// integers only; characters are matched one at a time (see the CharacterPattern lesson).
+import Io::PrintLine;
+
+// Inclusive ranges, `..=`, suit a table whose rows name their first and last value.
+func Status(code: int32) -> char8[..] {
+    return match code {
+        100..=199 => "informational",
+        200..=299 => "success",
+        300..=399 => "redirection",
+        400..=499 => "client error",
+        500..=599 => "server error",
+        else => "not a status code"
+    };
+}
+
+// Exclusive ranges, `..`, suit boundaries: each range stops where the next one starts, so no value
+// falls between two arms and none is claimed twice. Ranges mix freely with literal arms, and a
+// negative end is written with its minus sign.
+func Size(count: int32) -> char8[..] {
+    return match count {
+        0 => "none",
+        1..10 => "a few",
+        10..100 => "dozens",
+        100..1000 => "hundreds",
+        -1000..0 => "a debt",
+        else => "a lot"
+    };
+}
+
+func Main() -> int {
+    let codes: int32[4] = [204, 302, 404, 99];
+    for index in 0..4 {
+        PrintLine("{} {}", codes[index], Status(codes[index]));
+    }
+
+    let counts: int32[5] = [0, 9, 10, 250, -3];
+    for index in 0..5 {
+        PrintLine("{} is {}", counts[index], Size(counts[index]));
+    }
+    return 0;
+}

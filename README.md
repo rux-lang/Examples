@@ -88,6 +88,7 @@ Declaring types of your own.
 Everything a `match` arm can say.
 
 - 7.1 **[Guard](Patterns/Guard/)** — add an `if` condition to a match arm
+- 7.2 **[RangePattern](Patterns/RangePattern/)** — match a whole range of numbers in one arm
 
 ### 8. Optionals
 
