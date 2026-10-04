@@ -25,7 +25,6 @@ First programs: printing, values and their types.
 - 1.10 **[Console](Basics/Console/)** — write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
 - 1.11 **[Const](Basics/Const/)** — name a value the compiler folds in, and see where it differs from `let`
 - 1.12 **[Convert](Basics/Convert/)** — convert between numeric types with `as`, and see what a value that does not fit becomes
-- **[Primitive](Basics/Primitive/)** — declare and print every primitive type, from `int8` to `char32` _(being split into the lessons above)_
 
 ### 2. Operators
 
