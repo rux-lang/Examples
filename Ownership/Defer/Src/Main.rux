@@ -1,66 +1,58 @@
-// The Memory lesson had a problem it did not dwell on: every way out of the
-// function needs its own `Free`. Add an early return and it is easy to leave
-// one behind, and the leak is invisible.
+// Some work has to be undone however a function ends: a valve that is opened must be closed, on
+// the normal path and on every early `return` as well. Writing the close before each exit is easy
+// to get wrong, and the mistake is silent.
 //
-// `defer` fixes that by moving the cleanup next to the thing it cleans up. The
-// statement runs when the scope ends, however it ends.
-import Io::{ Print, PrintLine };
-import Memory::{ Alloc, Free, Zero };
+// `defer` registers a statement now and runs it when the enclosing scope ends, by whichever way
+// it ends. So the cleanup is written once, on the line right after the work it undoes, where a
+// reader can check that the two match.
+//
+// Several defers run in reverse order: the last one registered runs first. That is the order
+// cleanup usually needs, because what was set up last tends to depend on what came before it.
+//
+// A destructor cleans up after a value. `defer` is for cleanup that belongs to a piece of work
+// rather than to any one value's life.
+import Io::PrintLine;
 
-func Ordering() {
-    PrintLine("    body starts");
-    defer PrintLine("    deferred A");
-    defer PrintLine("    deferred B");
-    PrintLine("    body ends");
+struct Valve {
+    name: char8[..];
 }
 
-// Two exits, one `Free`. The release is written once, beside the allocation,
-// and happens on whichever path is taken.
-func SumTo(count: uint, failEarly: bool) -> uint {
-    let size = count * sizeof(uint);
-    var values = Alloc(size) as *var uint;
-    if values == null {
-        return 0;
+extend Valve {
+    func Open(self: &Valve) {
+        PrintLine("    open {}", self.name);
     }
 
-    // From here on, no matter how this function ends, the memory goes back.
-    defer Free(values);
-    defer PrintLine("    releasing the block");
+    func Close(self: &Valve) {
+        PrintLine("    close {}", self.name);
+    }
+}
 
-    Zero(values, size);
-    for i in 0..count {
-        values[i] = i + 1;
+func Fill(litres: int32) -> bool {
+    let supply = Valve { name: "supply" };
+    supply.Open();
+    defer supply.Close();
+
+    let drain = Valve { name: "drain" };
+    drain.Open();
+    defer drain.Close();
+
+    // An early exit. Both valves are still closed, drain first.
+    if litres > 100 {
+        PrintLine("    {} litres is too much, stopping", litres);
+        return false;
     }
 
-    // An early exit. Without the `defer` above this line would leak, and
-    // nothing would say so.
-    if failEarly {
-        PrintLine("    leaving early");
-        return 0;
-    }
-
-    var total: uint = 0;
-    for i in 0..count {
-        total += values[i];
-    }
-    return total;
+    PrintLine("    filling {} litres", litres);
+    return true;
 }
 
 func Main() -> int {
-    // Deferred statements run in reverse order — last scheduled, first run.
-    // That matches how things are usually built up: the thing set up last
-    // depends on the ones before it, so it is undone first.
-    PrintLine("ordering:");
-    Ordering();
+    PrintLine("fill 40:");
+    let first = Fill(40);
+    PrintLine("    filled: {}", first);
 
-    PrintLine("normal path:");
-    PrintLine("    sum of 1..5 is {}", SumTo(5, false));
-
-    PrintLine("early exit:");
-    PrintLine("    result {}", SumTo(5, true));
-
-    // The value a function returns is worked out before its deferred
-    // statements run, so cleanup cannot change the answer on its way out.
-    PrintLine("done");
+    PrintLine("fill 500:");
+    let second = Fill(500);
+    PrintLine("    filled: {}", second);
     return 0;
 }
