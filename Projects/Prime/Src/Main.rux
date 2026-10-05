@@ -26,7 +26,7 @@ func Main() -> int {
     // multiple k * n, with k below n, also has the factor k, so the pass for k (or for a prime
     // factor of k) has already crossed it out. For the same reason the passes can stop once
     // n * n reaches the limit, because such an n has no multiples left to visit.
-    var n: uint = 2;
+    var n = 2;
     while n * n < Limit {
         if !crossedOut[n] {
             var multiple = n * n;

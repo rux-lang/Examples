@@ -16,6 +16,7 @@ rux run
 (-1, 5) is above the x axis, 5 up
 (2, -7) is below the x axis
 1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz
+rain without wind: take an umbrella
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/tuple-pattern

@@ -7,13 +7,12 @@
 //
 //     .Circle { radius }                bind the field to a variable of the same name
 //     .Circle { radius: r }             bind the field to a name of your choosing
-//     .Rectangle { width, height: _ }   ignore a field you do not need
+//     .Rectangle { width }              leave out a field you do not need
 //     .Circle { radius: 0 }             match only when the field holds this value
 //
-// Fields are found by name, so their order in the pattern does not matter. What does matter is
-// that every field is mentioned: leave one out and the compiler stops with
-//     error: pattern for 'Shape::Rectangle' expects 2 fields, but found 1
-// Writing `height: _` is how you say "I know about this field and I do not need it".
+// Fields are found by name, so their order in the pattern does not matter. A field left out
+// matches anything, as if it were written `height: _`, and `.Rectangle {}` leaves out every field.
+// Writing `height: _` anyway says "I know about this field and I do not need it".
 import Io::PrintLine;
 
 variant Shape {
@@ -31,24 +30,26 @@ func Area(shape: Shape) -> int32 {
     };
 }
 
-// Renaming and ignoring. `radius: r` reads the radius into `r`; `height: _` and `base: _` skip the
-// fields this question does not need; and the triangle lists its fields in the opposite order.
+// Renaming and ignoring. `radius: r` reads the radius into `r`; the rectangle leaves out the
+// height this question does not need; and the triangle skips it with `height: _`, listing its
+// fields in the opposite order.
 func Width(shape: Shape) -> int32 {
     return match shape {
         .Circle { radius: r } => 2 * r,
-        .Rectangle { width, height: _ } => width,
+        .Rectangle { width } => width,
         .Triangle { height: _, base } => base
     };
 }
 
 // Testing. A literal in a field picks out the cases holding that value. Arms are tried in order, so
 // the circle with a `0` comes first and the plain circle arm below it catches every other radius.
+// The other arms test no field, so `{}` leaves every field out.
 func Kind(shape: Shape) -> char8[..] {
     return match shape {
         .Circle { radius: 0 } => "dot",
-        .Circle { radius: _ } => "circle",
-        .Rectangle { width: _, height: _ } => "rectangle",
-        .Triangle { base: _, height: _ } => "triangle"
+        .Circle {} => "circle",
+        .Rectangle {} => "rectangle",
+        .Triangle {} => "triangle"
     };
 }
 

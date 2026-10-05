@@ -20,7 +20,7 @@
 //
 //     month 13 does not exist
 //     Panic: a month is always 1 to 12
-//       at BadMonth (Src/Main.rux:30:10)
+//       at BadMonth (Src/Main.rux:30:5)
 import Core::Panic;
 import Io::PrintLine;
 
@@ -47,7 +47,7 @@ func Main() -> int {
     let start: uint = 11;
     var total = 0;
     for offset in 0..4 {
-        let month = (start - 1 + offset) % 12 + 1;
+        let month = (start - 1 + offset as uint) % 12 + 1;
         let days = DaysIn(month);
         total += days;
         PrintLine("month {:2}: {} days", month, days);
