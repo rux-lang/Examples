@@ -29,7 +29,7 @@ Combining values into new ones.
 
 - 2.1 **[Arithmetic](Operators/Arithmetic/)** — add, subtract, multiply, divide and take the remainder
 - 2.2 **[Comparison](Operators/Comparison/)** — compare two values with `==`, `!=`, `<`, `<=`, `>` and `>=`
-- 2.3 **[Logical](Operators/Logical/)** — combine conditions with `&&`, `
+- 2.3 **[Logical](Operators/Logical/)** — combine conditions with `&&`, `||` and `!`
 - 2.4 **[Assignment](Operators/Assignment/)** — update a variable in place with `+=`, `-=`, `++` and friends
 - 2.5 **[Precedence](Operators/Precedence/)** — which operator binds first, and how parentheses change it
 
@@ -130,7 +130,7 @@ Operations that can fail: `T ! E`.
 - 9.8 **[Propagate](Errors/Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
 - 9.9 **[ErrorVariant](Errors/ErrorVariant/)** — describe the ways an operation can fail with a variant
 - 9.10 **[ErrorMapping](Errors/ErrorMapping/)** — add context to an error as it passes through with `? else (e => ...)`
-- 9.11 **[ErrorSum](Errors/ErrorSum/)** — fail in more than one way with an error sum `A 
+- 9.11 **[ErrorSum](Errors/ErrorSum/)** — fail in more than one way with an error sum `A | B`
 - 9.12 **[FallibleMain](Errors/FallibleMain/)** — let `Main` itself fail, and see the exit status
 - 9.13 **[AbsenceToError](Errors/AbsenceToError/)** — turn a missing value into a failure with `?? fail`
 - 9.14 **[NestedFallible](Errors/NestedFallible/)** — results inside results: `T? ! E` and `(T ! E1) ! E2`
@@ -141,7 +141,7 @@ Operations that can fail: `T ! E`.
 
 A value that is one of several types: `A | B`.
 
-- 10.1 **[SumType](SumTypes/SumType/)** — a value that can be an `int32` or a `bool`: `int32 
+- 10.1 **[SumType](SumTypes/SumType/)** — a value that can be an `int32` or a `bool`: `int32 | bool`
 - 10.2 **[TypedPattern](SumTypes/TypedPattern/)** — match a sum by the type it holds
 - 10.3 **[SubsetPattern](SumTypes/SubsetPattern/)** — match several members of a sum in one arm
 - 10.4 **[Is](SumTypes/Is/)** — ask which type a sum holds with `is`
@@ -234,7 +234,7 @@ Numbers in depth.
 - 16.1 **[WideInteger](Numbers/WideInteger/)** — 128-, 256- and 512-bit integers
 - 16.2 **[NumberLimit](Numbers/NumberLimit/)** — the smallest and largest value each number type can hold
 - 16.3 **[FloatSpecial](Numbers/FloatSpecial/)** — infinity and NaN, and how they compare
-- 16.4 **[Bitwise](Numbers/Bitwise/)** — `&`, `
+- 16.4 **[Bitwise](Numbers/Bitwise/)** — `&`, `|`, `^` and `~`: set, clear, flip and test bits with masks
 - 16.5 **[Shift](Numbers/Shift/)** — move bits left and right with `<<`, `>>` and `>>>`
 - 16.6 **[CheckedArithmetic](Numbers/CheckedArithmetic/)** — detect overflow instead of getting a wrong answer
 - 16.7 **[WrappingArithmetic](Numbers/WrappingArithmetic/)** — arithmetic that wraps around or saturates on purpose
