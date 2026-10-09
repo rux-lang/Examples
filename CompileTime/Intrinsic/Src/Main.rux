@@ -1,17 +1,18 @@
 // `int8::Max`, `#target` and `Assert` have always come from `Core`, so they can look like part of
-// the language. They are not. The compiler knows how to implement them, but a program reaches them
-// only through *declarations*, and `Core` is simply the package that usually provides those
-// declarations. An `intrinsic` declaration names something the compiler supplies and gives its
-// type, with no body.
+// the language. They are not. The type `int8` is built in, but its constants come from an
+// extension, and `#target` and `Assert` from *declarations*; `Core` is simply the package that
+// usually provides both. An `intrinsic` declaration names something the compiler supplies and
+// gives its type, with no body.
 //
 // This lesson takes the declarations from `Basis`, a small provider package beside this one,
 // instead of from `Core`. Open `Basis/Src/Basis.rux`: it is a handful of lines, and the program
 // below works the same as it would with `Core`.
 //
-// Only real intrinsics can be declared this way. `intrinsic type int7` is refused because "'int7'
-// is not a supported intrinsic scalar type", and an `intrinsic func` the compiler does not
-// implement "is not a supported intrinsic function". Writing a provider is a way to replace
-// `Core`, not a way to invent new language features.
+// Only real intrinsics can be declared this way. An `intrinsic func` the compiler does not
+// implement "is not a supported intrinsic function", and a type cannot be declared at all: every
+// primitive is built in, so `intrinsic type int7` is refused because "intrinsic type declarations
+// have been removed". Writing a provider is a way to replace `Core`, not a way to invent new
+// language features.
 import Basis::{ #target, Assert, float64, int8 };
 import Io::PrintLine;
 

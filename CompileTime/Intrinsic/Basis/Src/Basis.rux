@@ -1,19 +1,16 @@
-// Everything here is a declaration the compiler already knows how to implement. `intrinsic` says
-// "the compiler supplies this; here is its name and its type", and gives it no body. The package
-// gets no special powers from this: Core declares the same things in exactly the same way.
+// Everything here is either an extension of a built-in type or a declaration the compiler already
+// knows how to implement. `intrinsic` says "the compiler supplies this; here is its name and its
+// type", and gives it no body. The package gets no special powers from this: Core declares the
+// same things in exactly the same way.
 
-// The one-byte signed integer. Its arithmetic belongs to the compiler; the constants are ordinary
-// source, so the provider chooses which ones to offer.
-pub intrinsic type int8;
-
+// The one-byte signed integer is built into the compiler, so nothing declares it. Its constants
+// are ordinary source in an extension, so the provider chooses which ones to offer.
 extend int8 {
     pub const Min: int8 = -128i8;
     pub const Max: int8 = 127i8;
 }
 
 // Infinity cannot be written as a literal, so the compiler supplies its value.
-pub intrinsic type float64;
-
 extend float64 {
     pub intrinsic const Infinity: float64;
 }

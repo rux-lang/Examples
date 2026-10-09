@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "Intrinsic"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Declaring compiler-provided types and values in a provider package of your own"
+Description = "Declaring compiler-provided constants and values in a provider package of your own"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

@@ -1,6 +1,6 @@
 # Intrinsic
 
-See that `int8`, `#target` and `Assert` reach a program through `intrinsic` declarations, by taking them from a small provider package of your own instead of `Core`.
+See that `int8::Max`, `#target` and `Assert` reach a program through an extension and `intrinsic` declarations, by taking them from a small provider package of your own instead of `Core`.
 
 **You'll need:** [Dependency](https://rux-lang.dev/docs/learn/dependency), [Target](https://rux-lang.dev/docs/learn/target), [Assert](https://rux-lang.dev/docs/learn/assert)
 
