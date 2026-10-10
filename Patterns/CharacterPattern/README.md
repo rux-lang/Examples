@@ -1,6 +1,6 @@
 # CharacterPattern
 
-Match character literals and escapes such as `'w'` and `'\n'`, and use a guard for a class of characters.
+Match character literals and escapes such as `'w'` and `'\n'`, and a whole class of characters with a range such as `'a'..='z'`.
 
 **You'll need:** [Character](https://rux-lang.dev/docs/learn/character), [Match](https://rux-lang.dev/docs/learn/match), [Guard](https://rux-lang.dev/docs/learn/guard)
 
