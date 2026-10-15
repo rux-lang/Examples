@@ -4,7 +4,7 @@ Example projects and programming tutorials for the [Rux](https://rux-lang.dev) l
 
 ## The Course
 
-The course is read in order: each lesson is one package that teaches one idea, and assumes only the lessons before it. Each lesson has a page at `https://rux-lang.dev/docs/learn/<lesson>`. Parts 1–17 build the language step by step; Parts 18–24 tour the standard packages and can be read in any order once their prerequisites are done; Part 25 holds complete small programs.
+The course is read in order: each lesson is one package that teaches one idea, and assumes only the lessons before it. Each lesson has a page at `https://rux-lang.dev/docs/learn/<lesson>`. Parts 1–17 build the language step by step; Parts 18–26 tour the standard packages and can be read in any order once their prerequisites are done; Part 27 holds complete small programs.
 
 ### 1. Basics
 
@@ -207,6 +207,9 @@ Strings, characters, formatting, parsing and input.
 - 14.11 **[Render](Text/Render/)** — format values into a `String` instead of the console
 - 14.12 **[Parse](Text/Parse/)** — turn text into a number, and handle text that is not one
 - 14.13 **[Input](Text/Input/)** — read a line typed by the user, and notice when input ends
+- 14.14 **[JoinLines](Text/JoinLines/)** — split text into lines and join pieces back together, and change its case
+- 14.15 **[Regex](Text/Regex/)** — test and find matches of a regular expression
+- 14.16 **[RegexCapture](Text/RegexCapture/)** — capture groups, every match, splitting and replacing
 
 ### 15. Memory
 
@@ -226,6 +229,7 @@ Pointers, raw memory and allocators.
 - 15.12 **[FixedBuffer](Memory/FixedBuffer/)** — allocate from a buffer you provide
 - 15.13 **[Pool](Memory/Pool/)** — reuse fixed-size blocks instead of allocating new ones
 - 15.14 **[Zeroize](Memory/Zeroize/)** — clear sensitive memory explicitly
+- 15.15 **[Rc](Memory/Rc/)** — share one value between several owners with reference counting
 
 ### 16. Numbers
 
@@ -242,6 +246,7 @@ Numbers in depth.
 - 16.9 **[BitOperation](Numbers/BitOperation/)** — count, find and rotate bits
 - 16.10 **[Endian](Numbers/Endian/)** — write a number's bytes in a chosen byte order
 - 16.11 **[Math](Numbers/Math/)** — roots, powers, logarithms, trigonometry, and rounding
+- 16.12 **[Complex](Numbers/Complex/)** — complex numbers: arithmetic, magnitude and polar form
 
 ### 17. Collections
 
@@ -254,6 +259,10 @@ Containers from the `Collections` package.
 - 17.5 **[HashSet](Collections/HashSet/)** — test membership with a hash set
 - 17.6 **[TreeMap](Collections/TreeMap/)** — keep keys in order, and walk them in order
 - 17.7 **[TreeSet](Collections/TreeSet/)** — keep a set of values in order
+- 17.8 **[PriorityQueue](Collections/PriorityQueue/)** — always take the most urgent item next
+- 17.9 **[BitSet](Collections/BitSet/)** — a set of small integers kept as bits
+- 17.10 **[SmallVector](Collections/SmallVector/)** — a vector that keeps its first few items without allocating
+- 17.11 **[LruCache](Collections/LruCache/)** — a bounded cache that forgets the least recently used entry
 
 ### 18. Algorithms
 
@@ -264,6 +273,8 @@ Algorithms over slices from the `Algorithms` package.
 - 18.3 **[BinarySearch](Algorithms/BinarySearch/)** — find a value in sorted data quickly
 - 18.4 **[MinMax](Algorithms/MinMax/)** — the smallest and largest values, and the empty case
 - 18.5 **[Fold](Algorithms/Fold/)** — combine all elements into one value with a function
+- 18.6 **[IteratorAdaptor](Algorithms/IteratorAdaptor/)** — chain lazy steps such as map, filter and take over an iterator
+- 18.7 **[Scan](Algorithms/Scan/)** — running sums and scans, counting sequences and safe midpoints
 
 ### 19. Files
 
@@ -279,6 +290,7 @@ Paths, files and directories.
 - 19.8 **[BufferedIo](Files/BufferedIo/)** — buffer writes and flush them
 - 19.9 **[AtomicFile](Files/AtomicFile/)** — replace a file's contents all at once or not at all
 - 19.10 **[TemporaryFile](Files/TemporaryFile/)** — a scratch file that cleans up after itself
+- 19.11 **[MemoryStream](Files/MemoryStream/)** — read and write bytes in memory through the same reader and writer interfaces as a file
 
 ### 20. Utilities
 
@@ -293,6 +305,8 @@ Time, randomness, hashing and identifiers.
 - 20.7 **[Entropy](Utilities/Entropy/)** — unpredictable bytes from the operating system
 - 20.8 **[Hash](Utilities/Hash/)** — fast non-cryptographic hashes and checksums
 - 20.9 **[Uuid](Utilities/Uuid/)** — create, print and parse UUIDs
+- 20.10 **[NanoId](Utilities/NanoId/)** — short, URL-safe random identifiers
+- 20.11 **[TimeZone](Utilities/TimeZone/)** — turn a moment into local time in a time zone, and back
 
 ### 21. Data formats
 
@@ -303,6 +317,9 @@ Reading and writing JSON and TOML.
 - 21.3 **[JsonStream](DataFormats/JsonStream/)** — read JSON as a stream of events
 - 21.4 **[Toml](DataFormats/Toml/)** — parse a TOML document and read its values
 - 21.5 **[TomlWrite](DataFormats/TomlWrite/)** — write a TOML document
+- 21.6 **[BaseEncoding](DataFormats/BaseEncoding/)** — bytes as hexadecimal, Base64, Base32 and Base58 text
+- 21.7 **[Url](DataFormats/Url/)** — parse, resolve and build URLs and their queries
+- 21.8 **[Compress](DataFormats/Compress/)** — compress and decompress data in the Deflate, zlib and gzip formats
 
 ### 22. Packages
 
@@ -318,6 +335,8 @@ Modules, packages, libraries and tools.
 - 22.8 **[SharedLibrary](Packages/SharedLibrary/)** — build a shared library
 - 22.9 **[Documentation](Packages/Documentation/)** — document your code with `///` comments
 - 22.10 **[Tooling](Packages/Tooling/)** — format, lint, test and document with the `rux` tool
+- 22.11 **[UnitTest](Packages/UnitTest/)** — write `#Test()` functions with `Expect` checks and run them with `rux test`
+- 22.12 **[Benchmark](Packages/Benchmark/)** — measure how long code takes with the `Test` package's benchmarks
 
 ### 23. Compile time
 
@@ -341,26 +360,52 @@ Talking to the operating system and the machine.
 - 24.4 **[Asm](Platform/Asm/)** — write a function body in assembly
 - 24.5 **[AsmArm](Platform/AsmArm/)** — the same function in AArch64 assembly, chosen with `when`
 
-### 25. Projects
+### 25. Concurrency
+
+Threads, and the tools that let them share work safely.
+
+- 25.1 **[Thread](Concurrency/Thread/)** — start a thread, wait for its result, and ask how many can run at once
+- 25.2 **[Atomic](Concurrency/Atomic/)** — count across threads without a lock
+- 25.3 **[Mutex](Concurrency/Mutex/)** — guard shared data with a lock that only one thread holds at a time
+- 25.4 **[Arc](Concurrency/Arc/)** — share ownership of one value between threads
+- 25.5 **[Channel](Concurrency/Channel/)** — send values from one thread to another
+- 25.6 **[WaitGroup](Concurrency/WaitGroup/)** — wait until a group of threads has finished
+- 25.7 **[Once](Concurrency/Once/)** — run initialization exactly once, whichever thread gets there first
+- 25.8 **[RwLock](Concurrency/RwLock/)** — many readers at once, or one writer alone
+
+### 26. Systems
+
+Processes, command lines, logs and networks.
+
+- 26.1 **[Environment](Systems/Environment/)** — the program's arguments, environment variables and exit status
+- 26.2 **[ChildProcess](Systems/ChildProcess/)** — run another program and capture its output
+- 26.3 **[CommandLine](Systems/CommandLine/)** — declare options and arguments, and get the help text for free
+- 26.4 **[Log](Systems/Log/)** — structured log records with levels and typed fields
+- 26.5 **[IpAddress](Systems/IpAddress/)** — IPv4 and IPv6 addresses, and socket addresses with a port
+- 26.6 **[Tcp](Systems/Tcp/)** — a TCP server and client talking over the loopback interface
+- 26.7 **[Udp](Systems/Udp/)** — datagrams between two UDP sockets
+
+### 27. Projects
 
 Complete small programs. Each one needs only the parts before its checkpoint.
 
-- 25.1 **[Thanks](Projects/Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it _(after Control flow)_
-- 25.2 **[FizzBuzz](Projects/FizzBuzz/)** — the classic counting game _(after Control flow)_
-- 25.3 **[Temperature](Projects/Temperature/)** — a table of Celsius and Fahrenheit temperatures _(after Functions)_
-- 25.4 **[Prime](Projects/Prime/)** — every prime below 100, found with the sieve of Eratosthenes _(after Sequences)_
-- 25.5 **[Calculator](Projects/Calculator/)** — evaluate expressions and report every way they can go wrong _(after Errors)_
-- 25.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Numbers)_
-- 25.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, including linear and degenerate cases _(after Numbers)_
-- 25.8 **[WordCount](Projects/WordCount/)** — count how often each word appears _(after Collections)_
-- 25.9 **[Inventory](Projects/Inventory/)** — keep a stock list of items, with updates that can fail _(after Collections)_
-- 25.10 **[Statistics](Projects/Statistics/)** — count, extremes, mean, variance and median, including empty and single-value input _(after Algorithms)_
-- 25.11 **[Guess](Projects/Guess/)** — a number guessing game with seven valid guesses from 1 to 100 _(after Utilities)_
-- 25.12 **[Age](Projects/Age/)** — an age in completed years, months and days, with month-end clamping _(after Utilities)_
-- 25.13 **[Password](Projects/Password/)** — a 16-character password drawn from system entropy with rejection sampling _(after Utilities)_
-- 25.14 **[Launch](Projects/Launch/)** — a mission checklist, a bounded countdown and a launch _(after Utilities)_
-- 25.15 **[Notes](Projects/Notes/)** — keep notes in a JSON file _(after Data formats)_
-- 25.16 **[Melody](Projects/Melody/)** — play a tune through the Windows console speaker (Windows only) _(after Platform)_
+- 27.1 **[Thanks](Projects/Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it _(after Control flow)_
+- 27.2 **[FizzBuzz](Projects/FizzBuzz/)** — the classic counting game _(after Control flow)_
+- 27.3 **[Temperature](Projects/Temperature/)** — a table of Celsius and Fahrenheit temperatures _(after Functions)_
+- 27.4 **[Prime](Projects/Prime/)** — every prime below 100, found with the sieve of Eratosthenes _(after Sequences)_
+- 27.5 **[Calculator](Projects/Calculator/)** — evaluate expressions and report every way they can go wrong _(after Errors)_
+- 27.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Numbers)_
+- 27.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, including linear and degenerate cases _(after Numbers)_
+- 27.8 **[WordCount](Projects/WordCount/)** — count how often each word appears _(after Collections)_
+- 27.9 **[Inventory](Projects/Inventory/)** — keep a stock list of items, with updates that can fail _(after Collections)_
+- 27.10 **[Statistics](Projects/Statistics/)** — count, extremes, mean, variance and median, including empty and single-value input _(after Algorithms)_
+- 27.11 **[Guess](Projects/Guess/)** — a number guessing game with seven valid guesses from 1 to 100 _(after Utilities)_
+- 27.12 **[Age](Projects/Age/)** — an age in completed years, months and days, with month-end clamping _(after Utilities)_
+- 27.13 **[Password](Projects/Password/)** — a 16-character password drawn from system entropy with rejection sampling _(after Utilities)_
+- 27.14 **[Launch](Projects/Launch/)** — a mission checklist, a bounded countdown and a launch _(after Utilities)_
+- 27.15 **[Notes](Projects/Notes/)** — keep notes in a JSON file _(after Data formats)_
+- 27.16 **[Melody](Projects/Melody/)** — play a tune through the Windows console speaker (Windows only) _(after Platform)_
+- 27.17 **[Grep](Projects/Grep/)** — search files for lines that match a regular expression, with command-line options _(after Systems)_
 
 ## Running an Example
 
