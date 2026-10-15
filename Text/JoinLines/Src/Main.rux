@@ -1,0 +1,77 @@
+// Text read from a file or typed by a person arrives as one run of bytes with line breaks in it.
+// `Lines` walks that run one line at a time. Each line is a view of the original bytes, without
+// its break, so the walk copies nothing and allocates nothing.
+//
+// `Join` goes the other way: it takes several pieces and makes one String, with a separator
+// between each two. It is the tidy answer to "a comma after every item but the last".
+//
+// `ToUpper`, `ToLower` and `FoldCase` change the case of a whole text and hand back a new String.
+// They apply Unicode's full mappings, so a letter may become two and the length may change.
+// `FoldCase` is the one for comparing: two texts that differ only in case fold to the same bytes.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::PrintLine;
+import Text::{ FoldCase, Join, StringView, TextError, ToLower, ToUpper };
+
+func Main() -> ! TextError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // A guest list as a file might hold it: one line ends in `\r\n`, as Windows writes it, one is
+    // blank, and the text ends with a break.
+    let text = StringView::FromValidated(
+        "Ada Lovelace\r\ngrace hopper\n\n  Alan Turing  \nKatherine Johnson\n");
+
+    // A line ends at `\n` or `\r\n`, and neither is part of the line. The blank line is kept as an
+    // empty line, but the final break does not start another one: this text has five lines.
+    var count = 0;
+    for line in text.Lines() {
+        count += 1;
+        PrintLine("line {}  [{}]", count, line);
+    }
+
+    // Keep the names, trimmed, in an array of views; the blank line is skipped.
+    var names: StringView[8] = [StringView(); 8];
+    var kept: uint = 0;
+    for line in text.Lines() {
+        let name = line.Trim();
+        if !name.IsEmpty() {
+            names[kept] = name;
+            kept += 1;
+        }
+    }
+
+    // Four names, three separators. `Join` allocates the result once, at its final length.
+    let joined = Join(allocator, names[..kept], StringView::FromValidated(", "))?;
+    PrintLine("joined   {}", joined);
+
+    // The parts and the separator are views, not bare literals. Passing ", " as it is fails:
+    //
+    //     error: argument 3 to 'Join' has type 'char8[..]', but parameter 'separator' requires
+    //     'StringView'
+
+    // Case changes make new text. `ß` has no single capital letter, so in upper case it becomes
+    // "SS": six characters in, seven out.
+    let upper = ToUpper(allocator, StringView::FromValidated("Straße"))?;
+    let lower = ToLower(allocator, StringView::FromValidated("ÉCOLE"))?;
+    PrintLine("upper    {} ({} characters)", upper, upper.View().ScalarCount());
+    PrintLine("lower    {}", lower);
+
+    // To compare without regard to case, fold both sides and compare the folds with `Equals`.
+    // Folding the query once and each name once finds "grace hopper" however it was typed.
+    // `folded == query` is refused, since a String carries its allocator, which has no `==`:
+    //
+    //     error: structural equality for 'String' is unavailable because element type
+    //     'Allocator' has no '==' operator
+    let query = FoldCase(allocator, StringView::FromValidated("GRACE HOPPER"))?;
+    for i in 0..kept {
+        let folded = FoldCase(allocator, names[i])?;
+        if folded.Equals(query) {
+            PrintLine("found    {} at position {}", names[i], i + 1);
+        }
+    }
+
+    // `Straße` and `STRASSE` differ in case and in length, and still fold to the same text.
+    let street = FoldCase(allocator, StringView::FromValidated("Straße"))?;
+    let shouted = FoldCase(allocator, StringView::FromValidated("STRASSE"))?;
+    PrintLine("same     {}", street.Equals(shouted));
+}

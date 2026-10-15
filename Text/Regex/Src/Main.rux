@@ -1,0 +1,91 @@
+// A regular expression is a small pattern that describes a whole family of texts. `\d{4}` is
+// "four digits"; `^[A-Z]{3}-\d{4}$` is "three capital letters, a hyphen and four digits, and
+// nothing else". One pattern can check what a person typed, or find what you are looking for in
+// a page of text, where the same job by hand would be a loop full of special cases.
+//
+// `Regex::New` compiles a pattern once, and the compiled `Regex` is then searched as often as
+// needed. Compiling can fail — the pattern may be malformed — so it returns `Regex ! RegexError`,
+// and the error says what went wrong and at which byte of the pattern.
+//
+// The package matches in linear time: a search never takes more than a fixed amount of work per
+// byte of text, whatever the pattern. The price is that it refuses the few features that would
+// need backtracking, such as backreferences.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::PrintLine;
+import Regex::{ Escape, Regex, RegexError, RegexErrorKind };
+
+func Reason(kind: RegexErrorKind) -> char8[..] {
+    return match kind {
+        .UnclosedGroup => "a ( with no )",
+        .UnclosedClass => "a [ with no ]",
+        .NothingToRepeat => "nothing before the repetition",
+        .Unsupported => "needs backtracking",
+        else => "another mistake"
+    };
+}
+
+// Compiles `pattern` only to see whether it is one, and reports why not.
+func Check(allocator: Allocator, pattern: char8[..]) {
+    match Regex::New(allocator, pattern) {
+        .Success(_) => PrintLine("{:<10} compiles", pattern),
+        .Failure(error) => PrintLine("{:<10} {} at byte {}", pattern, Reason(error.kind),
+            error.offset)
+    }
+}
+
+func Main() -> ! RegexError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // A backslash in a Rux string must itself be escaped, so the pattern `\d` is written "\\d".
+    // Written as "\d", it never reaches the Regex package: the compiler stops at the string.
+    //
+    //     error: escape sequence '\d' is not recognized
+    //
+    // `^` and `$` pin the match to the start and end of the text: without them, `IsMatch` would
+    // also accept a code with something before or after it.
+    let code = Regex::New(allocator, "^[A-Z]{3}-\\d{4}$")?;
+    for text in ["ABC-1234", "abc-1234", "ABC-12345", "XY-0001"] {
+        PrintLine("{:<10} {}", text, code.IsMatch(text)?);
+    }
+
+    // Even `IsMatch` can fail, since a search takes working memory from the allocator, so the `?`
+    // is needed. `if code.IsMatch(text) { … }` is refused with:
+    //
+    //     error: condition for 'if' must have type 'bool', but found 'bool8 ! RegexError'
+
+    // `Find` answers with where the leftmost match is, as a `Match` of byte positions, or `none`.
+    // `Slice` cuts the matched text out of the text that was searched.
+    let log = "disk 91% full at 09:41; retry at 09:45, give up at 10:15";
+    let time = Regex::New(allocator, "\\d{2}:\\d{2}")?;
+    match time.Find(log)? {
+        found? => PrintLine("first     {} at bytes {}..{}", found.Slice(log), found.start,
+            found.end),
+        none => PrintLine("no time")
+    }
+
+    // `FindAt` searches from a byte position onwards, so starting each search where the last
+    // match ended walks through every match in turn.
+    var at: uint = 0;
+    while true {
+        let found = time.FindAt(log, at)? ?? break;
+        PrintLine("time      {}", found.Slice(log));
+        at = found.end;
+    }
+
+    // In a pattern `.` means "any character", so the pattern "v1.2" also matches "v102". `Escape`
+    // turns text into a pattern that matches exactly that text, here `v1\.2`.
+    let release = "v102 was replaced by v1.2";
+    let loose = Regex::New(allocator, "v1.2")?;
+    let pattern = Escape(allocator, "v1.2")?;
+    let exact = Regex::New(allocator, pattern.Bytes())?;
+    PrintLine("loose     {}", (loose.Find(release)? ?? return).Slice(release));
+    PrintLine("exact     {} from {}", (exact.Find(release)? ?? return).Slice(release), pattern);
+
+    // A malformed pattern is refused when it is compiled, never halfway through a search.
+    Check(allocator, "\\d+-\\d+");
+    Check(allocator, "(\\d+");
+    Check(allocator, "[a-z");
+    Check(allocator, "*.txt");
+    Check(allocator, "(a)\\1");
+}
