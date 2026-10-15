@@ -1,0 +1,88 @@
+// Locks let threads share data. A channel lets them share nothing: one thread sends a value, and
+// the value moves to whichever thread receives it. Each value has one owner at a time, so there
+// is nothing to guard.
+//
+// A `Channel<T>` is a queue with room for a fixed number of values. `Send` waits while it is full
+// and `Receive` waits while it is empty, so a fast producer is slowed to the pace of its consumer
+// instead of piling up values without limit. Values arrive in the order they were sent.
+//
+// When the producer has nothing more to send, it calls `Close`. Receivers still take what is left
+// in the queue, and then `Receive` returns none: that is how a consumer knows the stream is over.
+// Like `Mutex<T>`, a channel is a handle, and `Clone` gives each thread its own.
+import Io::{ Print, PrintLine };
+import Sync::Channel;
+import Thread::{ JoinHandle, Spawn };
+
+// The first stage sends 1 to 10, then closes its channel.
+func Generate(output: Channel<uint64>) -> () {
+    for value in 1u64..=10u64 {
+        // `Send` fails, handing the value back, only once the channel is closed.
+        output.Send(value) catch { else => return };
+    }
+    output.Close();
+}
+
+// The middle stage's two ends.
+struct Stage {
+    input: Channel<uint64>;
+    output: Channel<uint64>;
+}
+
+// The second stage squares each value it receives until its input runs dry, then closes its own
+// output, so the end of the stream passes down the line.
+func Square(stage: Stage) -> () {
+    while true {
+        match stage.input.Receive() {
+            value? => stage.output.Send(value * value) catch { else => return },
+            none => break
+        }
+    }
+    stage.output.Close();
+}
+
+func Main() -> int {
+    // Two small channels: neither stage can run more than two values ahead of the next.
+    let numbers = Channel<uint64>(2);
+    let squares = Channel<uint64>(2);
+    var producer = Spawn(Generate, numbers.Clone()) catch { else => return 1 };
+    var squarer = Spawn(Square, Stage { input: numbers.Clone(), output: squares.Clone() }) catch {
+        else => return 1
+    };
+
+    // Only `Main` prints. It receives the squares in order, and stops when the stream ends.
+    // `Receive` returns `uint64?`, so `let value: uint64 = squares.Receive();` is refused:
+    //
+    //     error: cannot assign 'uint64?' to 'uint64'
+    var total: uint64 = 0;
+    Print("squares:");
+    while true {
+        match squares.Receive() {
+            value? => {
+                Print(" {}", value);
+                total = total + value;
+            },
+            none => break
+        }
+    }
+    PrintLine("");
+    PrintLine("total:   {}", total);
+    producer.Join();
+    squarer.Join();
+
+    // Closing does not throw away what was already sent: the queue drains first.
+    let late = Channel<uint64>(4);
+    late.Send(7) catch { else => return 1 };
+    late.Send(8) catch { else => return 1 };
+    late.Close();
+    let first = late.Receive() ?? 0;
+    let second = late.Receive() ?? 0;
+    let third = late.Receive();
+    PrintLine("after close: {}, {}, then {}", first, second, third == none ? "none" : "more");
+
+    // A send to a closed channel fails and returns the value, so nothing is lost silently.
+    match late.Send(9) {
+        .Success(_) => PrintLine("sent 9"),
+        .Failure(value) => PrintLine("closed, {} came back", value)
+    }
+    return 0;
+}

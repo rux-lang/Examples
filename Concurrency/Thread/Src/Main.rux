@@ -1,0 +1,90 @@
+// A thread is a second line of execution inside the same program: it runs at the same time as
+// `Main`, on another processor when one is free, and shares the program's memory. Work that splits
+// into independent pieces finishes sooner when each piece gets its own thread.
+//
+// Rux has no closures, so a thread cannot capture the variables around it. `Spawn(entry, context)`
+// takes a function and one value to call it with; the value moves to the new thread, and the
+// function's result waits there until someone collects it. Starting a thread can fail when the
+// system has none to spare, so `Spawn` returns `JoinHandle<R> ! ThreadError`.
+//
+// `Join` on the handle waits for the thread to finish and hands back its result. Printing only
+// after joining keeps the output in a fixed order, however the threads were scheduled.
+import Io::PrintLine;
+import Thread::{
+    AvailableParallelism, CurrentId, JoinHandle, Spawn, SpawnWith, ThreadError, ThreadOptions
+};
+
+// Everything a thread needs travels in its one context value.
+struct Span {
+    first: uint64;
+    last: uint64;
+}
+
+// The function each thread runs: it takes the context and returns a result.
+func SumSpan(span: Span) -> uint64 {
+    var total: uint64 = 0;
+    for value in span.first..=span.last {
+        total = total + value;
+    }
+    return total;
+}
+
+func Identify(unused: uint8) -> uint64 {
+    return CurrentId();
+}
+
+func Describe(error: ThreadError) -> char8[..] {
+    return match error {
+        .Exhausted => "the system has no thread to spare",
+        .InvalidStackSize => "the stack size was refused",
+        .Failed => "the system could not start it"
+    };
+}
+
+func Main() -> int {
+    // Four threads, each summing a quarter of 1..=1000000. They start at once and run side by side.
+    // `Spawn` returns an outcome rather than a handle, so the failure is dealt with first; calling
+    // `Join` on the outcome itself is refused:
+    //
+    //     error: type 'JoinHandle<uint64> ! ThreadError' has no field 'Join'
+    var handles: JoinHandle<uint64>[4] = [
+        Spawn(SumSpan, Span { first: 1, last: 250000 }) catch { else => return 1 },
+        Spawn(SumSpan, Span { first: 250001, last: 500000 }) catch { else => return 1 },
+        Spawn(SumSpan, Span { first: 500001, last: 750000 }) catch { else => return 1 },
+        Spawn(SumSpan, Span { first: 750001, last: 1000000 }) catch { else => return 1 }
+    ];
+
+    // `Join` waits for each thread in turn. A thread that finished early simply waits to be asked.
+    var total: uint64 = 0;
+    for index in 0..4 {
+        let part = handles[index].Join();
+        PrintLine("thread {} summed       {:>12}", index + 1, part);
+        total = total + part;
+    }
+    PrintLine("total                 {:>12}", total);
+    PrintLine("joinable after join   {}", handles[0].IsJoinable());
+
+    // `SpawnWith` takes options too: here, a 64 KiB stack instead of the system's default. Every
+    // thread has its own identifier, and this one hands its own back to compare.
+    let options = ThreadOptions().WithStackSize(65536u);
+    match SpawnWith(options, Identify, 0u8) {
+        .Success(handle) => {
+            // A handle is moved, never copied, so `var other = handle;` is refused:
+            //
+            //     error: move-only value 'handle' requires an explicit '<-' in initialization
+            var other <- handle;
+            PrintLine("a different id        {}", other.Join() != CurrentId());
+        },
+        .Failure(error) => PrintLine("no thread: {}", Describe(error))
+    }
+
+    // A handle that is detached, or simply dropped, lets its thread run on unwatched. Nothing can
+    // join it any more, so nothing can see its result.
+    var background = Spawn(SumSpan, Span { first: 1, last: 10 }) catch { else => return 1 };
+    background.Detach();
+    PrintLine("joinable after detach {}", background.IsJoinable());
+
+    // How many threads can usefully run at once: the processors online, never zero.
+    PrintLine("processors            {}", AvailableParallelism());
+    return 0;
+}

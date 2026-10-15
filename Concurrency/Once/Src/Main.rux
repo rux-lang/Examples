@@ -1,0 +1,93 @@
+// Some work should happen once and only once: building a lookup table, reading a configuration
+// file, opening a log. Doing it in `Main` before any thread starts is simplest. When that is not
+// possible, because the first user may be any thread at any time, a check like
+// `if !Built { Build(); }` is a race: two threads can both see `false` and both build.
+//
+// A `Once` settles it. The first `Call` runs its function; any other thread that calls meanwhile
+// waits until that has finished, and every later call returns at once. Everything the function
+// wrote is visible to every thread that `Call` returns on.
+//
+// A `Once` needs no destroying, so it can be a module variable, starting as `Once::Incomplete`,
+// which every thread names directly. Next to it is a `thread var`: a module variable of which
+// every thread has its own copy.
+import Io::PrintLine;
+import Sync::Once;
+import Thread::{ JoinHandle, Spawn };
+
+const Limit: uint = 1000;
+
+// The table every thread reads, built on first use, and how many times it was built.
+var Composite: bool[1001] = [false; 1001];
+var Builds: uint64 = 0;
+
+// What guards the building. A module variable starts from a compile-time value, which is why
+// `Once::Incomplete` is a constant; `var Setup: Once = Once();` is refused:
+//
+//     error: call to 'Once' is not a compile-time value
+var Setup: Once = Once::Incomplete;
+
+// Each thread's own count of the lookups it made. Every thread's copy starts at 0.
+thread var Lookups: uint64 = 0;
+
+// The sieve of Eratosthenes: cross out every multiple of each prime.
+func BuildTable() {
+    Builds = Builds + 1;
+    Composite[0] = true;
+    Composite[1] = true;
+    for value in 2..=Limit {
+        if Composite[value] { continue; }
+        var multiple = value * value;
+        while multiple <= Limit {
+            Composite[multiple] = true;
+            multiple = multiple + value;
+        }
+    }
+}
+
+func IsPrime(value: uint) -> bool {
+    // Whichever thread gets here first builds the table; the others wait for it.
+    Setup.Call(BuildTable);
+    Lookups = Lookups + 1;
+    return !Composite[value];
+}
+
+struct Span {
+    first: uint;
+    last: uint;
+}
+
+struct Report {
+    primes: uint;
+    lookups: uint64;
+}
+
+func CountPrimes(span: Span) -> Report {
+    var primes: uint = 0;
+    for value in span.first..=span.last {
+        if IsPrime(value) { primes = primes + 1; }
+    }
+    return Report { primes: primes, lookups: Lookups };
+}
+
+func Main() -> int {
+    // Four threads all need the table at once, and none of them builds it in advance.
+    var counters: JoinHandle<Report>[4] = [
+        Spawn(CountPrimes, Span { first: 1, last: 250 }) catch { else => return 1 },
+        Spawn(CountPrimes, Span { first: 251, last: 500 }) catch { else => return 1 },
+        Spawn(CountPrimes, Span { first: 501, last: 750 }) catch { else => return 1 },
+        Spawn(CountPrimes, Span { first: 751, last: 1000 }) catch { else => return 1 }
+    ];
+    var total: uint = 0;
+    for index in 0..4 {
+        let report = counters[index].Join();
+        PrintLine("thread {}: {} primes in {} lookups", index + 1, report.primes, report.lookups);
+        total = total + report.primes;
+    }
+    PrintLine("primes up to {}:  {}", Limit, total);
+    PrintLine("table built:        {} time", Builds);
+    PrintLine("completed:          {}", Setup.IsCompleted());
+
+    // `Main` made no lookups, so its own copy of `Lookups` is untouched.
+    PrintLine("lookups in Main:    {}", Lookups);
+    return 0;
+}

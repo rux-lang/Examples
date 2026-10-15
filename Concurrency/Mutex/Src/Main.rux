@@ -1,0 +1,77 @@
+// An atomic keeps one number safe. Most shared data is more than one number, and its parts must
+// change together: money moved between two accounts leaves one and arrives in the other, and
+// nobody may see it in neither. A lock makes a group of changes look like one.
+//
+// A `Mutex<T>` holds a value that only one thread at a time may reach. `Lock` waits until no
+// other thread holds the lock, takes it, and returns a `MutexGuard<T>`. The guard is the only way
+// to the value, and when it is dropped, at the end of its block, the lock is released for the
+// next thread. Forgetting to unlock is therefore impossible.
+//
+// A `Mutex<T>` is a handle: the value lives in storage that every handle shares. `Clone` makes
+// another handle for another thread, and the value is destroyed when the last handle is gone.
+import Io::PrintLine;
+import Sync::Mutex;
+import Thread::{ JoinHandle, Spawn };
+
+// Two balances that must always add up to the same total.
+struct Accounts {
+    checking: int64;
+    savings: int64;
+    transfers: uint64;
+}
+
+// A teller moves `amount` from checking to savings, a thousand times over.
+struct Teller {
+    amount: int64;
+    accounts: Mutex<Accounts>;
+}
+
+func Transfer(accounts: &Mutex<Accounts>, amount: int64) {
+    // The guard holds the lock from here to the end of the function. While it does, no other
+    // thread can see the money half moved.
+    let guard = accounts.Lock();
+    let book = guard.Get();
+    book.checking = book.checking - amount;
+    book.savings = book.savings + amount;
+    book.transfers = book.transfers + 1;
+}
+
+func Work(teller: Teller) -> () {
+    for round in 0..1000 {
+        Transfer(teller.accounts, teller.amount);
+    }
+}
+
+func Report(accounts: &Mutex<Accounts>) {
+    let guard = accounts.Lock();
+    let book = guard.Get();
+    PrintLine("checking {}  savings {}  total {}  transfers {}", book.checking, book.savings,
+        book.checking + book.savings, book.transfers);
+}
+
+func Main() -> int {
+    let accounts = Mutex<Accounts>(Accounts { checking: 10000, savings: 0, transfers: 0 });
+    Report(accounts);
+
+    // Each teller gets its own handle to the same accounts. A negative amount moves money back.
+    // A handle is never copied, so `accounts: accounts` is refused; `Clone` is the way to share:
+    //
+    //     error: move-only value 'accounts' requires an explicit '<-' in aggregate
+    var tellers: JoinHandle<()>[4] = [
+        Spawn(Work, Teller { amount: 3, accounts: accounts.Clone() }) catch { else => return 1 },
+        Spawn(Work, Teller { amount: 2, accounts: accounts.Clone() }) catch { else => return 1 },
+        Spawn(Work, Teller { amount: -1, accounts: accounts.Clone() }) catch { else => return 1 },
+        Spawn(Work, Teller { amount: -2, accounts: accounts.Clone() }) catch { else => return 1 }
+    ];
+    for index in 0..4 {
+        tellers[index].Join();
+    }
+    Report(accounts);
+
+    // `TryLock` never waits: it returns none while the lock is held, even by this same thread.
+    var held = accounts.Lock();
+    PrintLine("try while held:     {}", accounts.TryLock() != none);
+    held.Unlock();
+    PrintLine("try after unlock:   {}", accounts.TryLock() != none);
+    return 0;
+}

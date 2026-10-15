@@ -1,0 +1,98 @@
+// `total = total + 1` looks like one step, but the processor does it in three: read `total`,
+// add one, write it back. When two threads run it at once, both can read the same old value and
+// both write the same new one, and one of the two increments is lost. That is a data race, and
+// the result depends on how the threads happened to be scheduled.
+//
+// An `Atomic<T>` holds one integer, `bool` or pointer and changes it only in indivisible steps.
+// `FetchAdd` reads, adds and writes as one indivisible step, so no other thread can slip in
+// between, and no increment is ever lost. No lock is taken: the hardware keeps the threads apart.
+//
+// `CompareExchange(expected, desired)` is the building block for everything else: it writes
+// `desired` only if the value is still `expected`. It succeeds with the old value, or fails with
+// the value it found instead, and a loop tries again from there.
+import Atomic::Atomic;
+import Core::MemoryOrder;
+import Io::PrintLine;
+import Thread::{ JoinHandle, Spawn };
+
+// The two atomics every worker shares. They live in `Main`, which outlives every worker. An atomic
+// holds an integer, a `bool` or a pointer and nothing else; `FetchAdd` on an `Atomic<float64>` is
+// refused:
+//
+//     error: 'AtomicFetchAdd' cannot act on type 'float64'
+//     note: its type argument must be an integer of 8 to 64 bits
+struct Shared {
+    checked: Atomic<uint64>;
+    longest: Atomic<uint64>;
+}
+
+// One worker's share of the numbers, and the address of what it shares with the others.
+struct Span {
+    first: uint64;
+    last: uint64;
+    shared: *Shared;
+}
+
+// How many steps of the Collatz rule take `value` down to 1: halve it when even, otherwise
+// triple it and add one.
+func Steps(value: uint64) -> uint64 {
+    var current = value;
+    var steps: uint64 = 0;
+    while current != 1 {
+        current = current % 2 == 0 ? current / 2 : current * 3 + 1;
+        steps = steps + 1;
+    }
+    return steps;
+}
+
+// Raises `longest` to `candidate` if that is larger. Another thread may change it between the
+// read and the write, so the exchange is retried from whatever value it actually found.
+func RaiseTo(longest: &Atomic<uint64>, candidate: uint64) {
+    var seen = longest.Load();
+    while candidate > seen {
+        match longest.CompareExchange(seen, candidate) {
+            .Success(_) => return,
+            .Failure(found) => seen = found
+        }
+    }
+}
+
+// Each worker counts every number in its span and offers each chain length as a new longest.
+func Walk(span: Span) -> () {
+    for value in span.first..=span.last {
+        // A plain count that nothing else depends on, so the cheapest order is enough.
+        span.shared.checked.FetchAddWith(1, MemoryOrder::Relaxed);
+        RaiseTo(span.shared.longest, Steps(value));
+    }
+}
+
+func Main() -> int {
+    let shared = Shared { checked: Atomic<uint64>(0), longest: Atomic<uint64>(0) };
+
+    // Four threads explore a quarter of 1..=100000 each, all updating the same two atomics.
+    var workers: JoinHandle<()>[4] = [
+        Spawn(Walk, Span { first: 1, last: 25000, shared: @shared }) catch { else => return 1 },
+        Spawn(Walk, Span { first: 25001, last: 50000, shared: @shared }) catch { else => return 1 },
+        Spawn(Walk, Span { first: 50001, last: 75000, shared: @shared }) catch { else => return 1 },
+        Spawn(Walk, Span { first: 75001, last: 100000, shared: @shared }) catch { else => return 1 }
+    ];
+    for index in 0..4 {
+        workers[index].Join();
+    }
+
+    // Every worker has finished, so these are the final values: not one update was lost.
+    PrintLine("numbers checked  {}", shared.checked.Load());
+    PrintLine("longest chain    {} steps", shared.longest.Load());
+
+    // `Store` replaces the value; `Exchange` replaces it and hands back what was there.
+    shared.checked.Store(10);
+    let before = shared.checked.Exchange(20);
+    PrintLine("exchange         {} -> {}", before, shared.checked.Load());
+
+    // A compare-exchange that expects the wrong value changes nothing and reports what it found.
+    match shared.checked.CompareExchange(10, 30) {
+        .Success(previous) => PrintLine("replaced {}", previous),
+        .Failure(found) => PrintLine("not replaced     found {}", found)
+    }
+    return 0;
+}

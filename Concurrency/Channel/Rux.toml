@@ -1,0 +1,15 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "Channel"
+Version = "0.1.0"
+Type = "Executable"
+Description = "Send values from one thread to another"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+
+[Dependencies]
+Io = { Namespace = "Rux", Version = "*" }
+Sync = { Namespace = "Rux", Version = "*" }
+Thread = { Namespace = "Rux", Version = "*" }

@@ -1,0 +1,81 @@
+// A thread outlives the line that started it, so whatever it is given must last as long as the
+// thread does. Moving a value in works for one thread. Several threads that need the same large
+// value would each need a copy, and a pointer to a local is only safe while that local lives.
+//
+// An `Arc<T>` (atomically reference-counted) puts one value on the heap and shares it between
+// handles. Copying a handle only adds one to a count; the value itself is never duplicated.
+// Dropping a handle subtracts one, and the last handle to go destroys the value. It is the `Rc<T>`
+// of the Rc lesson with one difference: the count changes through atomic operations, so copies
+// can be made and dropped on different threads at the same time.
+//
+// Through an `Arc<T>` the value is only read. Whatever in it must change while it is shared needs
+// its own synchronization, such as an `Atomic<T>` or a `Mutex<T>` inside it.
+import Allocator::{ Arc, SystemAllocator };
+import Atomic::Atomic;
+import Io::PrintLine;
+import Thread::{ JoinHandle, Spawn };
+
+// What every till shares: a price list nobody changes, and a counter they all add to.
+struct Shop {
+    prices: uint64[4];
+    sold: Atomic<uint64>;
+}
+
+// What a till is given: its own orders, and a handle to the shop.
+struct Till {
+    orders: uint64[4];
+    shop: Arc<Shop>;
+}
+
+// Prices the orders from the shared list and counts the items in the shared total. `Get` gives a
+// read-only `*Shop`, so `shop.prices[0] = 110;` here is refused:
+//
+//     error: cannot modify data through read-only pointer '*Shop'
+func Ring(till: Till) -> uint64 {
+    let shop = till.shop.Get();
+    var revenue: uint64 = 0;
+    for index in 0..4 {
+        revenue = revenue + till.orders[index] * shop.prices[index];
+        shop.sold.FetchAdd(till.orders[index]);
+    }
+    return revenue;
+}
+
+// A copy shares the value rather than duplicating it.
+func Inspect(copy: Arc<Shop>, original: &Arc<Shop>) {
+    PrintLine("same shop       {}", copy.SameAs(original));
+    PrintLine("handles now     {}", original.Count());
+}
+
+func Main() -> int {
+    // The first handle. Its storage comes from an allocator, so making it can fail.
+    let stock = Shop { prices: [120, 250, 75, 499], sold: Atomic<uint64>(0) };
+    var shop = Arc::Create<Shop>(SystemAllocator(), stock) catch { else => return 1 };
+    PrintLine("handles before  {}", shop.Count());
+
+    // Each till gets a copy of the handle. Every copy points at the same shop, and moves to its
+    // thread with the rest of the till.
+    var tills: JoinHandle<uint64>[3] = [
+        Spawn(Ring, Till { orders: [1, 0, 2, 0], shop: shop }) catch { else => return 1 },
+        Spawn(Ring, Till { orders: [0, 3, 0, 1], shop: shop }) catch { else => return 1 },
+        Spawn(Ring, Till { orders: [2, 2, 2, 2], shop: shop }) catch { else => return 1 }
+    ];
+    for index in 0..3 {
+        PrintLine("till {} took     {}", index + 1, tills[index].Join());
+    }
+
+    // Every till has finished and dropped its copy, so only `Main`'s handle is left.
+    PrintLine("items sold      {}", shop.Get().sold.Load());
+    PrintLine("handles after   {}", shop.Count());
+
+    // Passing a handle by value copies it, so for as long as the call runs there are two.
+    Inspect(shop, shop);
+
+    // The copy went with the call, so this is the only handle again, and it may change the value.
+    match shop.GetMutable() {
+        value? => value.prices[0] = 110,
+        none => PrintLine("still shared")
+    }
+    PrintLine("first price     {}", shop.Get().prices[0]);
+    return 0;
+}

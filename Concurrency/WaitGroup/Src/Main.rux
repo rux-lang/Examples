@@ -1,0 +1,93 @@
+// `Join` waits for one thread whose handle you kept. Often there is a whole group of them, started
+// in a loop and let go, and what matters is only that all of them are finished.
+//
+// A `WaitGroup` counts unfinished work. `Add(n)` raises the count before the work starts, each
+// worker calls `Done` as its last step, and `Wait` sleeps until the count is back at zero. The
+// waiting thread never needs the workers' handles, so they can be detached.
+//
+// Workers that finish in any order must not print as they go, or the lines come out shuffled.
+// Here each one writes its answer into its own numbered slot, and `Main` prints the slots in
+// order once `Wait` returns.
+import Io::PrintLine;
+import Sync::{ Mutex, WaitGroup };
+import Thread::Spawn;
+
+const Workers: uint = 4;
+const Size: uint64 = 25000;
+
+// One slot per worker, filled in whatever order the workers finish.
+struct Results {
+    primes: uint64[4];
+}
+
+// Everything one worker needs: its slot and its range, and handles to what the group shares.
+struct Job {
+    slot: uint;
+    first: uint64;
+    last: uint64;
+    results: Mutex<Results>;
+    group: WaitGroup;
+}
+
+func IsPrime(value: uint64) -> bool {
+    if value < 2 { return false; }
+    var divisor: uint64 = 2;
+    while divisor * divisor <= value {
+        if value % divisor == 0 { return false; }
+        divisor = divisor + 1;
+    }
+    return true;
+}
+
+func Store(results: &Mutex<Results>, slot: uint, count: uint64) {
+    let guard = results.Lock();
+    guard.Get().primes[slot] = count;
+}
+
+func CountPrimes(job: Job) -> () {
+    var count: uint64 = 0;
+    for value in job.first..=job.last {
+        if IsPrime(value) { count = count + 1; }
+    }
+    Store(job.results, job.slot, count);
+    // The last step: once every worker has called this, `Wait` returns.
+    job.group.Done();
+}
+
+func Main() -> int {
+    let results = Mutex<Results>(Results { primes: [0, 0, 0, 0] });
+    let group = WaitGroup();
+
+    // Count all the work in before starting any of it, so `Wait` cannot see zero too early.
+    group.Add(Workers as uint32);
+    for index in 0..Workers {
+        let first = index as uint64 * Size + 1;
+        let job = Job {
+            slot: index, first: first, last: first + Size - 1,
+            results: results.Clone(), group: group.Clone()
+        };
+        // The job holds handles, so it cannot be copied and is moved in. `Spawn(CountPrimes, job)`
+        // is refused:
+        //
+        //     error: move-only value 'job' requires an explicit '<-' in argument
+        //     help: prefix the argument with '<-', as in 'Take(<-job)'
+        //
+        // Nobody joins these threads, so their handles are let go at once.
+        var worker = Spawn(CountPrimes, <-job) catch { else => return 1 };
+        worker.Detach();
+    }
+
+    // Sleeps until every worker has called `Done`.
+    group.Wait();
+
+    let guard = results.Lock();
+    var total: uint64 = 0;
+    for index in 0..Workers {
+        let first = index as uint64 * Size + 1;
+        let count = guard.Get().primes[index];
+        PrintLine("{:>6} to {:>6}: {} primes", first, first + Size - 1, count);
+        total = total + count;
+    }
+    PrintLine("all {} workers done: {} primes up to {}", Workers, total, Workers as uint64 * Size);
+    return 0;
+}

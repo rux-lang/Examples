@@ -1,0 +1,71 @@
+// Many shared values are read far more often than they change: a configuration, a price list, a
+// routing table. A `Mutex<T>` makes every reader wait for every other reader, although readers
+// alone could never disturb each other.
+//
+// An `RwLock<T>` tells the two apart. `Read` returns a `ReadGuard<T>`, and any number of threads
+// may hold one at the same time. `Write` returns a `WriteGuard<T>`, which waits until nobody holds
+// the lock at all and then keeps everyone else out until it is dropped. A read guard's `Get` gives
+// a `*T`, so a reader cannot write by mistake; only a write guard gives a `*var T`.
+//
+// Like `Mutex<T>`, an `RwLock<T>` is a handle: `Clone` gives each thread its own, and the value
+// lives until the last handle and the last guard are gone.
+import Io::PrintLine;
+import Sync::RwLock;
+import Thread::{ JoinHandle, Spawn };
+
+// Stock in two warehouses. Moving stock changes both, and the total must never look different.
+struct Stock {
+    north: int64;
+    south: int64;
+}
+
+// The writer moves one item at a time from north to south, 500 times.
+func Move(stock: RwLock<Stock>) -> uint64 {
+    var moves: uint64 = 0;
+    for round in 0..500 {
+        let guard = stock.Write();
+        let bins = guard.Get();
+        bins.north = bins.north - 1;
+        bins.south = bins.south + 1;
+        moves = moves + 1;
+    }
+    return moves;
+}
+
+// A reader looks at the total over and over, and counts how often it saw the right one. Its guard
+// gives a read-only `*Stock`, so `bins.north = 0;` here is refused:
+//
+//     error: cannot modify data through read-only pointer '*Stock'
+func Audit(stock: RwLock<Stock>) -> uint64 {
+    var correct: uint64 = 0;
+    for round in 0..2000 {
+        let guard = stock.Read();
+        let bins = guard.Get();
+        if bins.north + bins.south == 1000 { correct = correct + 1; }
+    }
+    return correct;
+}
+
+func Main() -> int {
+    let stock = RwLock<Stock>(Stock { north: 1000, south: 0 });
+
+    // One writer and three readers, all at once. The readers share the lock with each other, and
+    // wait only while the writer holds it.
+    var writer = Spawn(Move, stock.Clone()) catch { else => return 1 };
+    var readers: JoinHandle<uint64>[3] = [
+        Spawn(Audit, stock.Clone()) catch { else => return 1 },
+        Spawn(Audit, stock.Clone()) catch { else => return 1 },
+        Spawn(Audit, stock.Clone()) catch { else => return 1 }
+    ];
+    PrintLine("writer moved     {} items", writer.Join());
+    for index in 0..3 {
+        PrintLine("reader {} saw     {} of 2000 totals right", index + 1, readers[index].Join());
+    }
+
+    // Two read guards on one lock at the same time: reading is shared.
+    let first = stock.Read();
+    let second = stock.Read();
+    PrintLine("north {}  south {}  (read twice: {})", first.Get().north, first.Get().south,
+        second.Get().north == first.Get().north);
+    return 0;
+}
