@@ -1,0 +1,90 @@
+// A `Box<T>` has exactly one owner, which is what lets it know when to free its value. Some values
+// have no single owner, though: one theme used by every window of an editor, one loaded image
+// shown in several places. Whichever user goes last should free it, and none of them knows
+// which one that is.
+//
+// `Rc<T>`, a reference-counted handle, settles it by counting. `Rc::Create` moves the value into
+// allocated memory with a count of one. Copying a handle does not copy the value: it adds one
+// to the count, and both handles reach the same value. When a handle's life ends the count goes
+// down by one, and the handle that takes it to zero destroys the value and frees the memory.
+//
+// Shared values are read-only. `Get()` returns a `*T` for reading. `GetMutable()` returns a
+// `*var T` only while a single handle exists, since a change made through one handle would
+// otherwise surprise the others; while the value is shared it returns `none`.
+//
+// An `Rc` counts with plain arithmetic, so its handles must all stay on one thread. Its twin,
+// `Arc`, counts atomically for values shared between threads; it comes with the Threads part.
+import Allocator::{ AllocError, Allocator, Rc, SystemAllocator };
+import Io::PrintLine;
+
+struct Theme {
+    name: char8[..];
+    size: int32;
+}
+
+extend Theme {
+    func ~Theme(self: &var Theme) {
+        PrintLine("    the {} theme is destroyed", self.name);
+    }
+}
+
+// Every window holds a handle to its theme, not a copy of it.
+struct Window {
+    title: char8[..];
+    theme: Rc<Theme>;
+}
+
+// The window arrives by value, so for the length of the call there is one more handle.
+func Draw(window: Window) {
+    let theme = window.theme.Get();
+    PrintLine("    {} in {} at {}pt, {} handles", window.title, theme.name, theme.size,
+        window.theme.Count());
+}
+
+func OpenWindows(theme: Rc<Theme>, allocator: Allocator) -> ! AllocError {
+    // Two more handles: the count is now one for `Main`, one for this parameter and one each
+    // for the windows.
+    let editor = Window { title: "editor", theme: theme };
+    let preview = Window { title: "preview", theme: theme };
+    PrintLine("    {} handles", theme.Count());
+    Draw(editor);
+
+    // `GetMutable` needs a `var` handle, so take one more copy. Even so, the answer is `none`:
+    // while the value is shared, nobody may write to it.
+    var mine = theme;
+    PrintLine("    can write: {}", mine.GetMutable() != none);
+
+    // `SameAs` asks whether two handles reach one value, not whether two values are equal. A
+    // second theme with the same fields is still a different value, with its own count.
+    let lookalike = Rc::Create<Theme>(allocator, Theme { name: "lookalike", size: 12 })?;
+    PrintLine("    editor and preview share: {}", editor.theme.SameAs(preview.theme));
+    PrintLine("    lookalike is shared:      {}", lookalike.SameAs(theme));
+
+    // Every handle made here ends with the call. The lookalike was the only handle to its
+    // value, so that value is destroyed now; the paper theme still has `Main`'s handle.
+}
+
+func Main() -> ! AllocError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    var theme = Rc::Create<Theme>(allocator, Theme { name: "paper", size: 11 })?;
+    PrintLine("created, {} handle", theme.Count());
+
+    // A lone handle may write. `GetMutable` returns `(*var Theme)?`, a pointer or `none`.
+    match theme.GetMutable() {
+        value? => value.size = 12,
+        none => PrintLine("shared, so read-only")
+    }
+
+    // `Get()` gives only a `*Theme`, so writing through it is refused:
+    //
+    //     error: cannot modify data through read-only pointer '*Theme'
+
+    PrintLine("opening windows:");
+    OpenWindows(theme, allocator)?;
+    PrintLine("windows closed, {} handle", theme.Count());
+
+    // `theme` is the last handle, so the value is destroyed when `Main` ends, and only then.
+    PrintLine("end of Main:");
+}
