@@ -1,0 +1,112 @@
+// Text formats such as JSON, TOML, URLs and e-mail carry text, not raw bytes. A key, a hash or
+// an image has to be written as characters before it can travel through them, and read back
+// exactly afterwards. A base encoding does that with a small alphabet of safe characters:
+//
+//     hexadecimal  16 characters, 4 bits each:  2 characters per byte
+//     Base32       32 characters, 5 bits each:  8 characters per 5 bytes
+//     Base64       64 characters, 6 bits each:  4 characters per 3 bytes
+//     Base58       58 characters, for identifiers people copy by hand
+//
+// This is not the character encoding of the Encoding lesson, which stores text as UTF-8 or
+// UTF-16. It goes the other way: any bytes at all become plain ASCII text.
+//
+// Nothing in the Encoding package allocates. Every function writes into a buffer you provide and
+// returns how much it wrote, and a length function says how big that buffer must be. Decoding is
+// strict, and a `DecodeError` says what is wrong and at which byte.
+import Encoding::{ Base32Encode, Base32Variant, Base58Encode, Base58EncodedMaxLength,
+    Base64Decode, Base64Encode, Base64EncodedLength, Base64Variant, HexDecode, HexEncode,
+    ViewHex };
+import Io::PrintLine;
+
+// Prints `bytes` in one Base64 variant.
+func ShowBase64(label: char8[..], bytes: byte[..], form: Base64Variant) {
+    var text: char8[64];
+    let written = Base64Encode(bytes, text[..], form) catch {
+        else => {
+            PrintLine("{:<18} does not fit", label);
+            return;
+        }
+    };
+    PrintLine("{:<18} {}", label, text[..written]);
+}
+
+// Decodes hexadecimal text, or says why it cannot. Encoding turns bytes into characters and
+// decoding turns them back, so the destination here is a `var byte[..]`. A character buffer, or
+// an array declared with `let`, is the wrong kind of slice:
+//
+//     HexDecode(text, characters[..])
+//         error: argument 2 to 'HexDecode' has type 'var char8[..]', but parameter 'into'
+//                requires 'var uint8[..]'
+func ReadHex(text: char8[..]) {
+    var bytes: byte[8];
+    match HexDecode(text, bytes[..]) {
+        .Success(count) => PrintLine("hex {:<12} -> {} bytes: {}", text, count,
+            ViewHex(bytes[..count])),
+        .Failure(error) => PrintLine("hex {:<12} -> {}", text, error)
+    }
+}
+
+// Decodes standard Base64 text into a buffer of `room` bytes, or says why it cannot.
+func ReadBase64(text: char8[..], room: uint) {
+    var bytes: byte[8];
+    match Base64Decode(text, bytes[..room]) {
+        .Success(count) => PrintLine("b64 {:<12} -> {} bytes: {}", text, count,
+            ViewHex(bytes[..count])),
+        .Failure(error) => PrintLine("b64 {:<12} -> {}", text, error)
+    }
+}
+
+func Main() -> int {
+    // Five bytes that are not text: no text format could hold them as they are.
+    let key: byte[5] = [0xFB, 0xEF, 0xFF, 0x00, 0x10];
+    var text: char8[64];
+
+    let hex = HexEncode(key[..], text[..]) catch { else => 0 };
+    PrintLine("{:<18} {}", "hex", text[..hex]);
+
+    // Base64 comes in four variants. The standard alphabet ends in `+` and `/`, which mean
+    // something in a URL, so the URL-safe one uses `-` and `_` instead. Either may drop the `=`
+    // padding that rounds the text up to a multiple of four characters.
+    ShowBase64("base64", key[..], Base64Variant::Standard);
+    ShowBase64("base64, no pad", key[..], Base64Variant::StandardUnpadded);
+    ShowBase64("base64 url", key[..], Base64Variant::Url);
+    ShowBase64("base64 url, no pad", key[..], Base64Variant::UrlUnpadded);
+
+    // Base32 uses only capitals and digits, so it survives case-insensitive systems. Crockford's
+    // alphabet leaves out I, L, O and U, which are easy to misread.
+    let base32 = Base32Encode(key[..], text[..], Base32Variant::Standard) catch { else => 0 };
+    PrintLine("{:<18} {}", "base32", text[..base32]);
+    let crockford = Base32Encode(key[..], text[..], Base32Variant::Crockford) catch { else => 0 };
+    PrintLine("{:<18} {}", "base32 crockford", text[..crockford]);
+
+    // Base58 drops 0, O, I, l, + and /, so a person can copy it without mistakes. Its length
+    // depends on the value, so there is only an upper bound to size the buffer with.
+    let base58 = Base58Encode(key[..], text[..]) catch { else => 0 };
+    PrintLine("{:<18} {}  (at most {})", "base58", text[..base58], Base58EncodedMaxLength(5));
+
+    // The length functions size a buffer exactly. A buffer that is too short is refused, never
+    // filled with what fits: a cut-off encoding would be a different value. So every encoder
+    // returns `uint ! FormatError`, the count or the refusal, and never just the count:
+    //
+    //     let written: uint = Base64Encode(key[..], text[..]);
+    //         error: cannot assign 'uint ! FormatError' to 'uint'
+    PrintLine("27 bytes in Base64 take {} characters", Base64EncodedLength(27));
+    var short: char8[4];
+    match Base64Encode("Many hands make light work.", short[..]) {
+        .Success(written) => PrintLine("wrote {}", written),
+        .Failure(_) => PrintLine("a 4-character buffer is refused")
+    }
+    let written = Base64Encode("Many hands make light work.", text[..]) catch { else => 0 };
+    PrintLine("{}", text[..written]);
+
+    // Decoding is strict, so every value has exactly one encoded form.
+    ReadHex("fbefff0010");
+    ReadHex("FBEFFF0010");
+    ReadHex("fbefff001");
+    ReadHex("0xfbefff");
+    ReadBase64("SGVsbG8=", 8);
+    ReadBase64("SGVsbG9=", 8);
+    ReadBase64("SGVsbG8", 8);
+    ReadBase64("SGVsbG8=", 3);
+    return 0;
+}

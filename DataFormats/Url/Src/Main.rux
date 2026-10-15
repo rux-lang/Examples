@@ -1,0 +1,103 @@
+// A URL names something on a network and says how to reach it:
+//
+//     https://rux-lang.dev:443/docs/learn/url?q=caf%C3%A9&page=2#install
+//     scheme   host         port path            query            fragment
+//
+// Splitting that by hand looks easy and is not: `%C3%A9` is an escaped `é`, a host is not case
+// sensitive but a path is, and `..` in a path climbs a level. `Url::Parse` reads a URL by RFC 3986
+// and keeps it in one normalized form, so each component is a view of that text, and two URLs
+// that mean the same thing come out as the same text.
+//
+// A link on a page is often relative, such as `../guide` or `?page=3`. `Resolve` turns it into a
+// full URL against the page it appears on, exactly as a browser does.
+//
+// Components stay percent-encoded. `Pairs` walks a query's `name=value` pairs, `Decode` turns one
+// into text, and `QueryBuilder` goes the other way, escaping text into a query.
+import Allocator::{ Allocator, SystemAllocator };
+import Encoding::{ PercentEncode, PercentSet };
+import Io::PrintLine;
+import Url::{ Decode, Pairs, QueryBuilder, Url, UrlError };
+
+func Reason(error: UrlError) -> char8[..] {
+    return match error {
+        UrlError::MissingScheme => "no scheme: a relative reference",
+        UrlError::InvalidScheme => "not a scheme",
+        UrlError::InvalidHost => "not a host",
+        UrlError::InvalidPort => "not a port",
+        UrlError::InvalidPercentEncoding => "a % without two hexadecimal digits",
+        UrlError::OutOfMemory => "out of memory",
+        UrlError::InvalidText => "not UTF-8 text"
+    };
+}
+
+func Check(allocator: Allocator, text: char8[..]) {
+    match Url::Parse(allocator, text) {
+        .Success(url) => PrintLine("  {:<28} -> {}", text, url.Text()),
+        .Failure(error) => PrintLine("  {:<28} -> {}", text, Reason(error))
+    }
+}
+
+func Main() -> ! UrlError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // Parsing normalizes: the scheme and host are lower-cased, the default port is dropped, the
+    // dot segments are removed from the path, and escapes use upper-case hexadecimal.
+    let page = Url::Parse(allocator,
+        "HTTPS://Rux-Lang.DEV:443/docs/./learn/../learn/url?q=caf%c3%a9&page=2#install")?;
+    PrintLine("url       {}", page.Text());
+    PrintLine("scheme    {}", page.Scheme());
+    PrintLine("host      {}", page.Host() ?? "");
+    PrintLine("port      {} (not written, the default for https)", page.PortOrDefault() ?? 0);
+    PrintLine("path      {}", page.Path());
+    PrintLine("query     {}", page.Query() ?? "");
+    PrintLine("fragment  {}", page.Fragment() ?? "");
+
+    // The query, pair by pair. `Decode` turns `caf%C3%A9` back into `café`; `true` reads `+` as a
+    // space, as a query from an HTML form writes it.
+    //
+    // A URL may have no query at all, so `Query()` returns `char8[..]?`, and `?? ""` treats a
+    // missing query as an empty one. Without it:
+    //
+    //     for pair in Pairs(page.Query()) { }
+    //         error: argument 1 to 'Pairs' has type 'char8[..]?', but parameter 'query' requires
+    //                'char8[..]'
+    for pair in Pairs(page.Query() ?? "") {
+        let value = Decode(allocator, pair.value, true)?;
+        PrintLine("  {} = {}", pair.name, value);
+    }
+
+    // Relative references, resolved against the page.
+    PrintLine("links on the page:");
+    let links: char8[..][6] = ["guide", "../packaging/manifest", "/blog", "?page=3", "#run-it",
+        "//github.com/rux-lang"];
+    for link in links {
+        let target = page.Resolve(link)?;
+        PrintLine("  {:<22} -> {}", link, target.Text());
+    }
+
+    // Building a query. Each name and value is escaped as HTML forms do it: a space becomes `+`,
+    // and `&` or `=` inside a value becomes `%26` or `%3D`, so it cannot end the pair early.
+    var query = QueryBuilder(allocator);
+    query.Append("q", "fish & chips")?;
+    query.Append("sort", "price=asc")?;
+    var search = Url::Parse(allocator, "https://example.com/search")?;
+    search.SetQuery(query.Text())?;
+    PrintLine("search    {}", search.Text());
+
+    // One path segment from arbitrary text. The Encoding package's `PercentEncode` with the
+    // `Component` set escapes everything but letters, digits and `-._~`, the `/` included, so the
+    // text stays one segment.
+    var segment: char8[64];
+    let length = PercentEncode("Kyiv 2026/10.txt", segment[..], PercentSet::Component) catch {
+        else => 0
+    };
+    PrintLine("segment   {}", segment[..length]);
+
+    // Text that is not a URL.
+    PrintLine("refused:");
+    Check(allocator, "rux-lang.dev/docs");
+    Check(allocator, "https://rux lang.dev/");
+    Check(allocator, "https://rux-lang.dev:99999/");
+    Check(allocator, "https://rux-lang.dev/caf%c");
+}

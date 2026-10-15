@@ -1,0 +1,158 @@
+// Compression finds what repeats in data and writes each repeat as a short reference back to an
+// earlier copy. A log, a JSON document or a page of HTML repeats a great deal and shrinks to a
+// fraction of its size; random bytes do not repeat and do not shrink at all.
+//
+// The Compress package speaks Deflate, the method inside gzip, zlib and ZIP files and behind
+// HTTP's `Content-Encoding: gzip`. The same compressed data travels in one of three containers:
+//
+//     Format::Raw   the bare Deflate stream
+//     Format::Zlib  a 2-byte header, the stream, and an Adler-32 checksum of the data
+//     Format::Gzip  a 10-byte header, the stream, a CRC-32 checksum and the length: a .gz file
+//
+// `Compress` and `Decompress` work on data already in memory. `CompressWriter` and
+// `DecompressReader` do the same through the `Writer` and `Reader` interfaces, a piece at a time,
+// so a file of any size can be compressed without holding all of it at once.
+//
+// The file this program writes lives in its package's `Bin/` folder, and is deleted at the end.
+import Allocator::{ Allocator, SystemAllocator };
+import Collections::{ CollectionError, Vector };
+import Compress::{ Compress, CompressWriter, Decompress, DecompressReader, Format, Level };
+import FileSystem::{ DeleteFile, File, OpenOptions };
+import Io::{ IoError, IoErrorKind, PrintLine };
+import Path::{ OsString, Path };
+import Text::TextError;
+
+// Text as the bytes it is made of, as in the Hash lesson. `Compress` takes bytes, and text is
+// not accepted in their place:
+//
+//     Compress(allocator, "Hello, Rux!", Format::Gzip)
+//         error: argument 2 to 'Compress' has type 'char8[..]', but parameter 'data' requires
+//                'uint8[..]'
+func AsBytes(text: char8[..]) -> byte[..] {
+    return (text.data as *byte)[..text.length];
+}
+
+func SameBytes(left: byte[..], right: byte[..]) -> bool {
+    if left.length != right.length { return false; }
+    for i in 0..left.length {
+        if left[i] != right[i] { return false; }
+    }
+    return true;
+}
+
+// A web server's access log of `count` requests: a few paths and statuses in an order that looks
+// random but is the same on every run, and a time in milliseconds.
+func MakeLog(allocator: Allocator, count: int) -> Vector<char8> ! CollectionError {
+    let paths: char8[..][6] = ["/docs/learn/compress", "/docs/learn/url", "/images/logo.svg",
+        "/v1/playground/run", "/blog", "/packages"];
+    let statuses: char8[..][3] = [" 200 ", " 304 ", " 404 "];
+    let digits = "0123456789";
+    var log = Vector<char8>(allocator);
+    var state: uint32 = 2026;
+    for _ in 0..count {
+        state = state * 1664525 + 1013904223;
+        log.PushSlice("GET ")?;
+        log.PushSlice(paths[((state >> 8) % 6) as uint])?;
+        log.PushSlice(statuses[((state >> 16) % 3) as uint])?;
+        log.Push(digits[((state >> 20) % 10) as uint])?;
+        log.Push(digits[((state >> 24) % 10) as uint])?;
+        log.PushSlice(" ms\n")?;
+    }
+    return <-log;
+}
+
+// Writes `text` into a .gz file. The writer takes the file and compresses whatever is written
+// to it, here 1000 characters at a time; nothing is complete until `Finish` writes the last block
+// and the checksum. When the function returns the writer is destroyed, and the file it holds is
+// closed. A file is move-only, so handing it over takes `<-`:
+//
+//     CompressWriter::New(allocator, file, Format::Gzip)
+//         error: move-only value 'file' requires an explicit '<-' in argument
+func WriteLog(allocator: Allocator, path: Path, text: char8[..]) -> ! IoError {
+    var file = File::Open(allocator, path, OpenOptions::Writing())?;
+    var writer = CompressWriter::New(allocator, <-file, Format::Gzip)?;
+    var written: uint = 0;
+    while written < text.length {
+        let end = written + 1000 < text.length ? written + 1000 : text.length;
+        written = written + writer.Write(text[written..end])?;
+    }
+    writer.Finish()?;
+}
+
+// Reads the .gz file back a buffer at a time, until the reader reports the end of the data. That
+// end comes only after the checksum agreed.
+func ReadLog(allocator: Allocator, path: Path) -> ! IoError {
+    var file = File::Open(allocator, path, OpenOptions::Reading())?;
+    PrintLine("file                {} bytes", file.Size()?);
+    var reader = DecompressReader::New(allocator, <-file, Format::Gzip)?;
+    var buffer: char8[1024];
+    var total: uint = 0;
+    var lines: uint = 0;
+    while true {
+        let count = reader.Read(buffer[..]) catch {
+            error if error.IsEnd() => break,
+            error => fail error
+        };
+        for c in buffer[..count] {
+            if c == '\n' { lines = lines + 1; }
+        }
+        total = total + count;
+    }
+    PrintLine("read back           {} bytes, {} lines", total, lines);
+}
+
+func Main() -> ! IoError | CollectionError | TextError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    let log = MakeLog(allocator, 400)?;
+    let data = AsBytes(log.AsSlice());
+    PrintLine("log                 {} bytes", data.length);
+
+    // The same data in the three containers. The compressed stream inside is the same; the
+    // containers differ only by the size of their header and checksum.
+    let raw = Compress(allocator, data, Format::Raw)?;
+    let zlib = Compress(allocator, data, Format::Zlib)?;
+    let gzip = Compress(allocator, data, Format::Gzip)?;
+    PrintLine("raw                 {} bytes", raw.Length());
+    PrintLine("zlib                {} bytes", zlib.Length());
+    PrintLine("gzip                {} bytes", gzip.Length());
+
+    // How hard to look for repeats. `Store` does not compress at all, so it comes out a little
+    // larger than the data; the others trade time for size. `Default` is what `Compress` uses
+    // when no level is given.
+    let levels: Level[4] = [Level::Store, Level::Fastest, Level::Default, Level::Best];
+    let names: char8[..][4] = ["store", "fastest", "default", "best"];
+    for i in 0..4 {
+        let packed = Compress(allocator, data, Format::Gzip, levels[i])?;
+        PrintLine("gzip, {:<13} {} bytes", names[i], packed.Length());
+    }
+
+    // The round trip gives back every byte. Decompressing needs only the format: the level is
+    // not part of the data.
+    let unpacked = Decompress(allocator, gzip.AsSlice(), Format::Gzip)?;
+    PrintLine("round trip          {} bytes, identical: {}", unpacked.Length(),
+        SameBytes(unpacked.AsSlice(), data));
+
+    // Short text has nothing to repeat, and the container's header and checksum make it larger.
+    let short = Compress(allocator, AsBytes("Hello, Rux!"), Format::Gzip)?;
+    PrintLine("11 bytes as gzip    {} bytes", short.Length());
+
+    // The checksum catches damage. Change one bit of the compressed data and decompressing
+    // fails with `InvalidInput` instead of returning wrong data.
+    var damaged = Vector<byte>(allocator);
+    damaged.PushSlice(gzip.AsSlice())?;
+    damaged.AsMutableSlice()[100] = damaged.AsSlice()[100] ^ 0x01;
+    match Decompress(allocator, damaged.AsSlice(), Format::Gzip) {
+        .Success(_) => PrintLine("damaged             accepted"),
+        .Failure(error) => PrintLine("damaged             refused, invalid input: {}",
+            error.kind == IoErrorKind::InvalidInput)
+    }
+
+    // Streaming into a .gz file, and back out of it.
+    var holder = OsString::FromText(allocator, "Bin/access.log.gz")?;
+    let path = Path::FromView(holder.View());
+    WriteLog(allocator, path, log.AsSlice())?;
+    ReadLog(allocator, path)?;
+    DeleteFile(allocator, path)?;
+}

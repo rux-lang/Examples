@@ -1,0 +1,19 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "Compress"
+Version = "0.1.0"
+Type = "Executable"
+Description = "Compress and decompress data in the Deflate, zlib and gzip formats"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+
+[Dependencies]
+Allocator = { Namespace = "Rux", Version = "*" }
+Collections = { Namespace = "Rux", Version = "*" }
+Compress = { Namespace = "Rux", Version = "*" }
+FileSystem = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
+Path = { Namespace = "Rux", Version = "*" }
+Text = { Namespace = "Rux", Version = "*" }
