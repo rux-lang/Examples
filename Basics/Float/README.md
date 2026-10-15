@@ -1,7 +1,7 @@
 # Float
 
-Store fractional numbers in `float64`, `float32` and the `float` alias, and see why a float is
-only ever an approximation.
+Store fractional numbers in `float64`, `float32` and the `float` alias, meet the narrow and wide
+widths from `float8` to `float512`, and see why a float is only ever an approximation.
 
 **You'll need:** [Variable](https://rux-lang.dev/docs/learn/variable), [Integer](https://rux-lang.dev/docs/learn/integer)
 
@@ -16,6 +16,13 @@ distance  384400.0
 single    0.75
 1/3       0.3333333333333333 as float64
 1/3       0.33333334 as float32
+1/3       0.3333 as float16
+1/3       0.34 as float8
+largest   65500.0 as float16, 240.0 as float8
+float80   80 bits in 16 bytes
+float128  128 bits in 16 bytes
+float256  256 bits in 32 bytes
+float512  512 bits in 64 bytes
 0.1 + 0.2 0.30000000000000004
 whole     2.0
 ```

@@ -6,8 +6,8 @@
 // Every integer type knows its own limits, as `Min` and `Max`. Those two names are declared in the
 // standard `Core` package, so this lesson imports each type it asks about, and its Rux.toml lists
 // `Core` as a dependency next to `Io`.
-import Core::{ int, int128, int16, int32, int64, int8 };
-import Core::{ uint, uint16, uint32, uint512, uint64, uint8 };
+import Core::{ int, int128, int16, int256, int32, int512, int64, int8 };
+import Core::{ uint, uint128, uint16, uint256, uint32, uint512, uint64, uint8 };
 import Io::PrintLine;
 
 func Main() -> int {
@@ -25,7 +25,12 @@ func Main() -> int {
 
     // The wide types are for numbers no machine register holds, such as the ones cryptography
     // and exact arithmetic work with. They are ordinary integers all the same.
+    // Their numbers get long quickly: each doubling of the width roughly doubles the digits.
     PrintLine("int128   max {}", int128::Max);
+    PrintLine("uint128  max {}", uint128::Max);
+    PrintLine("int256   max {}", int256::Max);
+    PrintLine("uint256  max {}", uint256::Max);
+    PrintLine("int512   min {}", int512::Min);
     PrintLine("uint512  max {}", uint512::Max);
 
     // `int` and `uint` have no number in their name because the target machine picks their

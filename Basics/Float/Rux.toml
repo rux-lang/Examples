@@ -6,8 +6,9 @@ MinRux = "0.4.0"
 Name = "Float"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Floating-point numbers: float32, float64 and the float alias"
+Description = "Floating-point numbers: float64, float32, the narrow and wide widths, and the float alias"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
+Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }

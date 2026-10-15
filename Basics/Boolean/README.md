@@ -16,6 +16,9 @@ bool8     true
 bool16    false
 bool32    true
 bool64    false
+bool128   true
+bool256   false
+bool512   true
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/boolean
