@@ -1,0 +1,17 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "MemoryStream"
+Version = "0.1.0"
+Type = "Executable"
+Description = "Read and write bytes in memory through the same reader and writer interfaces as a file"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+
+[Dependencies]
+Allocator = { Namespace = "Rux", Version = "*" }
+FileSystem = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
+Path = { Namespace = "Rux", Version = "*" }
+Text = { Namespace = "Rux", Version = "*" }

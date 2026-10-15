@@ -1,0 +1,112 @@
+// An iterator hands out one item each time its `Next` is called. An adaptor is an iterator that
+// wraps another one and changes what comes out: `Map` passes each item through a function,
+// `Filter` drops the items that fail a test, `Take` stops after a number of them, and so on.
+// Core provides seven, and because each is an iterator itself they nest, each one wrapping the
+// next:
+//
+//     Take(Filter(Map(source, Square), IsEven), 3)
+//
+// Read that from the inside out: square each item, keep the even squares, stop after three.
+//
+// Adaptors are lazy. Building the chain computes nothing; each adaptor asks the one inside it
+// for an item only when it is itself asked for one. So no list of results is ever built, and a
+// chain can even draw from a source that never ends, as long as something stops asking.
+//
+// An adaptor takes anything whose `Next` returns `T?` — Core calls that a `Cursor<T>`. That is
+// a container's iterator, another adaptor, or a slice turned into one by `Walk`.
+import Core::{ Chain, Enumerate, Filter, Indexed, Map, Skip, Take, Walk, Zip };
+import Io::{ Print, PrintLine };
+
+// Counts up from a number, for ever, and says each time it is asked.
+struct Counter {
+    next: int32;
+}
+
+extend Counter {
+    func Next(self: &var Counter) -> int32? {
+        Print(" (asked: {})", self.next);
+        self.next = self.next + 1;
+        return self.next - 1;
+    }
+}
+
+func Curve(score: int32) -> int32 {
+    return score + 5;
+}
+
+func Passed(score: int32) -> bool {
+    return score >= 50;
+}
+
+func Failed(entry: Indexed<int32>) -> bool {
+    return entry.item < 50;
+}
+
+func Square(value: int32) -> int32 {
+    return value * value;
+}
+
+func IsEven(value: int32) -> bool {
+    return value % 2 == 0;
+}
+
+func Main() -> int {
+    let names: char8[..][6] = ["ada", "ben", "cai", "dee", "eve", "fay"];
+    let scores: int32[6] = [72, 45, 90, 38, 66, 49];
+
+    // A slice is not an iterator; `Walk` makes one. `Map` then hands out each score curved.
+    // Leave out the `Walk` and the slice fails the bound:
+    //
+    //     for score in Map(scores[..], Curve) { ... }
+    //         error: type argument 'int32[..]' does not satisfy interface bound 'Cursor' on type
+    //                parameter 'I'
+    Print("curved:   ");
+    for score in Map(Walk(scores[..]), Curve) {
+        Print(" {}", score);
+    }
+    PrintLine();
+
+    // Adaptors nest: curve every score, then keep the passes.
+    Print("passed:   ");
+    for score in Filter(Map(Walk(scores[..]), Curve), Passed) {
+        Print(" {}", score);
+    }
+    PrintLine();
+
+    // `Skip` and `Take` cut out a window: the second page of two.
+    Print("page 2:   ");
+    for score in Take(Skip(Walk(scores[..]), 2), 2) {
+        Print(" {}", score);
+    }
+    PrintLine();
+
+    // `Enumerate` pairs each item with its position, as an `Indexed<int32>`, so a filter after
+    // it still knows where each item stood.
+    Print("failed at:");
+    for entry in Filter(Enumerate(Walk(scores[..])), Failed) {
+        Print(" {}", entry.index);
+    }
+    PrintLine();
+
+    // `Zip` walks two sources side by side, as a `Pair`, and stops when either runs out.
+    for pair in Take(Zip(Walk(names[..]), Walk(scores[..])), 3) {
+        PrintLine("{}  {}", pair.first, pair.second);
+    }
+
+    // `Chain` reads one source to its end, then the other.
+    let late: int32[2] = [81, 57];
+    Print("all:      ");
+    for score in Chain(Walk(scores[..]), Walk(late[..])) {
+        Print(" {}", score);
+    }
+    PrintLine();
+
+    // Laziness: the counter never ends, yet it is asked for only six numbers, one at a time as
+    // each result is wanted, because `Take` stops asking once it has handed out three.
+    Print("lazy:     ");
+    for value in Take(Filter(Map(Counter { next: 1 }, Square), IsEven), 3) {
+        Print(" -> {}", value);
+    }
+    PrintLine();
+    return 0;
+}
