@@ -1,0 +1,85 @@
+// A cache keeps answers that were slow to get — a file read from disk, a page fetched over the
+// network, a row from a database — so asking again is quick. But memory is finite, so a cache
+// that only ever grows is a leak with good intentions. It needs a rule for what to forget.
+//
+// "Least recently used" is the usual rule: when the cache is full, forget the entry nobody has
+// asked for in the longest time. Whatever was used a moment ago is likely to be used again soon;
+// whatever has sat untouched is the best guess at what will not be missed.
+//
+// `LruCache<K, V>` is a map with that rule built in. It is made with a capacity, and the same
+// two functions as a hash map to hash and compare keys. `Get` and `Put` both count as a use and
+// move the entry to the front; `Put` into a full cache evicts the entry at the back and tells you
+// which key it was. Once full, the cache reuses that entry's room, so it never allocates again.
+import Allocator::{ Allocator, SystemAllocator };
+import Collections::{ CollectionError, EqualsInt32, HashInt32, LruCache };
+import Io::{ Print, PrintLine };
+
+var Loads: int32 = 0;
+
+// Stands in for the slow part: a database lookup of a user's name. It counts its calls.
+func LoadName(id: int32) -> char8[..] {
+    Loads = Loads + 1;
+    return match id {
+        1 => "ada",
+        2 => "brian",
+        3 => "carmen",
+        4 => "dmitri",
+        else => "unknown"
+    };
+}
+
+// Answers from the cache when it can, and loads and caches the name when it cannot.
+func Name(cache: &var LruCache<int32, char8[..]>, id: int32) -> char8[..] ! CollectionError {
+    match cache.Get(id) {
+        name? => {
+            PrintLine("user {}  hit   {}", id, name);
+            return name;
+        },
+        none => {}
+    }
+    let name = LoadName(id);
+    let evicted = cache.Put(id, name)?;
+    match evicted {
+        old? => PrintLine("user {}  miss  {:<6}  (evicted user {})", id, name, old),
+        none => PrintLine("user {}  miss  {}", id, name)
+    }
+    return name;
+}
+
+// Prints the keys from the most to the least recently used. It takes a read-only reference, so it
+// cannot call `Get`: a lookup moves the entry to the front, which changes the cache.
+//
+//     let first = cache.Get(1);
+//         error: cannot call 'Get' through immutable reference '&LruCache<int32, char8[..]>'
+//
+// `Peek` and `Contains` read without counting as a use, and work through `&`.
+func ShowOrder(cache: &LruCache<int32, char8[..]>) {
+    var keys: int32[3] = [0; 3];
+    let count = cache.KeysByRecency(keys[..]);
+    Print("recency:");
+    for key in keys[..count] {
+        Print(" {}", key);
+    }
+    PrintLine();
+}
+
+func Main() -> ! CollectionError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // Room for three names, keyed by `int32`.
+    var cache = LruCache<int32, char8[..]>(allocator, 3, HashInt32, EqualsInt32);
+
+    let requests: int32[8] = [1, 2, 3, 1, 4, 2, 1, 3];
+    for id in requests[..] {
+        Name(cache, id)?;
+    }
+    ShowOrder(cache);
+    PrintLine("{} requests, {} loads", requests.length, Loads);
+
+    // `Peek` reads without counting as a use, so the order does not change. `Contains` asks
+    // without reading the value at all.
+    PrintLine("peek 2: {}", cache.Peek(2) ?? "(not cached)");
+    PrintLine("has 4: {}", cache.Contains(4));
+    ShowOrder(cache);
+}

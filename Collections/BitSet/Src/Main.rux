@@ -1,0 +1,78 @@
+// A hash set of small numbers spends many bytes on each one. When the members are small
+// non-negative integers — the days of a month, seat numbers, the ids of a few hundred features
+// — one bit per possible member is enough: bit 7 set means 7 is in the set.
+//
+// `BitSet` keeps those bits in 64-bit words. A membership test is a shift and a mask, counting
+// the members is a population count per word, and union, intersection and difference combine
+// two sets a whole word — 64 members — at a time. Setting a bit past the end grows the set;
+// asking about a bit past the end answers false, since an absent bit is an unset one.
+//
+// A bit set owns its words, so it cannot be copied:
+//
+//     var both = ann;
+//         error: move-only value 'ann' requires an explicit '<-' in initialization
+//
+// Moving it with `<-` would use `ann` up. To combine sets and keep the originals, build the
+// combination in a new set.
+import Allocator::{ Allocator, SystemAllocator };
+import Collections::{ BitSet, CollectionError };
+import Io::{ Print, PrintLine };
+
+// Prints the members in order. `NextSet(from)` finds the lowest set bit at or after `from`, so
+// each answer plus one is where to look next.
+func Show(label: char8[..], days: &BitSet) {
+    Print("{:<10}", label);
+    var from: uint = 0;
+    loop {
+        let day = days.NextSet(from) ?? break;
+        Print(" {}", day);
+        from = day + 1;
+    }
+    PrintLine("   ({} days)", days.Count());
+}
+
+func Main() -> ! CollectionError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // The days of June each person is free. `Set` may need another word, and so can fail.
+    var ann = BitSet(allocator);
+    let annFree: uint[7] = [2, 3, 9, 10, 16, 23, 30];
+    for day in annFree[..] {
+        ann.Set(day)?;
+    }
+    var ben = BitSet(allocator);
+    let benFree: uint[6] = [3, 4, 10, 17, 23, 24];
+    for day in benFree[..] {
+        ben.Set(day)?;
+    }
+    Show("ann", ann);
+    Show("ben", ben);
+    PrintLine("ann free on the 9th? {}  on the 99th? {}", ann.Get(9), ann.Get(99));
+
+    // Days both are free: start from Ann's days and keep only those Ben has too.
+    var both = BitSet(allocator);
+    both.UnionWith(ann)?;
+    both.IntersectWith(ben);
+    Show("both", both);
+
+    // Days either is free, and days only Ann is free.
+    var either = BitSet(allocator);
+    either.UnionWith(ann)?;
+    either.UnionWith(ben)?;
+    Show("either", either);
+    var annOnly = BitSet(allocator);
+    annOnly.UnionWith(ann)?;
+    annOnly.DifferenceWith(ben);
+    Show("ann only", annOnly);
+
+    // Plans change: Ann books the 10th, and `Toggle` flips Ben's 17th off and his 18th on.
+    ann.Reset(10);
+    ben.Toggle(17)?;
+    ben.Toggle(18)?;
+    Show("ann now", ann);
+    Show("ben now", ben);
+
+    // The set spans as many bits as its highest member needed: 31 here, in one word.
+    PrintLine("ann spans {} bits", ann.Length());
+}

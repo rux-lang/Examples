@@ -1,0 +1,88 @@
+// A queue serves whoever came first. A priority queue serves whoever matters most: the most
+// urgent support ticket, the next timer to go off, the cheapest route found so far. Items go in
+// in any order, and `Pop` always hands out the largest one still inside.
+//
+// `PriorityQueue<T>` keeps its items in a vector arranged as a binary heap: a tree, flattened
+// into the vector, in which every parent is at least as large as its children. The largest is
+// therefore always at the front, and a `Push` or a `Pop` only repairs one path from the top to
+// the bottom of the tree — a few steps even for a million items. What the heap does not keep is
+// a sorted order: only the front is known to be the largest.
+//
+// "Largest" means the element type's own `<`. There is no ordering function to pass, as there is
+// for a tree map: to change the order, change the type's `<`. The queue lives in another package,
+// so both the type and its `<` must be `pub` for the queue's code to see them. Without `pub`, the
+// operator is invisible there and the queue reports it as missing:
+//
+//     error: operator '<' is not defined for 'Ticket'
+//     help: declare '<' on 'Ticket'
+import Allocator::{ Allocator, SystemAllocator };
+import Collections::{ CollectionError, PriorityQueue };
+import Io::PrintLine;
+
+// A support ticket. A higher priority is more urgent; among equals, the one that arrived first
+// should be served first, so it counts as the larger.
+pub struct Ticket {
+    priority: int32;
+    arrival: int32;
+    subject: char8[..];
+}
+
+extend Ticket {
+    pub func <(self: &Ticket, other: Ticket) -> bool {
+        if self.priority != other.priority {
+            return self.priority < other.priority;
+        }
+        return self.arrival > other.arrival;
+    }
+}
+
+// A timer that goes off at a given second. The earliest should come out first, so its `<` is
+// reversed: a later timer counts as the smaller.
+pub struct Timer {
+    at: int32;
+    name: char8[..];
+}
+
+extend Timer {
+    pub func <(self: &Timer, other: Timer) -> bool {
+        return self.at > other.at;
+    }
+}
+
+func Main() -> ! CollectionError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // `Push` may need more room, and so can fail; `?` hands that failure to `Main`.
+    var tickets = PriorityQueue<Ticket>(allocator);
+    tickets.Push(Ticket { priority: 1, arrival: 1, subject: "typo on the pricing page" })?;
+    tickets.Push(Ticket { priority: 3, arrival: 2, subject: "checkout is down" })?;
+    tickets.Push(Ticket { priority: 2, arrival: 3, subject: "password reset email is late" })?;
+    tickets.Push(Ticket { priority: 3, arrival: 4, subject: "site is slow" })?;
+    tickets.Push(Ticket { priority: 1, arrival: 5, subject: "dark mode request" })?;
+
+    // `Peek` looks at the front without taking it out. It returns a pointer, valid until the
+    // queue next changes, or `none` when the queue is empty.
+    match tickets.Peek() {
+        top? => PrintLine("next up: {} ({} waiting)", top.subject, tickets.Length()),
+        none => PrintLine("no tickets")
+    }
+
+    // `Pop` takes the front out and returns it, or `none` once the queue is empty.
+    loop {
+        let ticket = tickets.Pop() ?? break;
+        PrintLine("  priority {}  #{}  {}", ticket.priority, ticket.arrival, ticket.subject);
+    }
+    PrintLine("empty: {}", tickets.IsEmpty());
+
+    // The same queue over the reversed `<` hands out the earliest time first.
+    var timers = PriorityQueue<Timer>(allocator);
+    timers.Push(Timer { at: 30, name: "autosave" })?;
+    timers.Push(Timer { at: 5, name: "blink the cursor" })?;
+    timers.Push(Timer { at: 60, name: "check mail" })?;
+    timers.Push(Timer { at: 12, name: "refresh the feed" })?;
+    loop {
+        let timer = timers.Pop() ?? break;
+        PrintLine("at {:2}s  {}", timer.at, timer.name);
+    }
+}
