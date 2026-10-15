@@ -1,0 +1,109 @@
+// A Nano ID is a short random identifier, such as V1StGXR8_Z5jdHi6B-myT. It does the job of a
+// UUID in less space: twenty-one characters drawn from the sixty-four that are safe in a URL or a
+// file name, A-Z, a-z, 0-9, `_` and `-`. Each character carries six random bits, so a standard
+// identifier carries 126, more than a version 4 UUID, in twenty-one characters instead of 36.
+//
+// `NanoId::Generate()` makes one from the operating system's entropy and returns
+// `NanoId ! EntropyError`. `NanoId::Parse` reads the text form back, strictly: exactly twenty-one
+// characters, every one from the default alphabet.
+//
+// `GenerateNanoId` fills a buffer you provide instead, of any length and from any alphabet, such
+// as six digits for a confirmation code. An alphabet must be two to 256 distinct ASCII
+// characters, so that every character is equally likely; `ValidateAlphabet` says which rule a bad
+// one breaks, before any entropy is spent.
+import Io::PrintLine;
+import NanoId::{ GenerateNanoId, NanoId, NanoIdAlphabet, NanoIdLength, NanoIdParseError,
+    ValidateAlphabet };
+
+func Reason(error: NanoIdParseError) -> char8[..] {
+    return match error {
+        .WrongLength(_) => "wrong length",
+        .InvalidCharacter(_) => "not in the alphabet"
+    };
+}
+
+func Show(text: char8[..]) {
+    match NanoId::Parse(text) {
+        .Success(id) => PrintLine("{:<23} -> {}", text, id),
+        .Failure(error) => PrintLine("{:<23} -> {} at byte {}", text, Reason(error), error.Offset())
+    }
+}
+
+func Check(alphabet: char8[..]) {
+    match ValidateAlphabet(alphabet) {
+        .Success(_) => PrintLine("{:<16} -> usable", alphabet),
+        .Failure(error) => match error {
+            .AlphabetTooSmall => PrintLine("{:<16} -> too few characters", alphabet),
+            .AlphabetTooLarge => PrintLine("{:<16} -> too many characters", alphabet),
+            .DuplicateCharacter(at) => PrintLine("{:<16} -> a duplicate at byte {}", alphabet, at),
+            .NonAsciiCharacter(at) => PrintLine("{:<16} -> not ASCII at byte {}", alphabet, at),
+            .Entropy(_) => PrintLine("{:<16} -> no entropy", alphabet)
+        }
+    }
+}
+
+// Whether every character of `text` appears in `alphabet`.
+func AllFrom(text: char8[..], alphabet: char8[..]) -> bool {
+    for c in text {
+        var found = false;
+        for member in alphabet {
+            if member == c { found = true; }
+        }
+        if !found { return false; }
+    }
+    return true;
+}
+
+func Main() -> int {
+    PrintLine("default alphabet: {} characters, {} per identifier", NanoIdAlphabet.length,
+        NanoIdLength);
+
+    // Reading the text form. The first is the example from Nano ID's own documentation.
+    Show("V1StGXR8_Z5jdHi6B-myT");
+    Show("V1StGXR8_Z5jdHi6B");
+    Show("V1StGXR8_Z5jdHi6B-myT42");
+    Show("V1StGXR8+Z5jdHi6B-myT");
+
+    // A new identifier, different on every run. Generating can fail when the system has no
+    // entropy, and then there is no identifier at all, never a predictable one. So the outcome is
+    // not the identifier itself:
+    //
+    //     let id: NanoId = NanoId::Generate();
+    //         error: cannot assign 'NanoId ! EntropyError' to 'NanoId'
+    let id = NanoId::Generate() catch {
+        else => {
+            PrintLine("no entropy for a new identifier");
+            return 1;
+        }
+    };
+    PrintLine("a new one:   {}", id);
+    // Whatever it is, its shape is fixed: twenty-one characters that parse back to the same value.
+    match NanoId::Parse(id.Text()) {
+        .Success(back) => PrintLine("length {}, parses back to itself: {}", id.Text().length,
+            back.Equals(id)),
+        .Failure(_) => PrintLine("does not parse back")
+    }
+
+    // A six-digit code from a custom alphabet, in a buffer of exactly the length wanted. This
+    // call returns `! NanoIdError`, since the alphabet could be unusable, and that failure must be
+    // handled too:
+    //
+    //     GenerateNanoId(code[..], "0123456789");
+    //         error: fallible result of type '! NanoIdError' is discarded
+    var code: char8[6];
+    GenerateNanoId(code[..], "0123456789") catch {
+        else => {
+            PrintLine("no entropy for a code");
+            return 1;
+        }
+    };
+    PrintLine("a code:      {}", code[..]);
+    PrintLine("length {}, digits only: {}", code.length, AllFrom(code[..], "0123456789"));
+
+    // Alphabets that would make some characters likelier than others are refused.
+    Check("0123456789abcdef");
+    Check("x");
+    Check("abcabc");
+    Check("abé");
+    return 0;
+}

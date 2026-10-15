@@ -1,0 +1,16 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "TimeZone"
+Version = "0.1.0"
+Type = "Executable"
+Description = "Turn a moment into local time in a named time zone, and back"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+
+[Dependencies]
+Allocator = { Namespace = "Rux", Version = "*" }
+Io = { Namespace = "Rux", Version = "*" }
+Time = { Namespace = "Rux", Version = "*" }
+TimeZone = { Namespace = "Rux", Version = "*" }

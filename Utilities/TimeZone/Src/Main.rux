@@ -1,0 +1,109 @@
+// An offset such as +03:00 says how far a clock is from UTC at one moment. A time zone says which
+// offset a place uses at every moment: Kyiv keeps +02:00 in winter and +03:00 in summer, and
+// moves between them on dates its rules fix. So a time zone turns a moment into the local time
+// there, and back.
+//
+// `TimeZone::FromRule` builds a zone from a POSIX `TZ` rule, a short text that names the
+// standard time, its offset, the daylight time and when it starts and ends. Kyiv's is
+// `EET-2EEST,M3.5.0/3,M10.5.0/4`: EET, two hours east of UTC (POSIX writes east as minus), and
+// EEST from 03:00 on the last Sunday of March (M3.5.0/3) until 04:00 on the last Sunday of
+// October (M10.5.0/4). `TimeZone::Load` reads a zone's whole history from the tz database by
+// name instead, but Windows has no such database, so this program builds its zones from rules.
+//
+// `StateAt` gives the offset, the abbreviation and whether it is daylight time at a moment, and
+// `ToLocal` the local date and time. `Resolve` goes the other way, from a local date and time to
+// the moment, and says whether that local time happened once, twice as clocks fell back over it,
+// or never as they sprang forward over it.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::PrintLine;
+import Time::{ ParseDateTime, ParseRfc3339, Timestamp };
+import TimeZone::{ LocalTimeKind, TimeZone, TimeZoneError };
+
+func Reason(error: TimeZoneError) -> char8[..] {
+    return match error {
+        TimeZoneError::NotFound => "no zone of that name",
+        TimeZoneError::InvalidName => "not a zone name",
+        TimeZoneError::InvalidData => "not a tz database file",
+        TimeZoneError::InvalidRule => "not a POSIX TZ rule",
+        TimeZoneError::Unreadable => "the zone file could not be read",
+        TimeZoneError::OutOfMemory => "out of memory"
+    };
+}
+
+// The local time in `zone` at `moment`, with what the zone calls it.
+func ShowMoment(zone: &TimeZone, moment: Timestamp) {
+    let state = zone.StateAt(moment);
+    PrintLine("  {:<8} {:<4} daylight {:<5}  {}", zone.Name(), state.abbreviation, state.daylight,
+        zone.ToLocal(moment));
+}
+
+// Which moments the local date and time `text` stands for in `zone`.
+func ShowLocal(zone: &TimeZone, text: char8[..]) {
+    let local = ParseDateTime(text) catch {
+        else => {
+            PrintLine("{} is not a date and time", text);
+            return;
+        }
+    };
+    let found = zone.Resolve(local);
+    match found.kind {
+        LocalTimeKind::Unique => PrintLine("  {} happens once:  {}", text,
+            zone.ToLocal(found.earlier)),
+        LocalTimeKind::Ambiguous => PrintLine("  {} happens twice: {} then {}", text,
+            zone.ToLocal(found.earlier), zone.ToLocal(found.later)),
+        LocalTimeKind::Skipped => PrintLine("  {} never happens: taken as {}", text,
+            zone.ToLocal(found.later))
+    }
+}
+
+func Main() -> int {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // Building a zone allocates, and a rule can be malformed, so each returns
+    // `TimeZone ! TimeZoneError`. A zone owns that memory, so it is never copied by accident:
+    //
+    //     let copy = kyiv;
+    //         error: move-only value 'kyiv' requires an explicit '<-' in initialization
+    //
+    // The functions below borrow it instead, as `&TimeZone`.
+    let utc = TimeZone::Utc(allocator) catch { else => return 1 };
+    let kyiv = TimeZone::FromRule(allocator, "Kyiv", "EET-2EEST,M3.5.0/3,M10.5.0/4") catch {
+        else => return 1
+    };
+    let newYork = TimeZone::FromRule(allocator, "New York", "EST5EDT,M3.2.0,M11.1.0") catch {
+        else => return 1
+    };
+
+    // One moment in winter and one in summer, each read on three clocks. The offsets change with
+    // the season, and by a different amount on different dates in each place.
+    let winter = ParseRfc3339("2026-01-15T12:00:00Z") catch { else => return 1 };
+    let summer = ParseRfc3339("2026-07-01T12:00:00Z") catch { else => return 1 };
+    PrintLine("{}", winter);
+    ShowMoment(utc, winter.ToTimestamp());
+    ShowMoment(kyiv, winter.ToTimestamp());
+    ShowMoment(newYork, winter.ToTimestamp());
+    PrintLine("{}", summer);
+    ShowMoment(utc, summer.ToTimestamp());
+    ShowMoment(kyiv, summer.ToTimestamp());
+    ShowMoment(newYork, summer.ToTimestamp());
+
+    // From local time back to a moment. On 29 March 2026 Kyiv's clocks jump from 03:00 to 04:00,
+    // so 03:30 never happens; on 25 October they go back from 04:00 to 03:00, so 03:30 happens
+    // twice, an hour apart. That is why `Resolve` returns a `LocalTime`, with the kind and both
+    // candidate moments, and not one `Timestamp`:
+    //
+    //     let moment: Timestamp = kyiv.Resolve(local);
+    //         error: cannot assign 'LocalTime' to 'Timestamp'
+    PrintLine("Kyiv local times:");
+    ShowLocal(kyiv, "2026-07-01T15:00:00");
+    ShowLocal(kyiv, "2026-03-29T03:30:00");
+    ShowLocal(kyiv, "2026-10-25T03:30:00");
+
+    // A rule must name its standard time with at least three letters, then give its offset.
+    match TimeZone::FromRule(allocator, "Nowhere", "X5") {
+        .Success(_) => PrintLine("rule X5 accepted"),
+        .Failure(error) => PrintLine("rule X5 refused: {}", Reason(error))
+    }
+    return 0;
+}
