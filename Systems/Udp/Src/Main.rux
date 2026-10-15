@@ -1,0 +1,64 @@
+// UDP is TCP's simpler sibling. There is no connection to set up and no stream: a program sends
+// a datagram — one self-contained message of up to about 64 KB — to an address, and the other
+// side receives it whole, or not at all. Nothing is resent if it is lost and nothing keeps
+// datagrams in order. In exchange each message costs one packet and no handshake, which suits
+// games, voice, time and name lookups: small messages where a late answer is worth nothing.
+//
+// A `UdpSocket` is bound to an address, like a TCP listener, and can then both send and
+// receive. `SendTo` names where each datagram goes; `ReceiveFrom` waits for the next one and
+// returns a `Datagram`: its length and the address it came from, which is where to reply.
+//
+// Both sockets live in this one program, on the loopback address. Datagrams sent to a socket on
+// the same machine wait in its queue until it receives them, so one thread is enough.
+import Io::{ IoError, IoErrorKind, PrintLine };
+import Net::{ IpAddress, Ipv4Address, SocketAddress, UdpSocket };
+import Time::Duration;
+
+func Main() -> ! IoError {
+    // Port 0 again lets the system choose; the ports differ between runs and are not printed.
+    let loopback = SocketAddress::New(IpAddress::FromIpv4(Ipv4Address::Localhost()), 0);
+    let alice = UdpSocket::Bind(loopback)?;
+    let bob = UdpSocket::Bind(loopback)?;
+    let aliceAddress = alice.LocalAddress()?;
+    let bobAddress = bob.LocalAddress()?;
+
+    // One datagram there, and a reply to whoever sent it.
+    alice.SendTo("ping", bobAddress)?;
+    var buffer: char8[64];
+    let received = bob.ReceiveFrom(buffer[..])?;
+    PrintLine("bob got [{}] from alice? {}", buffer[..received.length],
+        received.source.Equals(aliceAddress));
+    bob.SendTo("pong", received.source)?;
+    let answer = alice.ReceiveFrom(buffer[..])?;
+    PrintLine("alice got [{}]", buffer[..answer.length]);
+
+    // Each send is its own datagram, and each receive takes exactly one: the boundaries stay.
+    alice.SendTo("first", bobAddress)?;
+    alice.SendTo("second", bobAddress)?;
+    for _ in 0..2 {
+        let datagram = bob.ReceiveFrom(buffer[..])?;
+        PrintLine("bob got [{}], {} bytes", buffer[..datagram.length], datagram.length);
+    }
+
+    // `Connect` fixes the one peer a socket talks to, so `Send` and `Receive` need no address.
+    // Nothing is sent: for UDP, connecting only sets a default and filters what arrives.
+    alice.Connect(bobAddress)?;
+    bob.Connect(aliceAddress)?;
+    alice.Send("over the connected pair")?;
+    let length = bob.Receive(buffer[..])?;
+    PrintLine("bob got [{}]", buffer[..length]);
+
+    // Nobody promises an answer, so a receive that must not wait forever gets a timeout.
+    bob.SetReadTimeout(Duration::FromMilliseconds(100))?;
+    match bob.Receive(buffer[..]) {
+        .Success(_) => PrintLine("bob got something unexpected"),
+        .Failure(error) if error.kind == IoErrorKind::TimedOut =>
+            PrintLine("bob waited 100 ms: nothing"),
+        .Failure(error) => fail error
+    }
+
+    // A socket owns what the system gave it, so it is moved, never copied:
+    //
+    //     let carol = alice;
+    //         error: move-only value 'alice' requires an explicit '<-' in initialization
+}

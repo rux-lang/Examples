@@ -1,0 +1,144 @@
+// Reading arguments one by one, as the Environment lesson did, gets tedious quickly: options
+// in any order, `-v` and `--verbose` meaning the same, `--jobs=4` and `--jobs 4` too, and a
+// helpful message for every mistake. The `CommandLine` package does it from a description.
+//
+// A program describes what it accepts as plain values: a `CommandSpec` with its options —
+// `Flag`s that are present or not, `ValueOption`s that take a value — its positional
+// arguments — `Required`, `Optional` or `Remaining` — and its subcommands. `Parse` checks a
+// list of arguments against that description and returns `Parsed ! CommandLineError`; the
+// parse then answers questions such as `Has`, `Count`, `Value` and `Positional`. The same
+// description writes the help text, so the two can never disagree.
+//
+// `ParseProcess` reads the program's own arguments. To print the same thing on every run, this
+// lesson mostly parses fixed lists instead, written as one string and split at the spaces.
+import Allocator::{ Allocator, SystemAllocator };
+import CommandLine::{
+    Command, CommandSpec, Flag, OptionSpec, Optional, Parse, Parsed, ParseProcess, PositionalSpec,
+    Remaining, Required, ValueOption, WriteUsage
+};
+import Io::{ ConsoleWriter, IoError, PrintLine };
+import Path::{ OsString, OsStringView };
+import Text::{ FormatError, StringView, TextError, TextWriter };
+
+// Splits native text at its spaces, the way a shell splits what you type, into `words`.
+func Split(text: OsStringView, words: var OsStringView[..]) -> uint {
+    let units = text.Units();
+    var count: uint = 0;
+    var start: uint = 0;
+    for at in 0..=units.length {
+        if at == units.length || units[at] as uint32 == 0x20 {
+            if at > start && count < words.length {
+                words[count] = OsStringView::FromUnits(units[start..at]);
+                count = count + 1;
+            }
+            start = at + 1;
+        }
+    }
+    return count;
+}
+
+func IsCommand(parsed: &Parsed, word: char8[..]) -> bool {
+    let name = StringView::FromValidated(parsed.CommandName() ?? "");
+    let wanted = StringView::FromValidated(word);
+    return name.Equals(wanted);
+}
+
+// What the program would do with a successful parse. Asking for help is a successful parse too,
+// and `WriteHelp` on a subcommand's parse names the command above it.
+func Describe(parsed: &Parsed, screen: &var TextWriter) -> ! FormatError {
+    if parsed.HelpRequested() {
+        parsed.WriteHelp(screen)?;
+        return;
+    }
+    let verbose = parsed.Count("verbose");
+    let sub = parsed.Subcommand() ?? return;
+    if sub.HelpRequested() {
+        sub.WriteHelp(screen)?;
+        return;
+    }
+    if IsCommand(parsed, "add") {
+        // `Integer` reads a value as a number, and fails when it is not one.
+        match sub.Integer("priority") {
+            .Success(priority) => PrintLine("  add [{}] priority {}, verbosity {}",
+                sub.Positional("title") ?? OsStringView(), priority ?? 3, verbose),
+            .Failure(error) => PrintLine("  error: {}", error)
+        }
+        for tag in sub.Positionals("tags") {
+            PrintLine("  tag {}", tag);
+        }
+    } else if IsCommand(parsed, "list") {
+        PrintLine("  list, all {}, filter [{}]", sub.Has("all"),
+            sub.Positional("filter") ?? OsStringView());
+    }
+}
+
+func Try(spec: *CommandSpec, allocator: Allocator, line: char8[..]) -> ! (TextError | FormatError) {
+    PrintLine("$ todo {}", line);
+    var holder = OsString::FromText(allocator, line)?;
+    var words: OsStringView[8] = [OsStringView(); 8];
+    let count = Split(holder.View(), words[..]);
+
+    // `ConsoleWriter` is a `TextWriter` over standard output, for the help text.
+    var failure: IoError? = none;
+    var console = ConsoleWriter(@failure);
+    let screen: &var TextWriter = console;
+    match Parse(spec, words[..count]) {
+        .Success(parsed) => Describe(parsed, screen)?,
+        .Failure(error) => PrintLine("  error: {}", error)
+    }
+}
+
+func Main() -> ! (TextError | FormatError) {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // The description: two subcommands, each with its own options and positionals.
+    let addOptions: OptionSpec[1] = [ValueOption("priority", 'p', "N", "How urgent, 1 to 5")];
+    let addPositionals: PositionalSpec[2] = [
+        Required("title", "What to do"), Remaining("tags", "Words to file it under")
+    ];
+    let listOptions: OptionSpec[1] = [Flag("all", 'a', "Include finished items")];
+    let listPositionals: PositionalSpec[1] = [Optional("filter", "Only items with this tag")];
+    let commands: CommandSpec[2] = [
+        Command("add", "Add an item").WithOptions(addOptions[..]).WithPositionals(addPositionals[..]),
+        Command("list", "Show the items").WithOptions(listOptions[..])
+            .WithPositionals(listPositionals[..])
+    ];
+    let options: OptionSpec[1] = [Flag("verbose", 'v', "Say more; repeat for even more")];
+    let todo = Command("todo", "Keeps a to-do list").WithVersion("1.0.0")
+        .WithOptions(options[..]).WithCommands(commands[..]);
+
+    // Lines that parse, and lines that do not.
+    Try(@todo, allocator, "add milk")?;
+    Try(@todo, allocator, "-vv add --priority=1 milk shop home")?;
+    Try(@todo, allocator, "list -a home")?;
+    Try(@todo, allocator, "add -p high milk")?;
+    Try(@todo, allocator, "add")?;
+    Try(@todo, allocator, "add -x milk")?;
+    Try(@todo, allocator, "remove milk")?;
+    Try(@todo, allocator, "list home work")?;
+
+    // The help text, written from the same description, for the program and for a subcommand.
+    Try(@todo, allocator, "--help")?;
+    Try(@todo, allocator, "add -h")?;
+
+    // And this run's own arguments. `rux run` passes none, and a command is required, so this
+    // ends the way a real program would: the reason, then the usage line.
+    PrintLine("$ todo");
+    var failure: IoError? = none;
+    var console = ConsoleWriter(@failure);
+    let screen: &var TextWriter = console;
+    match ParseProcess(@todo) {
+        .Success(parsed) => Describe(parsed, screen)?,
+        .Failure(error) => {
+            PrintLine("error: {}", error);
+            WriteUsage(todo, screen)?;
+        }
+    }
+
+    // A slice cannot be compared with `==`, which is why `IsCommand` compares `StringView`s:
+    //
+    //     let name = parsed.CommandName() ?? "";
+    //     if name == "add" { ... }
+    //         error: operator '==' is not defined for slice type 'char8[..]'
+}

@@ -1,0 +1,137 @@
+// A program can start another program: a child process. The child runs on its own, with its own
+// memory, and the two can talk only through what the system connects between them — the child's
+// arguments and environment on the way in, its three standard streams while it runs, and its
+// exit status at the end.
+//
+// `Command` describes the child: the program, its arguments, environment changes and where each
+// stream goes. `Run` starts it and waits, `Spawn` starts it and hands back a `Child` to talk to,
+// and `Capture` starts it and keeps everything it writes. Starting a program can fail — it may
+// not exist — so each returns a fallible with an `IoError`.
+//
+// To read the same on Windows, Linux and macOS, this program is its own child. Argument zero is
+// how it was started, so a `Command` built from it starts this executable again; an extra
+// argument tells that second copy which part to play.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::{ IoError, IoErrorKind, Print, PrintLine, ReadLine, ReadLineFrom, StandardError, WriteAll };
+import Path::{ OsString, OsStringView };
+import Process::{ Argument, ArgumentCount, Command, Exit, Stdio, Variable };
+import Text::{ StringBuilder, ToAsciiUpper };
+
+// Whether a native argument is the ASCII word `text`.
+func Is(argument: OsStringView, text: char8[..]) -> bool {
+    var holder = OsString::FromText(SystemAllocator(), text) catch { else => return false };
+    let wanted = holder.View();
+    return argument.Equals(wanted);
+}
+
+// The child's side. Each part is a few lines of an ordinary program.
+func RunChild(role: OsStringView) -> int32 {
+    if Is(role, "greet") {
+        Print("hello from the child");
+        var errors = StandardError::Acquire();
+        WriteAll(errors, "and a note on standard error") catch { else => return 2 };
+        return 0;
+    }
+    if Is(role, "fail") { return 7; }
+    if Is(role, "colour") {
+        Print("{}", Variable("LESSON_COLOUR") ?? OsStringView());
+        return 0;
+    }
+    if Is(role, "shout") {
+        // Reads lines until its input ends, and writes each back in capitals.
+        var line = StringBuilder(SystemAllocator());
+        while true {
+            ReadLine(line) catch { else => return 0 };
+            let loud = ToAsciiUpper(SystemAllocator(), line.View()) catch { else => return 3 };
+            PrintLine("{}", loud);
+            line.Clear();
+        }
+    }
+    if Is(role, "wait") {
+        // Waits for a line that never comes, until it is killed.
+        var line = StringBuilder(SystemAllocator());
+        ReadLine(line) catch { else => return 0 };
+    }
+    return 99;
+}
+
+// A command that starts this same program in `role`.
+func Myself(allocator: Allocator, role: char8[..]) -> Command {
+    var command = Command::FromNative(allocator, Argument(0) ?? OsStringView());
+    command.Argument(role);
+    return <-command;
+}
+
+func Main() -> ! IoError {
+    if ArgumentCount() > 1 {
+        Exit(RunChild(Argument(1) ?? OsStringView()));
+    }
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // `Run` waits for the child and returns how it finished. A status is a success only for
+    // exit code zero; `Code` is optional because a child ended by a signal has none.
+    let failing = Myself(allocator, "fail");
+    let status = failing.Run()?;
+    PrintLine("fail:   success {}, code {}", status.Success(), status.Code() ?? -1);
+
+    // `Capture` keeps both output streams and the status. The bytes are only bytes: a child may
+    // write anything, so they are shown, not trusted to be text.
+    let greeting = Myself(allocator, "greet");
+    let captured = greeting.Capture(allocator)?;
+    PrintLine("greet:  success {}", captured.Status().Success());
+    PrintLine("        output [{}]", captured.Output());
+    PrintLine("        error  [{}]", captured.Error());
+
+    // Environment changes made on the command reach only that child.
+    var colour = Myself(allocator, "colour");
+    colour.SetVariable("LESSON_COLOUR", "teal");
+    let painted = colour.Capture(allocator)?;
+    PrintLine("colour: the child saw [{}]", painted.Output());
+    PrintLine("        this process sees [{}]", Variable("LESSON_COLOUR") ?? OsStringView());
+
+    // Pipes: the parent writes to the child's input and reads its output while it runs.
+    // Closing the input is how the child learns that no more is coming.
+    var shout = Myself(allocator, "shout");
+    shout.StandardInput(Stdio::Pipe);
+    shout.StandardOutput(Stdio::Pipe);
+    var child = shout.Spawn()?;
+    var input = child.TakeInput() ?? fail IoError::Of(IoErrorKind::Other);
+    var output = child.TakeOutput() ?? fail IoError::Of(IoErrorKind::Other);
+    WriteAll(input, "quiet words\nstill quiet\n")?;
+    input.Close();
+    var line = StringBuilder(allocator);
+    while true {
+        ReadLineFrom(output, line) catch { error if error.IsEnd() => break, error => fail error };
+        PrintLine("shout:  {}", line.View());
+        line.Clear();
+    }
+    PrintLine("        success {}", child.Wait()?.Success());
+
+    // `TryWait` asks without waiting; `Kill` ends a child that would never finish.
+    var waiting = Myself(allocator, "wait");
+    waiting.StandardInput(Stdio::Pipe);
+    var sleeper = waiting.Spawn()?;
+    PrintLine("wait:   finished yet? {}", sleeper.TryWait()? != none);
+    sleeper.Kill()?;
+    PrintLine("        killed, success {}", sleeper.Wait()?.Success());
+
+    // A program that does not exist fails to start; it is not a child that exits.
+    let missing = Command(allocator, "no-such-program-anywhere");
+    match missing.Run() {
+        .Success(_) => PrintLine("missing: it ran?"),
+        .Failure(error) => PrintLine("missing: not found? {}", error.kind == IoErrorKind::NotFound)
+    }
+
+    // Starting a child can fail, so its status is only reachable through the fallible:
+    //
+    //     let status = failing.Run();
+    //     PrintLine("{}", status.Success());
+    //         error: type 'ExitStatus ! IoError' has no field 'Success'
+    //
+    // And an exit status is an `int32`, the width every system reports:
+    //
+    //     func RunChild(role: OsStringView) -> int { ... }
+    //     Exit(RunChild(role));
+    //         error: argument 1 to 'Exit' has type 'int', but parameter 'code' requires 'int32'
+}

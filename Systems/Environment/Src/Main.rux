@@ -1,0 +1,99 @@
+// Every program starts with two lists handed to it by whoever started it. The arguments are the
+// words typed after the program's name, such as `--verbose` or a file to open. The environment
+// is a set of `NAME=value` pairs, such as `PATH` or `HOME`, inherited from the parent process and
+// passed on to every child. When the program ends it hands one number back: its exit status,
+// zero for success.
+//
+// The `Process` package reads both lists. Neither is guaranteed to be text: on Linux and macOS
+// an argument is bytes, on Windows it is 16-bit units, and nothing obliges either to be valid
+// UTF-8 or UTF-16. So every argument and value is an `OsStringView`, a view of the native units
+// the system handed over, which `{}` prints and `ToText` converts when real text is needed.
+//
+// Reading allocates nothing: every view borrows storage the process owns for its whole life.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::{ IoError, IoErrorKind, PrintLine };
+import Path::{ OsString, OsStringView, Path };
+import Process::{
+    Argument, ArgumentCount, Arguments, CurrentId, Environment, Exit, RemoveVariable, SetVariable,
+    Variable
+};
+import Text::TextError;
+
+// `Variable` returns an optional: a variable that is not set is `none`, which is different
+// from one set to the empty string.
+func Show(name: char8[..]) {
+    match Variable(name) {
+        value? => PrintLine("{:<13} = \"{}\"", name, value),
+        none => PrintLine("{:<13} is not set", name)
+    }
+}
+
+func Main() -> ! (IoError | TextError) {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    // Argument zero is the program itself, as it was started: a name or a path the parent chose,
+    // so it differs from one machine to the next. The real arguments start at one.
+    PrintLine("arguments     {}", ArgumentCount() - 1);
+    let program = Path::FromView(Argument(0) ?? OsStringView());
+    PrintLine("program       {}", program.Stem() ?? OsStringView());
+    var index: uint = 1;
+    for argument in Arguments().Skip(1) {
+        PrintLine("argument {}    {}", index, argument);
+        index = index + 1;
+    }
+
+    // An argument is native text, so it is compared with native text: `OsString::FromText`
+    // turns a literal into the units this system uses. Run `rux run -- --quit` to take this
+    // branch. `Exit` ends the process at once with a status; nothing after it runs.
+    var quit = OsString::FromText(allocator, "--quit")?;
+    let wanted = quit.View();
+    let first = Argument(1) ?? OsStringView();
+    if first.Equals(wanted) {
+        PrintLine("leaving early with status 3");
+        Exit(3);
+    }
+
+    // A variable this program sets itself, so the output is the same on every machine. The
+    // change is seen by this process and by every child it starts from now on, never by the
+    // parent that started it.
+    Show("LESSON_COLOUR");
+    SetVariable("LESSON_COLOUR", "teal")?;
+    Show("LESSON_COLOUR");
+    SetVariable("LESSON_COLOUR", "")?;
+    Show("LESSON_COLOUR");
+
+    // `Environment` walks every variable, as `EnvironmentVariable` pairs of name and value.
+    var found = false;
+    var count: uint = 0;
+    var holder = OsString::FromText(allocator, "LESSON_COLOUR")?;
+    let name = holder.View();
+    for variable in Environment() {
+        count = count + 1;
+        if variable.name.Equals(name) {
+            found = true;
+        }
+    }
+    PrintLine("found in walk {}", found);
+    PrintLine("any at all    {}", count > 0);
+
+    RemoveVariable("LESSON_COLOUR")?;
+    Show("LESSON_COLOUR");
+
+    // A name may not contain `=`, since `=` is what ends a name in the environment.
+    match SetVariable("LESSON=COLOUR", "teal") {
+        .Success(_) => PrintLine("a name with = was accepted?"),
+        .Failure(error) if error.kind == IoErrorKind::InvalidInput =>
+            PrintLine("LESSON=COLOUR refused as invalid input"),
+        .Failure(error) => fail error
+    }
+
+    // The process identifier is the system's number for this run, and changes every time.
+    PrintLine("process id    {}", CurrentId());
+
+    // Returning from `Main` is the ordinary way to finish: a success here is exit status 0, and
+    // a failure passed out with `?` is status 1.
+    //
+    //     let home: OsStringView = Variable("HOME");
+    //         error: cannot assign 'OsStringView?' to 'OsStringView'
+}

@@ -1,0 +1,110 @@
+// Every machine on a network has an IP address. IPv4 writes one as four numbers from 0 to 255,
+// `192.168.1.20`; IPv6, which has room for far more machines, writes 16 bytes as eight groups of
+// hexadecimal digits, `2001:db8:0:0:0:0:0:1`, where `::` may stand for one run of zero groups:
+// `2001:db8::1`. Add a port, the number that picks one program on that machine, and you have a
+// socket address: `192.168.1.20:8080`, or `[2001:db8::1]:443`, with IPv6 in brackets so its
+// colons are not mistaken for the port's.
+//
+// The `Net` package keeps these as plain values. `Parse` reads the text and returns an optional:
+// text that is not an address is `none`. It is strict on purpose — no leading zeros, which some
+// systems read as octal, and no shortened forms such as `127.1`. `WriteText` writes the one
+// canonical form into a buffer, IPv6 in lower case with the longest run of zeros shortened.
+import Allocator::{ Allocator, SystemAllocator };
+import Io::PrintLine;
+import Net::{ IpAddress, Ipv4Address, Ipv6Address, SocketAddress };
+import Text::TextError;
+
+// What kind of address it is. `IsLoopback` is built in; the private ranges are read from the
+// octets, which are public fields.
+func Kind(address: IpAddress) -> char8[..] {
+    if address.IsLoopback() { return "loopback, this machine"; }
+    match address.AsIpv4() {
+        v4? => {
+            let o = v4.octets;
+            if v4.Equals(Ipv4Address::Unspecified()) { return "unspecified, any address"; }
+            let ten = o[0] == 10;
+            let oneSevenTwo = o[0] == 172 && o[1] >= 16 && o[1] <= 31;
+            let oneNineTwo = o[0] == 192 && o[1] == 168;
+            if ten || oneSevenTwo || oneNineTwo { return "private network"; }
+            return "public";
+        },
+        none => {}
+    }
+    let v6 = address.AsIpv6() ?? Ipv6Address::Unspecified();
+    if v6.Equals(Ipv6Address::Unspecified()) { return "unspecified, any address"; }
+    if (v6.octets[0] & 0xFE) == 0xFC { return "private network"; }
+    if v6.octets[0] == 0xFE && (v6.octets[1] & 0xC0) == 0x80 { return "link-local"; }
+    return "public";
+}
+
+func Show(text: char8[..]) {
+    match IpAddress::Parse(text) {
+        address? => {
+            // An IPv6 address takes at most 39 characters, so the buffer always has room.
+            var buffer: char8[39];
+            let length = address.WriteText(buffer[..]);
+            let version = address.IsIpv6() ? "IPv6" : "IPv4";
+            PrintLine("{:<26} {} {:<16} {}", text, version, buffer[..length], Kind(address));
+        },
+        none => PrintLine("{:<26} not an IP address", text)
+    }
+}
+
+func ShowSocket(text: char8[..]) {
+    match SocketAddress::Parse(text) {
+        socket? => {
+            var buffer: char8[47];
+            let length = socket.WriteText(buffer[..]);
+            PrintLine("{:<26} port {:<5} {}", text, socket.port, buffer[..length]);
+        },
+        none => PrintLine("{:<26} not a socket address", text)
+    }
+}
+
+func Main() -> ! TextError {
+    var system = SystemAllocator();
+    let allocator: Allocator = system;
+
+    Show("127.0.0.1");
+    Show("192.168.1.20");
+    Show("172.20.0.5");
+    Show("8.8.8.8");
+    Show("0.0.0.0");
+    Show("::1");
+    Show("2001:DB8:0:0:0:0:0:1");
+    Show("fd12:3456::7");
+    Show("fe80::1");
+    Show("256.1.1.1");
+    Show("192.168.01.20");
+    Show("127.1");
+    Show("example.com");
+
+    ShowSocket("127.0.0.1:8080");
+    ShowSocket("[::1]:443");
+    ShowSocket("::1:443");
+    ShowSocket("127.0.0.1:70000");
+    ShowSocket("localhost:80");
+
+    // Built from parts. `ToString` allocates the text, so it can fail.
+    let local = SocketAddress::New(IpAddress::FromIpv4(Ipv4Address::Localhost()), 3000);
+    let text = local.ToString(allocator)?;
+    PrintLine("built from parts           {}", text);
+    match SocketAddress::Parse("127.0.0.1:3000") {
+        parsed? => PrintLine("same as 127.0.0.1:3000?    {}", local.Equals(parsed)),
+        none => PrintLine("127.0.0.1:3000 did not parse")
+    }
+
+    // An IPv4 and an IPv6 address are never equal, even for the same machine:
+    let four = IpAddress::FromIpv4(Ipv4Address::Localhost());
+    let six = IpAddress::FromIpv6(Ipv6Address::Localhost());
+    PrintLine("127.0.0.1 equals ::1?      {}", four.Equals(six));
+
+    // An address is not text, and has no `{}` form of its own; `WriteText` is how it is shown.
+    // And `Parse` may find no address, so its result is an optional:
+    //
+    //     PrintLine("{}", four);
+    //         error: no matching overload for 'PrintLine' with argument types (char8[..], IpAddress)
+    //
+    //     let other: IpAddress = IpAddress::Parse("::1");
+    //         error: cannot assign 'IpAddress?' to 'IpAddress'
+}
