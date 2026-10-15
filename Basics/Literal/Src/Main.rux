@@ -24,11 +24,16 @@ func Main() -> int {
     PrintLine("exponents  {} {}", light, charge);
 
     // A suffix fixes the type inside the literal itself: `u8` makes a uint8, `i64` an int64 and
-    // `f32` a float32. Plain `u` and `i` mean `uint` and `int`.
+    // `f32` a float32. Plain `u` and `i` mean `uint` and `int`. Every width has its suffix, from
+    // `i8` to `i512`, `u8` to `u512` and `f8` to `f512`, and a literal of any width is read
+    // exactly: the one below is too big for 64 bits but fits a uint128.
     let small = 200u8;
     let wide = 5i64;
     let single = 0.5f32;
-    PrintLine("suffixes   {} {} {}", small, wide, single);
+    let half = 0.5f16;
+    PrintLine("suffixes   {} {} {} {}", small, wide, single, half);
+    let huge = 340_282_366_920_938_463_463_374_607_431_768_211_455u128;
+    PrintLine("u128       {}", huge);
 
     // With no suffix, a literal standing alone is an `int` or a `float64`. Next to a value that
     // already has a type, it takes that value's type instead. Here 100 becomes a uint8, the sum
