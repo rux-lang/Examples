@@ -1,0 +1,13 @@
+[Manifest]
+Version = 1
+MinRux = "0.4.0"
+
+[Package]
+Name = "UnitTest"
+Version = "0.1.0"
+Type = "SourceLibrary"
+Description = "Write `#Test()` functions with `Expect` checks and run them with `rux test`"
+Authors = ["Rux Contributors <info@rux-lang.dev>"]
+
+[Dependencies]
+Test = { Namespace = "Rux", Version = "*" }

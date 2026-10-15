@@ -1,0 +1,102 @@
+// A unit test calls a small piece of your code with input whose answer you know, and checks that
+// the answer comes back. Run them after every change, and a change that breaks something says so
+// at once, naming the check that failed.
+//
+// In Rux a test is a function marked `#Test()` that takes nothing and returns `! TestFailure`.
+// The checks of the `Test` package, `ExpectEqual`, `ExpectText`, `ExpectNear` and the rest, each
+// return `! TestFailure` too, so a test hands a failed check on with `?` and stops there.
+//
+// `rux test` builds the package in test mode, generates a `Main` that runs every `#Test()`
+// function, and runs it. That is why this package is a library: an executable has a `Main` of
+// its own and cannot hold tests. The tests sit beside the code, in the same file, so they can call
+// functions that are not `pub` as well. Run them with
+//
+//     rux test                 every test
+//     rux test -- Parse        only the tests whose names contain "Parse"
+//
+// A package with tests must depend on `Test`, whose runner the generated `Main` calls; without it:
+//
+//     error: package 'UnitTest' has '#Test()' functions but does not depend on 'Test'
+import Test::{ ExpectNear, ExpectText, TestFailure };
+
+/// Converts degrees Celsius to degrees Fahrenheit.
+/// @param celsius the temperature in degrees Celsius
+/// @returns the same temperature in degrees Fahrenheit
+pub func ToFahrenheit(celsius: float64) -> float64 {
+    return celsius * 9.0 / 5.0 + 32.0;
+}
+
+/// Reads a whole number of degrees with an optional minus sign, such as `21` or `-5`.
+/// @param text the text to read
+/// @returns the degrees, or none for anything else, or for more than three digits
+pub func ParseDegrees(text: char8[..]) -> int32? {
+    let negative = text.length > 0 && text[0] == '-';
+    let start: uint = negative ? 1 : 0;
+    if text.length == start || text.length - start > 3 { return none; }
+    var value: int32 = 0;
+    for i in start..text.length {
+        let c = text[i];
+        if c < '0' || c > '9' { return none; }
+        value = value * 10 + (c as int32 - 48);
+    }
+    return negative ? -value : value;
+}
+
+/// One word for how a temperature feels.
+/// @param celsius the temperature in degrees Celsius
+/// @returns `freezing`, `cold`, `mild` or `hot`
+pub func Describe(celsius: int32) -> char8[..] {
+    if celsius <= 0 { return "freezing"; }
+    if celsius < 15 { return "cold"; }
+    if celsius < 25 { return "mild"; }
+    return "hot";
+}
+
+// Floating-point arithmetic rounds, so two floats are compared within a tolerance, never with
+// `==`. These three points are the ones everybody knows.
+#Test()
+func FixedPoints() -> ! TestFailure {
+    ExpectNear(ToFahrenheit(0.0), 32.0, 0.000001)?;
+    ExpectNear(ToFahrenheit(100.0), 212.0, 0.000001)?;
+    ExpectNear(ToFahrenheit(-40.0), -40.0, 0.000001)?;
+}
+
+// Boundaries are where mistakes hide, so test each side of each one. A failed `ExpectText` shows
+// both texts and the byte where they part.
+#Test()
+func Words() -> ! TestFailure {
+    ExpectText(Describe(0), "freezing")?;
+    ExpectText(Describe(1), "cold")?;
+    ExpectText(Describe(14), "cold")?;
+    ExpectText(Describe(15), "mild")?;
+    ExpectText(Describe(24), "mild")?;
+    ExpectText(Describe(25), "hot")?;
+}
+
+// Tests in a module are named after it: `Parse::Positive`, `Parse::Negative`, `Parse::Rejects`.
+// So `rux test -- Parse` runs just these three. A module imports for itself.
+module Parse {
+    import Test::{ ExpectEqual, ExpectNone, ExpectSome, TestFailure };
+
+    // `ExpectSome` fails with its message when the optional is empty, and otherwise hands back
+    // the value inside for the next check.
+    #Test()
+    func Positive() -> ! TestFailure {
+        ExpectEqual(ExpectSome(ParseDegrees("21"), "21 is a temperature")?, 21)?;
+        ExpectEqual(ExpectSome(ParseDegrees("0"), "0 is a temperature")?, 0)?;
+    }
+
+    #Test()
+    func Negative() -> ! TestFailure {
+        ExpectEqual(ExpectSome(ParseDegrees("-5"), "-5 is a temperature")?, -5)?;
+    }
+
+    // What a function refuses matters as much as what it accepts.
+    #Test()
+    func Rejects() -> ! TestFailure {
+        ExpectNone(ParseDegrees(""), "empty text")?;
+        ExpectNone(ParseDegrees("-"), "a sign alone")?;
+        ExpectNone(ParseDegrees("12C"), "a unit after the digits")?;
+        ExpectNone(ParseDegrees("1000"), "four digits")?;
+    }
+}

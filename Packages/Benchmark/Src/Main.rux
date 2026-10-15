@@ -1,0 +1,99 @@
+// A benchmark measures how long a piece of code takes. One run of a fast function is too short
+// for a clock to time well, so a benchmark repeats the work many times and divides: the answer is
+// the time per iteration, in nanoseconds.
+//
+// The `Test` package does the repeating for you. A `BenchmarkCase` is a name and a function that
+// takes an iteration count and does the work that many times, in its own loop. `RunBenchmarksWith`
+// calls each one with a count that grows from 1 until a run lasts at least the minimum time in
+// its `BenchmarkOptions`, then prints the time per iteration of that last run.
+//
+// This program asks a question the Binary search lesson answered on paper: how much faster is
+// a binary search than looking at every element? Before timing anything, it checks that the two
+// searches agree, since a fast answer is worth nothing if it is wrong.
+//
+// Times depend on the machine, on what else it is doing, and on the build. Measure with
+// `rux run --release`: a Debug build does not optimize, so it times code nobody ships.
+import Algorithms::{ BinarySearch, Contains };
+import Io::PrintLine;
+import Test::{ BenchmarkCase, BenchmarkOptions, Consume, RunBenchmarksWith };
+import Time::Duration;
+
+// The sorted data every benchmark searches: 0, 2, 4, ... 2046, so odd numbers are missing.
+func Fill(values: var int[..]) {
+    for i in 0..values.length {
+        values[i] = i as int * 2;
+    }
+}
+
+// Each benchmark sets up its data before its loop. That costs the same once whatever the count,
+// so over thousands of iterations its share of the time per iteration all but vanishes.
+//
+// The loop counts what it found and hands the count to `Consume`. Without that, a Release build
+// could see that the result is never used, remove the searches as having no effect, and report
+// a time for doing nothing. `Consume` takes the count's address:
+//
+//     Consume(found);
+//         error: argument 1 to 'Consume' has type 'uint64', but parameter 'value' requires '*T'
+//
+// The iteration count is a `uint64`, and a benchmark taking anything else does not fit:
+//
+//     BenchmarkCase { name: "Search::Linear", run: Linear }   with   func Linear(iterations: int)
+//         error: field 'run' in initializer for 'BenchmarkCase' has type 'func(int) -> opaque',
+//                but its declaration requires 'func(uint64) -> opaque'
+func Linear(iterations: uint64) {
+    var values: int[1024];
+    Fill(values[..]);
+    var found: uint64 = 0;
+    for n in 0..iterations {
+        if Contains(values[..], (n % 2048) as int) { found = found + 1; }
+    }
+    Consume(@found);
+}
+
+// A value that is not there is the worst case for a linear search: it looks at every element.
+func LinearMissing(iterations: uint64) {
+    var values: int[1024];
+    Fill(values[..]);
+    var found: uint64 = 0;
+    for n in 0..iterations {
+        if Contains(values[..], 2049) { found = found + 1; }
+    }
+    Consume(@found);
+}
+
+func Binary(iterations: uint64) {
+    var values: int[1024];
+    Fill(values[..]);
+    var found: uint64 = 0;
+    for n in 0..iterations {
+        if BinarySearch(values[..], (n % 2048) as int) != none { found = found + 1; }
+    }
+    Consume(@found);
+}
+
+func Main() -> int {
+    // First, are both searches right? They must agree on every value, present or missing.
+    var values: int[1024];
+    Fill(values[..]);
+    var agree = true;
+    for target in 0..2048 {
+        let linear = Contains(values[..], target);
+        let binary = BinarySearch(values[..], target) != none;
+        if linear != binary { agree = false; }
+    }
+    PrintLine("linear and binary search agree on 2048 values: {}", agree);
+    PrintLine();
+
+    // Then, how fast? `BenchmarkOptions()` measures each benchmark for at least 200 milliseconds;
+    // a shorter minimum gives a quicker but rougher answer. Setting `options.filter = "Linear"`
+    // would run only the benchmarks whose names contain `Linear`.
+    let benchmarks: BenchmarkCase[3] = [
+        BenchmarkCase { name: "Search::Linear", run: Linear },
+        BenchmarkCase { name: "Search::LinearMissing", run: LinearMissing },
+        BenchmarkCase { name: "Search::Binary", run: Binary }
+    ];
+    var options = BenchmarkOptions();
+    options.minimumTime = Duration::FromMilliseconds(100);
+    RunBenchmarksWith(benchmarks[..], options);
+    return 0;
+}
