@@ -42,7 +42,7 @@ func Main() -> int {
     PrintLine("coin:   {}", coin);
     PrintLine("{} back from {}", refund, price);
 
-    // Take away the `extend` and every line above is refused: "argument 2 to 'PrintLine' has
-    // type 'Money', but variadic parameter 'args' requires 'Display'".
+    // Take away the `extend` and every line above is refused, the first with "no matching
+    // overload for 'PrintLine' with argument types (char8[..], Money)".
     return 0;
 }

@@ -3,9 +3,9 @@
 // body may use everything either one provides.
 //
 // Here `Scored` decides who wins and `Display` lets the body print a `T` with `{}`. With only
-// `<T: Scored>`, each `PrintLine` below is rejected: "argument 2 to 'PrintLine' has type 'T',
-// but variadic parameter 'args' requires 'Display'". A placeholder needs `Display`, and a
-// `T` is only what its bounds say it is.
+// `<T: Scored>`, each `PrintLine` below is rejected: "no matching overload for 'PrintLine' with
+// argument types (char8[..], T, T)". A placeholder needs `Display`, and a `T` is only what its
+// bounds say it is.
 import Io::PrintLine;
 import Text::{ Display, FormatError, FormatSpec, TextWriter };
 
