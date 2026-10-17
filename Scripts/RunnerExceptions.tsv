@@ -5,6 +5,7 @@ Projects/Quadratic	*	*	reads input	0
 Projects/Launch	*	*	reads input	0
 Text/Input	*	*	reads input	0
 Projects/Melody	windows	*	plays sound	0
+Projects/SystemInfo	windows	*	opens a window	0
 Platform/Extern	windows	*	-	0
 Platform/Asm	*	x86_64	-	0
 Errors/FallibleMain	*	*	-	1

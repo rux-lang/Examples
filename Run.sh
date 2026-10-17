@@ -169,7 +169,7 @@ awk -F '\t' '
         if (!($1 in packages)) fail("stale exception: " $1)
         if (seen[$1]++) fail("duplicate exception: " $1)
         if ($2 !~ /^(\*|windows|linux|macos|freebsd)$/ ||
-            $3 !~ /^(\*|x86_64|aarch64)$/ || $4 !~ /^(-|reads input|plays sound)$/ ||
+            $3 !~ /^(\*|x86_64|aarch64)$/ || $4 !~ /^(-|reads input|plays sound|opens a window)$/ ||
             $5 !~ /^(0|[1-9][0-9]*)$/ || length($5) > 3 || $5 + 0 > 255)
             fail("invalid exception: " $1)
         print $0

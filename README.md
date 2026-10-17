@@ -405,7 +405,8 @@ Complete small programs. Each one needs only the parts before its checkpoint.
 - 27.14 **[Launch](Projects/Launch/)** — a mission checklist, a bounded countdown and a launch _(after Utilities)_
 - 27.15 **[Notes](Projects/Notes/)** — keep notes in a JSON file _(after Data formats)_
 - 27.16 **[Melody](Projects/Melody/)** — play a tune through the Windows console speaker (Windows only) _(after Platform)_
-- 27.17 **[Grep](Projects/Grep/)** — search files for lines that match a regular expression, with command-line options _(after Systems)_
+- 27.17 **[SystemInfo](Projects/SystemInfo/)** — show the Windows version, build, processor and memory in a window (Windows only) _(after Platform)_
+- 27.18 **[Grep](Projects/Grep/)** — search files for lines that match a regular expression, with command-line options _(after Systems)_
 
 ## Running an Example
 
@@ -436,7 +437,7 @@ sh Run.sh test --filter Errors
 sh Run.sh test --rux-executable ../Rux/Bin/rux
 ```
 
-`check` type-checks the selected packages. `test` also runs eligible executables and builds static/shared libraries; source libraries are only checked. Tests verify exit codes, not printed output. Interactive and audible examples are checked but not run, and lessons that require another OS or architecture are reported as platform skips. Each run ends with checked, executed, built, skipped, and failed counts, returning a nonzero exit code if any check fails.
+`check` type-checks the selected packages. `test` also runs eligible executables and builds static/shared libraries; source libraries are only checked. Tests verify exit codes, not printed output. Interactive, audible and windowed examples are checked but not run, and lessons that require another OS or architecture are reported as platform skips. Each run ends with checked, executed, built, skipped, and failed counts, returning a nonzero exit code if any check fails.
 
 Both runners use `rux` on PATH unless an executable is supplied. Dependencies must already be installed. The filter is a case-insensitive literal substring of a repository-relative package path; matching a workspace selects its members. An unmatched filter is an error. You can invoke a runner from another directory: package paths remain relative to the repository, while an explicit relative compiler path is resolved from your current directory.
 

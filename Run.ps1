@@ -222,7 +222,7 @@ try {
         if ($rules.ContainsKey($label)) { throw "Duplicate exception: $label" }
         if ($os -notmatch '^(\*|windows|linux|macos|freebsd)$' -or
             $arch -notmatch '^(\*|x86_64|aarch64)$' -or
-            $reason -notin @('-', 'reads input', 'plays sound') -or
+            $reason -notin @('-', 'reads input', 'plays sound', 'opens a window') -or
             $expected -notmatch '^(0|[1-9][0-9]{0,2})$' -or [int]$expected -gt 255) {
             throw "Invalid exception: $label"
         }

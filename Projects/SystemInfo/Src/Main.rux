@@ -1,0 +1,471 @@
+// Showing what a Windows machine is, in a window of its own: the edition, version and build of
+// Windows, the processor, and the memory.
+//
+// Every value comes from Windows itself, through the Windows package. `RtlGetVersion` gives the
+// true version and build, because `GetVersionExW` tells a program without a manifest that it runs
+// on Windows 8. The registry gives the names — the edition, the release, the processor — and
+// `GlobalMemoryStatusEx` and `GetLogicalProcessorInformationEx` give the numbers. Windows 11 still
+// calls itself version 10, so it is told apart by its build, which starts at 22000; the registry's
+// edition name says "Windows 10" there too, and is corrected the same way.
+//
+// The window is the classic Win32 shape. A window class names a procedure, Windows calls that
+// procedure with every message for the window, and a loop takes messages from the queue and hands
+// them over until the window is closed. The procedure here is an ordinary Rux function. It draws
+// the report when asked to paint, makes its fonts again when the window moves to a monitor with
+// another scale, and ends the loop when the window is destroyed.
+//
+// Two details keep it looking like a Windows 11 program. It declares itself aware of each
+// monitor's scale, and sizes everything in units of a 96-DPI pixel multiplied out by the window's
+// DPI, so text stays sharp at 150%. And it is built as a console program, as every Rux program is
+// today, so it lets go of its console first.
+//
+// A Win32 call reports failure its own way. A call that fails shows a message box naming the call
+// and the Windows error code, and the program exits with 1. A registry value that is missing is
+// not a failure: it is shown as "unknown".
+import Core::{ #Error, #target };
+import Format::WriteFormat;
+import Text::{ BufferWriter, Display, FormatError, TextWriter };
+
+when #target.os {
+    .Windows => import Windows::{ ALL_PROCESSOR_GROUPS, AdjustWindowRectExForDpi, BeginPaint, CLEARTYPE_QUALITY,
+                                  CLIP_DEFAULT_PRECIS, COLOR_GRAYTEXT, COLOR_WINDOW, COLOR_WINDOWTEXT, CS_HREDRAW,
+                                  CS_VREDRAW, CW_USEDEFAULT, CreateFontW, CreateWindowExW, DEFAULT_CHARSET,
+                                  DEFAULT_PITCH, DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, DefWindowProcW,
+                                  DeleteObject, DispatchMessageW, EndPaint, FW_NORMAL, FW_SEMIBOLD, FreeConsole,
+                                  GetActiveProcessorCount, GetDpiForWindow, GetLastError,
+                                  GetLogicalProcessorInformationEx, GetMessageW, GetModuleHandleW, GetNativeSystemInfo,
+                                  GetPhysicallyInstalledSystemMemory, GetSysColor, GlobalMemoryStatusEx,
+                                  HKEY_LOCAL_MACHINE, IDC_ARROW, IDI_APPLICATION, InvalidateRect, LoadCursorW,
+                                  LoadIconW, MB_ICONERROR, MB_OK, MemoryStatusEx, Message, MessageBoxW,
+                                  MultiByteToWideChar, OUT_DEFAULT_PRECIS, OsVersionInfoEx,
+                                  PROCESSOR_ARCHITECTURE_AMD64, PROCESSOR_ARCHITECTURE_ARM64,
+                                  PROCESSOR_ARCHITECTURE_INTEL, PaintStruct, PostQuitMessage,
+                                  ProcessorRelationshipHeader, RRF_RT_REG_DWORD, RRF_RT_REG_SZ, Rect, RegGetValueW,
+                                  RegisterClassExW, RelationProcessorCore, RtlGetVersion, SWP_NOACTIVATE, SWP_NOMOVE,
+                                  SWP_NOZORDER, SW_SHOW, SelectObject, SetBkMode, SetProcessDpiAwarenessContext,
+                                  SetTextColor, SetWindowPos, ShowWindow, SystemInfo, TRANSPARENT, TextOutW,
+                                  TranslateMessage, UpdateWindow, WM_DESTROY, WM_DPICHANGED, WM_PAINT, WS_CAPTION,
+                                  WS_MINIMIZEBOX, WS_OVERLAPPED, WS_SYSMENU, WideCharToMultiByte, WindowClassEx },
+    else => #Error("SystemInfo opens a Win32 window, so it builds only for Windows")
+}
+
+// The names handed to Windows. A `c16` literal is UTF-16 with a NUL after it, which is exactly the
+// string a `W` function takes, so its `.data` is passed as it is.
+const ClassName = c16"RuxSystemInfo";
+const Title = c16"System Information";
+const FaceName = c16"Segoe UI";
+const CurrentVersion = c16"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
+const CentralProcessor = c16"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0";
+const ProductName = c16"ProductName";
+const DisplayVersion = c16"DisplayVersion";
+const UpdateBuildRevision = c16"UBR";
+const ProcessorNameString = c16"ProcessorNameString";
+const Megahertz = c16"~MHz";
+const Overflow = c16"The report did not fit its buffers.";
+
+// The UTF-8 code page, for converting between the text Rux formats and the text Windows draws.
+const Utf8: uint32 = 65001;
+
+// The layout, in pixels at 96 DPI, which is 100% scaling.
+const Margin: int32 = 24;
+const Indent: int32 = 12;
+const ValueColumn: int32 = 176;
+const ClientWidth: int32 = 600;
+const HeadingHeight: int32 = 30;
+const RowHeight: int32 = 22;
+const SectionGap: int32 = 14;
+
+// One line of the report, kept as the UTF-16 Windows draws, so painting converts nothing.
+const MaxRows: uint = 16;
+const LabelUnits: uint = 32;
+const ValueUnits: uint = 96;
+
+struct Row {
+    heading: bool;
+    label: char16[LabelUnits];
+    labelLength: int32;
+    value: char16[ValueUnits];
+    valueLength: int32;
+}
+
+// The report and the fonts live in module variables, because the window procedure is called by
+// Windows and can be handed nothing of its own.
+const EmptyRow = Row {
+    heading: false,
+    label: [0 as char16; LabelUnits],
+    labelLength: 0,
+    value: [0 as char16; ValueUnits],
+    valueLength: 0
+};
+
+var Rows: Row[MaxRows] = [EmptyRow; MaxRows];
+var RowCount: uint = 0;
+var HeadingFont: *var opaque = null;
+var LabelFont: *var opaque = null;
+var ValueFont: *var opaque = null;
+
+// A length at 96 DPI, at the window's DPI instead, rounded to the nearest pixel.
+func Scale(value: int32, dpi: uint32) -> int32 {
+    return (value * (dpi as int32) + 48) / 96;
+}
+
+// UTF-8 text as UTF-16, into a fixed buffer. Returns how many units were written.
+func Widen(text: char8[..], into: var char16[..]) -> int32 {
+    if text.length == 0 {
+        return 0;
+    }
+    return MultiByteToWideChar(Utf8, 0, text.data, text.length as int32, into.data, into.length as int32);
+}
+
+func AddRow(heading: bool, label: char8[..], value: char8[..]) {
+    if RowCount == MaxRows {
+        return;
+    }
+    Rows[RowCount].heading = heading;
+    Rows[RowCount].labelLength = Widen(label, Rows[RowCount].label[..]);
+    Rows[RowCount].valueLength = Widen(value, Rows[RowCount].value[..]);
+    RowCount += 1;
+}
+
+// A row whose value is formatted from a pattern, the way PrintLine formats.
+func AddValue(label: char8[..], #Format() format: char8[..], args: Display...) -> ! FormatError {
+    var room: char8[160] = [0 as char8; 160];
+    var writer = BufferWriter(room[..]);
+    let sink: &var TextWriter = writer;
+    WriteFormat(sink, format, args...)?;
+    AddRow(false, label, writer.Written());
+}
+
+// A string value from the machine's registry, as UTF-8 in `room` with the spaces around it
+// removed. Empty when the value is missing.
+func ReadText(subKey: char16[..], name: char16[..], room: var char8[..]) -> char8[..] {
+    var wide: char16[256] = [0 as char16; 256];
+    var size: uint32 = 512;
+    if RegGetValueW(HKEY_LOCAL_MACHINE as *var opaque, subKey.data, name.data, RRF_RT_REG_SZ, null,
+                    @wide[0] as *var opaque, @size) != 0 {
+        return room[..0];
+    }
+    // The size counts bytes, terminator included.
+    let units = (size / 2) as int32 - 1;
+    if units <= 0 {
+        return room[..0];
+    }
+    let bytes = WideCharToMultiByte(Utf8, 0, @wide[0], units, room.data, room.length as int32, null, null);
+    if bytes <= 0 {
+        return room[..0];
+    }
+    var start: uint = 0;
+    var end = bytes as uint;
+    while start < end && room[start] == c8' ' {
+        start += 1;
+    }
+    while end > start && room[end - 1] == c8' ' {
+        end -= 1;
+    }
+    return room[start..end];
+}
+
+// A number value from the machine's registry, or none when it is missing.
+func ReadNumber(subKey: char16[..], name: char16[..]) -> uint32? {
+    var value: uint32 = 0;
+    var size: uint32 = 4;
+    if RegGetValueW(HKEY_LOCAL_MACHINE as *var opaque, subKey.data, name.data, RRF_RT_REG_DWORD, null,
+                    @value as *var opaque, @size) != 0 {
+        return none;
+    }
+    return value;
+}
+
+// How many physical cores the machine has: Windows writes one record per core, each starting
+// with its own size, so counting them means walking the buffer record by record.
+func CountCores() -> uint32 {
+    var records: uint64[4096] = [0; 4096];
+    var length: uint32 = 32768;
+    if GetLogicalProcessorInformationEx(RelationProcessorCore, @records[0] as *var opaque, @length) == 0 {
+        return 0;
+    }
+    let start = (@records[0]) as uint;
+    var cores: uint32 = 0;
+    var offset: uint32 = 0;
+    while offset < length {
+        let header = (start + offset as uint) as *ProcessorRelationshipHeader;
+        if header.size == 0 {
+            break;
+        }
+        offset += header.size;
+        cores += 1;
+    }
+    return cores;
+}
+
+func StartsWith(text: char8[..], prefix: char8[..]) -> bool {
+    if text.length < prefix.length {
+        return false;
+    }
+    for index in 0..prefix.length {
+        if text[index] != prefix[index] {
+            return false;
+        }
+    }
+    return true;
+}
+
+func Gibibytes(bytes: uint64) -> float64 {
+    return (bytes as float64) / 1073741824.0;
+}
+
+// Reads everything the window shows, in the order it shows it.
+func Gather() -> ! FormatError {
+    var version: OsVersionInfoEx;
+    version.size = sizeof(OsVersionInfoEx) as uint32;
+    if RtlGetVersion(@version) != 0 {
+        version.majorVersion = 0;
+        version.minorVersion = 0;
+        version.buildNumber = 0;
+    }
+
+    AddRow(true, "Windows", "");
+    var productRoom: char8[128] = [0 as char8; 128];
+    let product = ReadText(CurrentVersion, ProductName, productRoom[..]);
+    let windows10 = "Windows 10";
+    if version.buildNumber >= 22000 && StartsWith(product, windows10) {
+        AddValue("Edition", "Windows 11{}", product[windows10.length..])?;
+    } else if product.length > 0 {
+        AddRow(false, "Edition", product);
+    } else {
+        AddRow(false, "Edition", "unknown");
+    }
+    var releaseRoom: char8[32] = [0 as char8; 32];
+    let release = ReadText(CurrentVersion, DisplayVersion, releaseRoom[..]);
+    AddRow(false, "Version", release.length > 0 ? release : "unknown");
+    match ReadNumber(CurrentVersion, UpdateBuildRevision) {
+        .Some(revision) => AddValue("OS build", "{}.{}", version.buildNumber, revision)?,
+        none => AddValue("OS build", "{}", version.buildNumber)?
+    }
+    AddValue("Kernel version", "{}.{}.{}", version.majorVersion, version.minorVersion, version.buildNumber)?;
+    var system: SystemInfo;
+    GetNativeSystemInfo(@system);
+    let architecture = (system.processorArchitecture & 0xFFFF) as uint16;
+    if architecture == PROCESSOR_ARCHITECTURE_AMD64 {
+        AddRow(false, "Architecture", "64-bit, x64");
+    } else if architecture == PROCESSOR_ARCHITECTURE_ARM64 {
+        AddRow(false, "Architecture", "64-bit, Arm64");
+    } else if architecture == PROCESSOR_ARCHITECTURE_INTEL {
+        AddRow(false, "Architecture", "32-bit, x86");
+    } else {
+        AddRow(false, "Architecture", "unknown");
+    }
+
+    AddRow(true, "Processor", "");
+    var processorRoom: char8[128] = [0 as char8; 128];
+    let processor = ReadText(CentralProcessor, ProcessorNameString, processorRoom[..]);
+    AddRow(false, "Name", processor.length > 0 ? processor : "unknown");
+    match ReadNumber(CentralProcessor, Megahertz) {
+        .Some(megahertz) => AddValue("Base speed", "{:.2} GHz", (megahertz as float64) / 1000.0)?,
+        none => AddRow(false, "Base speed", "unknown")
+    }
+    let cores = CountCores();
+    if cores > 0 {
+        AddValue("Cores", "{}", cores)?;
+    } else {
+        AddRow(false, "Cores", "unknown");
+    }
+    AddValue("Logical processors", "{}", GetActiveProcessorCount(ALL_PROCESSOR_GROUPS))?;
+
+    AddRow(true, "Memory", "");
+    var installed: uint64 = 0;
+    if GetPhysicallyInstalledSystemMemory(@installed) != 0 {
+        AddValue("Installed", "{:.1} GB", Gibibytes(installed * 1024))?;
+    }
+    var memory: MemoryStatusEx;
+    memory.length = sizeof(MemoryStatusEx) as uint32;
+    if GlobalMemoryStatusEx(@memory) != 0 {
+        AddValue("Usable", "{:.1} GB", Gibibytes(memory.totalPhysical))?;
+        AddValue("Available", "{:.1} GB", Gibibytes(memory.availablePhysical))?;
+        AddValue("In use", "{}%", memory.memoryLoad)?;
+    } else {
+        AddRow(false, "Usable", "unknown");
+    }
+}
+
+// The client area's height at 96 DPI: every row, the headings and the gaps between sections.
+func ClientHeight() -> int32 {
+    var height: int32 = Margin * 2;
+    for index in 0..RowCount {
+        if Rows[index].heading {
+            height += HeadingHeight;
+            if index > 0 {
+                height += SectionGap;
+            }
+        } else {
+            height += RowHeight;
+        }
+    }
+    return height;
+}
+
+// A Segoe UI font of a size in points. A negative height asks for that many pixels of character
+// height, and a point is 1/72 of an inch, of which the window has `dpi` pixels.
+func MakeFont(points: int32, weight: int32, dpi: uint32) -> *var opaque {
+    let pixels = (points * (dpi as int32) + 36) / 72;
+    return CreateFontW(-pixels, 0, 0, 0, weight, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                       CLEARTYPE_QUALITY, DEFAULT_PITCH, FaceName.data);
+}
+
+func DeleteFonts() {
+    if HeadingFont != null {
+        DeleteObject(HeadingFont);
+        HeadingFont = null;
+    }
+    if LabelFont != null {
+        DeleteObject(LabelFont);
+        LabelFont = null;
+    }
+    if ValueFont != null {
+        DeleteObject(ValueFont);
+        ValueFont = null;
+    }
+}
+
+func CreateFonts(dpi: uint32) {
+    DeleteFonts();
+    HeadingFont = MakeFont(12, FW_SEMIBOLD, dpi);
+    LabelFont = MakeFont(10, FW_NORMAL, dpi);
+    ValueFont = MakeFont(10, FW_SEMIBOLD, dpi);
+}
+
+// Draws the report: a heading per section, then each label in gray with its value beside it.
+func Paint(window: *var opaque) {
+    var paint: PaintStruct;
+    let context = BeginPaint(window, @paint);
+    if context == null {
+        return;
+    }
+    let dpi = GetDpiForWindow(window);
+    SetBkMode(context, TRANSPARENT);
+    let original = SelectObject(context, ValueFont);
+    var y: int32 = Margin;
+    for index in 0..RowCount {
+        if Rows[index].heading {
+            if index > 0 {
+                y += SectionGap;
+            }
+            SelectObject(context, HeadingFont);
+            SetTextColor(context, GetSysColor(COLOR_WINDOWTEXT));
+            TextOutW(context, Scale(Margin, dpi), Scale(y, dpi), @Rows[index].label[0], Rows[index].labelLength);
+            y += HeadingHeight;
+        } else {
+            SelectObject(context, LabelFont);
+            SetTextColor(context, GetSysColor(COLOR_GRAYTEXT));
+            TextOutW(context, Scale(Margin + Indent, dpi), Scale(y, dpi), @Rows[index].label[0],
+                     Rows[index].labelLength);
+            SelectObject(context, ValueFont);
+            SetTextColor(context, GetSysColor(COLOR_WINDOWTEXT));
+            TextOutW(context, Scale(ValueColumn, dpi), Scale(y, dpi), @Rows[index].value[0], Rows[index].valueLength);
+            y += RowHeight;
+        }
+    }
+    SelectObject(context, original);
+    EndPaint(window, @paint);
+}
+
+// The window procedure: Windows calls it with every message for the window.
+func Procedure(window: *var opaque, message: uint32, wParam: uint, lParam: int) -> int {
+    if message == WM_PAINT {
+        Paint(window);
+        return 0;
+    }
+    if message == WM_DPICHANGED {
+        // The new DPI is in the low word, and lParam points to the size Windows suggests for it.
+        CreateFonts((wParam & 0xFFFF) as uint32);
+        let suggested = (lParam as uint) as *Rect;
+        SetWindowPos(window, null, suggested.left, suggested.top, suggested.right - suggested.left,
+                     suggested.bottom - suggested.top, SWP_NOZORDER | SWP_NOACTIVATE);
+        InvalidateRect(window, null, true);
+        return 0;
+    }
+    if message == WM_DESTROY {
+        DeleteFonts();
+        PostQuitMessage(0);
+        return 0;
+    }
+    return DefWindowProcW(window, message, wParam, lParam);
+}
+
+// Tells the user which call failed and why, since a window program has no console to print to.
+func Fail(call: char8[..]) -> int {
+    let code = GetLastError();
+    var room: char8[160] = [0 as char8; 160];
+    var writer = BufferWriter(room[..]);
+    let sink: &var TextWriter = writer;
+    WriteFormat(sink, "{} failed with Windows error {}.", call, code) catch { else => {} };
+    var text: char16[161] = [0 as char16; 161];
+    Widen(writer.Written(), text[..160]);
+    MessageBoxW(null, @text[0], Title.data, MB_OK | MB_ICONERROR);
+    return 1;
+}
+
+func Main() -> int {
+    FreeConsole();
+    // Fails only when the awareness was already set, which leaves it as good as this.
+    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 as *var opaque);
+
+    Gather() catch {
+        else => {
+            MessageBoxW(null, Overflow.data, Title.data, MB_OK | MB_ICONERROR);
+            return 1;
+        }
+    };
+
+    let instance = GetModuleHandleW(null);
+    let windowClass = WindowClassEx {
+        size: sizeof(WindowClassEx) as uint32,
+        style: CS_HREDRAW | CS_VREDRAW,
+        windowProcedure: Procedure,
+        classExtra: 0,
+        windowExtra: 0,
+        instance: instance,
+        icon: LoadIconW(null, IDI_APPLICATION as *char16),
+        cursor: LoadCursorW(null, IDC_ARROW as *char16),
+        background: ((COLOR_WINDOW + 1) as uint) as *var opaque,
+        menuName: null,
+        className: ClassName.data,
+        smallIcon: null
+    };
+    if RegisterClassExW(@windowClass) == 0 {
+        return Fail("RegisterClassExW");
+    }
+
+    // A fixed-size window: a title bar, a close button and a minimize button, but no sizing border.
+    let style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+    let window = CreateWindowExW(0, ClassName.data, Title.data, style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                                 CW_USEDEFAULT, null, null, instance, null);
+    if window == null {
+        return Fail("CreateWindowExW");
+    }
+
+    // Only now is the monitor known, so only now can the window be given its size.
+    let dpi = GetDpiForWindow(window);
+    CreateFonts(dpi);
+    var frame = Rect { left: 0, top: 0, right: Scale(ClientWidth, dpi), bottom: Scale(ClientHeight(), dpi) };
+    AdjustWindowRectExForDpi(@frame, style, false, 0, dpi);
+    SetWindowPos(window, null, 0, 0, frame.right - frame.left, frame.bottom - frame.top,
+                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+    ShowWindow(window, SW_SHOW);
+    UpdateWindow(window);
+
+    // The message loop. GetMessageW returns zero for the quit message and -1 for an error.
+    var message: Message;
+    loop {
+        let result = GetMessageW(@message, null, 0, 0);
+        if result == 0 {
+            break;
+        }
+        if result == -1 {
+            return Fail("GetMessageW");
+        }
+        TranslateMessage(@message);
+        DispatchMessageW(@message);
+    }
+    return 0;
+}
