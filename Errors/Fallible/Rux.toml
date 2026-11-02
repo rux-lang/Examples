@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "Fallible"
 Version = "0.1.0"
 Type = "Executable"
-Description = "A value or an error: T ! E"
+Description = "A value or an error: -> T throws E, handled with try and catch"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

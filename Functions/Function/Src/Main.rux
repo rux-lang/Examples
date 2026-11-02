@@ -59,5 +59,7 @@ func Main() -> int {
     //
     //     func Bump(n: int) -> int { n = n + 1; return n; }
     //         error: cannot modify parameter 'n'
+    //         help: take 'n' as '&var int' to change the caller's value, or move it
+    //               into a 'var' local
     return 0;
 }

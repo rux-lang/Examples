@@ -5,7 +5,7 @@
 // Rux has no closures, so a thread cannot capture the variables around it. `Spawn(entry, context)`
 // takes a function and one value to call it with; the value moves to the new thread, and the
 // function's result waits there until someone collects it. Starting a thread can fail when the
-// system has none to spare, so `Spawn` returns `JoinHandle<R> ! ThreadError`.
+// system has none to spare, so `Spawn` is declared `-> JoinHandle<R> throws ThreadError`.
 //
 // `Join` on the handle waits for the thread to finish and hands back its result. Printing only
 // after joining keeps the output in a fixed order, however the threads were scheduled.
@@ -43,16 +43,15 @@ func Describe(error: ThreadError) -> char8[..] {
 
 func Main() -> int {
     // Four threads, each summing a quarter of 1..=1000000. They start at once and run side by side.
-    // `Spawn` returns an outcome rather than a handle, so the failure is dealt with first; calling
-    // `Join` on the outcome itself is refused:
+    // `Spawn` can throw, so the failure is dealt with at each call; a call left unmarked is
+    // refused:
     //
-    //     error: type 'JoinHandle<uint64> ! ThreadError' has no field 'Join'
-    var handles: JoinHandle<uint64>[4] = [
-        Spawn(SumSpan, Span { first: 1, last: 250000 }) catch { else => return 1 },
-        Spawn(SumSpan, Span { first: 250001, last: 500000 }) catch { else => return 1 },
-        Spawn(SumSpan, Span { first: 500001, last: 750000 }) catch { else => return 1 },
-        Spawn(SumSpan, Span { first: 750001, last: 1000000 }) catch { else => return 1 }
-    ];
+    //     error: call to 'Spawn' can throw 'ThreadError' but is not marked with 'try'
+    let first = try Spawn(SumSpan, Span { first: 1, last: 250000 }) catch { _ => return 1 };
+    let second = try Spawn(SumSpan, Span { first: 250001, last: 500000 }) catch { _ => return 1 };
+    let third = try Spawn(SumSpan, Span { first: 500001, last: 750000 }) catch { _ => return 1 };
+    let fourth = try Spawn(SumSpan, Span { first: 750001, last: 1000000 }) catch { _ => return 1 };
+    var handles: JoinHandle<uint64>[4] = [move first, move second, move third, move fourth];
 
     // `Join` waits for each thread in turn. A thread that finished early simply waits to be asked.
     var total: uint64 = 0;
@@ -65,22 +64,23 @@ func Main() -> int {
     PrintLine("joinable after join   {}", handles[0].IsJoinable());
 
     // `SpawnWith` takes options too: here, a 64 KiB stack instead of the system's default. Every
-    // thread has its own identifier, and this one hands its own back to compare.
+    // thread has its own identifier, and this one hands its own back to compare. Inside a `try`
+    // block every call is covered, and the `catch` arms take the error.
     let options = ThreadOptions().WithStackSize(65536u);
-    match SpawnWith(options, Identify, 0u8) {
-        .Success(handle) => {
-            // A handle is moved, never copied, so `var other = handle;` is refused:
-            //
-            //     error: move-only value 'handle' requires an explicit '<-' in initialization
-            var other <- handle;
-            PrintLine("a different id        {}", other.Join() != CurrentId());
-        },
-        .Failure(error) => PrintLine("no thread: {}", Describe(error))
+    try {
+        let handle = SpawnWith(options, Identify, 0u8);
+        // A handle is moved, never copied, so `var other = handle;` is refused:
+        //
+        //     error: cannot copy 'JoinHandle<uint64>', which owns resources
+        var other = move handle;
+        PrintLine("a different id        {}", other.Join() != CurrentId());
+    } catch {
+        error => PrintLine("no thread: {}", Describe(error))
     }
 
     // A handle that is detached, or simply dropped, lets its thread run on unwatched. Nothing can
     // join it any more, so nothing can see its result.
-    var background = Spawn(SumSpan, Span { first: 1, last: 10 }) catch { else => return 1 };
+    var background = try Spawn(SumSpan, Span { first: 1, last: 10 }) catch { _ => return 1 };
     background.Detach();
     PrintLine("joinable after detach {}", background.IsJoinable());
 

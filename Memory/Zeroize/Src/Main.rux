@@ -38,8 +38,10 @@ func Main() -> int {
     // A careless copy, made before the wipe. It is separate storage with its own bytes.
     let copy = pin;
 
-    // Done with the PIN: wipe its four bytes, starting at the address of the first one.
-    Zeroize(@pin[0], sizeof(uint8[4]));
+    // Done with the PIN: wipe its four bytes, starting at the address of the first one. Like any
+    // write through an address, the call sits in `unsafe`.
+    // Safety: `@pin[0]` starts the live, writable array `pin`, which is exactly that many bytes.
+    unsafe { Zeroize(@pin[0], sizeof(uint8[4])); }
 
     Show("pin after Zeroize:", pin[..]);
     Show("the earlier copy: ", copy[..]);

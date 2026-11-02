@@ -2,17 +2,17 @@
 // write, the built-in ones included, and from then on, in this package, every value of that type
 // has them.
 //
-// The receiver here is taken by value: `self: int`, not `self: &int`. A number or a slice is small,
-// and copying it is as cheap as borrowing it. A slice is a view, so even by value it still sees
+// The receiver here is taken by value: `self`, not `&self`. A number or a slice is small, and
+// copying it is as cheap as borrowing it. A slice is a view, so even by value it still sees
 // the caller's elements.
 import Io::PrintLine;
 
 extend int {
-    func IsEven(self: int) -> bool {
+    func IsEven(self) -> bool {
         return self % 2 == 0;
     }
 
-    func Clamped(self: int, low: int, high: int) -> int {
+    func Clamped(self, low: int, high: int) -> int {
         if self < low {
             return low;
         }
@@ -26,7 +26,7 @@ extend int {
 // The extended type must be one exact type. `int[..]` gains these methods, but a `uint8[..]` or an
 // `int32[..]` does not: it is a different type, and would need an `extend` of its own.
 extend int[..] {
-    func Sum(self: int[..]) -> int {
+    func Sum(self) -> int {
         var total = 0;
         for value in self {
             total += value;
@@ -34,7 +34,7 @@ extend int[..] {
         return total;
     }
 
-    func CountEven(self: int[..]) -> uint {
+    func CountEven(self) -> uint {
         var count: uint = 0;
         for value in self {
             // A method added above is used like any other.

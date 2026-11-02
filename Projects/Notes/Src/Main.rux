@@ -7,113 +7,115 @@
 //
 // A file is also where things go wrong. It may be missing, or it may hold something that is not
 // JSON, perhaps because someone edited it by hand. Every step that touches the disk or parses
-// text is fallible, and the program handles the two failures it expects — a damaged file and a
-// missing one — while `?` hands anything stranger to `Main`, which then ends with status 1.
+// text can throw, and the program catches the two failures it expects — a damaged file and a
+// missing one — while `try` passes anything stranger on to `Main`, which then ends with status 1.
 //
 // The file lives in this package's `Bin/` folder, and the program deletes it at the end.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ Array, CollectionError };
+import Collections::Array;
 import FileSystem::{ DeleteFile, File, OpenOptions, WriteAtomically };
 import Io::{ IoError, IoErrorKind, PrintLine, ReadExact };
-import Json::{ JsonParseError, JsonStyle, JsonValue, Parse, WriteValue };
+import Json::{ JsonError, JsonParseError, JsonStyle, JsonValue, Parse, WriteValue };
 import Path::{ OsString, Path };
 import Text::{ FormatError, String, StringBuilder, StringView, TextError, TextWriter };
 
-func Note(allocator: Allocator, title: char8[..], done: bool) -> JsonValue ! TextError {
+func Note(allocator: Allocator, title: char8[..], done: bool) -> JsonValue throws (TextError | JsonError) {
     var note = JsonValue::Object(allocator);
-    note.Insert(String::FromBytes(allocator, "title")?, JsonValue::Text(allocator, title)?);
-    note.Insert(String::FromBytes(allocator, "done")?, JsonValue::Boolean(allocator, done));
-    return <-note;
+    try note.Insert(String::FromBytes(allocator, "title"), JsonValue::Text(allocator, title));
+    try note.Insert(String::FromBytes(allocator, "done"), JsonValue::Boolean(allocator, done));
+    return move note;
 }
 
 // Turns the notes into indented JSON text, ready to be written or shown.
-func Encode(allocator: Allocator, notes: &JsonValue) -> String ! FormatError {
+func Encode(allocator: Allocator, notes: &JsonValue) -> String throws FormatError {
     var builder = StringBuilder(allocator);
     let sink: &var TextWriter = builder;
-    WriteValue(sink, notes, JsonStyle::Pretty())?;
-    return builder.IntoString();
+    try WriteValue(sink, notes, JsonStyle::Pretty());
+    return builder.TakeString();
 }
 
 // Writing atomically means the old file is replaced only once the new one is complete, so a
 // crash halfway through a save can never leave half a list behind.
-func Save(allocator: Allocator, path: Path, text: char8[..]) -> ! IoError {
-    WriteAtomically(allocator, path, text)?;
+func Save(allocator: Allocator, path: Path, text: char8[..]) throws IoError {
+    try WriteAtomically(allocator, path, text);
 }
 
 // Asks the file how big it is, reads exactly that many bytes, and parses them.
 func Load(allocator: Allocator, path: Path)
-    -> JsonValue ! (IoError | CollectionError | JsonParseError) {
-    var file = File::Open(allocator, path, OpenOptions::Reading())?;
-    let size = file.Size()?;
-    var bytes = Array::Filled<char8>(allocator, size as uint, c8' ')?;
-    ReadExact(file, bytes.AsMutableSlice())?;
-    file.Close()?;
-    return Parse(allocator, bytes.AsSlice())?;
+    -> JsonValue throws (IoError | JsonParseError) {
+    var file = try File::Open(allocator, path, OpenOptions::Reading());
+    let size = try file.Size();
+    var bytes = Array::Filled<char8>(allocator, size as uint, c8' ');
+    try ReadExact(file, bytes.AsMutableSlice());
+    try file.Close();
+    return try Parse(allocator, bytes.AsSlice());
 }
 
-// A note read from a file might lack a member, so each one is checked before it is read.
+// A note read from a file might lack a member, or hold one of the wrong kind, so each lookup
+// gives an optional that is checked before it is read.
 func PrintNotes(notes: &JsonValue) {
-    for i in 0..notes.Length() {
-        let note = notes.At(i);
-        let title = (*note).Find(StringView::FromValidated("title"));
-        let flag = (*note).Find(StringView::FromValidated("done"));
+    for i in 0..(notes.Length() ?? 0) {
+        let note = notes.At(i) ?? continue;
         var done = false;
-        if flag != null {
-            (*flag).AsBoolean(@done);
+        if note.Find(StringView::FromValidated("done")) is .Some(flag) {
+            done = flag.AsBoolean() ?? false;
         }
-        let mark = done ? "x" : " ";
-        if title != null {
-            PrintLine("  [{}] {}", mark, (*title).AsText());
-        } else {
-            PrintLine("  [{}] (untitled)", mark);
+        let mark = if done { "x" } else { " " };
+        var title = StringView::FromValidated("(untitled)");
+        if note.Find(StringView::FromValidated("title")) is .Some(member) {
+            title = member.AsText() ?? title;
         }
+        PrintLine("  [{}] {}", mark, title);
     }
 }
 
-func Main() -> ! (IoError | TextError | FormatError | CollectionError | JsonParseError) {
+func Main() throws (IoError | TextError | FormatError | JsonError | JsonParseError) {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    var holder = OsString::FromText(allocator, "Bin/notes.json")?;
+    var holder = OsString::FromText(allocator, "Bin/notes.json");
     let path = Path::FromView(holder.View());
 
     // The first session: start a list and save it.
     var notes = JsonValue::Array(allocator);
-    notes.Push(Note(allocator, "buy milk", true)?);
-    notes.Push(Note(allocator, "water the plants", false)?);
-    let first = Encode(allocator, notes)?;
-    Save(allocator, path, first.View().Bytes())?;
-    PrintLine("saved {} notes to {}", notes.Length(), path);
+    try notes.Push(Note(allocator, "buy milk", true));
+    try notes.Push(Note(allocator, "water the plants", false));
+    let first = try Encode(allocator, notes);
+    try Save(allocator, path, first.View().Bytes());
+    PrintLine("saved {} notes to {}", notes.Length() ?? 0, path);
 
     // The next session knows nothing but the file: load it, add a note, save it again.
-    var loaded = Load(allocator, path)?;
-    loaded.Push(Note(allocator, "write a Rux program", false)?);
-    let second = Encode(allocator, loaded)?;
-    Save(allocator, path, second.View().Bytes())?;
+    var loaded = try Load(allocator, path);
+    try loaded.Push(Note(allocator, "write a Rux program", false));
+    let second = try Encode(allocator, loaded);
+    try Save(allocator, path, second.View().Bytes());
     PrintLine("added a note; the file now reads:");
-    PrintLine("{}", second);
+    PrintLine("{}", second.View());
 
     // And one more time, to read the list as a person would.
-    let final = Load(allocator, path)?;
-    PrintLine("{} notes:", final.Length());
+    let final = try Load(allocator, path);
+    PrintLine("{} notes:", final.Length() ?? 0);
     PrintNotes(final);
 
     // Someone edits the file by hand and cuts it short. Loading now fails as a parse error, which
     // says where the text stopped making sense.
-    Save(allocator, path, "[{\"title\": \"half a note\"")?;
-    match Load(allocator, path) {
-        .Success(_) => PrintLine("the damaged file loaded?"),
-        .Failure(error: JsonParseError) =>
-            PrintLine("damaged file refused at byte {}: {}", error.Offset(), error),
-        .Failure(error) => fail error
+    try Save(allocator, path, "[{\"title\": \"half a note\"");
+    try {
+        let _ = Load(allocator, path);
+        PrintLine("the damaged file loaded?");
+    } catch {
+        error: JsonParseError => PrintLine("damaged file refused at byte {}: {}", error.Offset(), error),
+        error => throw error
     }
 
     // Clean up, then show that a missing file is told apart from every other I/O failure.
-    DeleteFile(allocator, path)?;
-    match Load(allocator, path) {
-        .Success(_) => PrintLine("the deleted file loaded?"),
-        .Failure(error: IoError) if error.kind == IoErrorKind::NotFound =>
+    try DeleteFile(allocator, path);
+    try {
+        let _ = Load(allocator, path);
+        PrintLine("the deleted file loaded?");
+    } catch {
+        error: IoError if error.kind == IoErrorKind::NotFound =>
             PrintLine("no notes file any more: starting a new list would begin here"),
-        .Failure(error) => fail error
+        error => throw error
     }
 }

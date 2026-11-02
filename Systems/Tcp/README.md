@@ -1,8 +1,6 @@
 # Tcp
 
-Run a TCP server and client in one program: a `TcpListener` bound to an ephemeral port on the
-loopback address accepts a `TcpStream`, a client thread connects and sends lines, the server
-answers each, and `Shutdown` tells the server the client has finished.
+Run a TCP server and client in one program: a `TcpListener` bound to an ephemeral port on the loopback address accepts a `TcpStream`, a client thread connects and sends lines, the server answers each, and `Shutdown` tells the server the client has finished.
 
 **You'll need:** [IpAddress](https://rux-lang.dev/docs/learn/ip-address), [Thread](https://rux-lang.dev/docs/learn/thread), [Input](https://rux-lang.dev/docs/learn/input), [Catch](https://rux-lang.dev/docs/learn/catch)
 

@@ -17,7 +17,7 @@ func Main() -> int {
             2 => "  ##  ##  ##  ##     ###    ",
             3 => "  #####   ##  ##     ###    ",
             4 => "  ## ##   ##  ##    ## ##   ",
-            else => "  ##  ##   ####    ##   ##  "
+            _ => "  ##  ##   ####    ##   ##  "
         };
         PrintLine("{}", line);
     }
@@ -37,7 +37,7 @@ func Main() -> int {
     PrintLine();
 
     // Every kind of help that goes into a language, in no particular order, because none of them
-    // is the one that matters least. The `else` arm is the last item, so a match over numbers
+    // is the one that matters least. The `_` arm is the last item, so a match over numbers
     // still has an answer for every row.
     let count = 9;
     PrintLine("Rux exists because of:");
@@ -52,7 +52,7 @@ func Main() -> int {
             6 => "the documentation nobody is thanked for",
             7 => "the funding that bought time to think",
             8 => "turning up, reading along, and asking good questions",
-            else => "the posts, the shares, the subscribes, the word of mouth"
+            _ => "the posts, the shares, the subscribes, the word of mouth"
         };
         PrintLine("  - {}", contribution);
     }

@@ -1,7 +1,6 @@
 # Integer
 
-Meet the integer types — signed and unsigned, from 8 to 512 bits, plus the machine-sized `int`
-and `uint` — and print the range each one holds.
+Meet the integer types — signed and unsigned, from 8 to 512 bits, plus the machine-sized `int` and `uint` — and print the range each one holds.
 
 **You'll need:** [Variable](https://rux-lang.dev/docs/learn/variable)
 

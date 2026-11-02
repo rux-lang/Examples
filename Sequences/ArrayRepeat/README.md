@@ -1,7 +1,6 @@
 # ArrayRepeat
 
-Build an array of many equal elements with `[0; 16]`, and see that the repeated value is evaluated
-only once.
+Build an array of many equal elements with `[0; 16]`, and see that the repeated value is evaluated only once.
 
 **You'll need:** [Array](https://rux-lang.dev/docs/learn/array), [Function](https://rux-lang.dev/docs/learn/function)
 

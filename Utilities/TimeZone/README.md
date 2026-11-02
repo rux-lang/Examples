@@ -1,8 +1,6 @@
 # TimeZone
 
-Build time zones from POSIX `TZ` rules with `TimeZone::FromRule`, read one moment on several
-clocks with `StateAt` and `ToLocal`, and turn a local time back into a moment with `Resolve`,
-which tells a time that happened once from one that happened twice or never.
+Build time zones from POSIX `TZ` rules with `TimeZone::FromRule`, read one moment on several clocks with `StateAt` and `ToLocal`, and turn a local time back into a moment with `Resolve`, which tells a time that happened once from one that happened twice or never.
 
 **You'll need:** [DateTime](https://rux-lang.dev/docs/learn/date-time), [Allocator](https://rux-lang.dev/docs/learn/allocator), [Move](https://rux-lang.dev/docs/learn/move), [Enum](https://rux-lang.dev/docs/learn/enum)
 

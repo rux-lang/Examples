@@ -25,26 +25,29 @@ func Reason(error: UrlError) -> char8[..] {
         UrlError::InvalidHost => "not a host",
         UrlError::InvalidPort => "not a port",
         UrlError::InvalidPercentEncoding => "a % without two hexadecimal digits",
-        UrlError::OutOfMemory => "out of memory",
         UrlError::InvalidText => "not UTF-8 text"
     };
 }
 
+// `Url::Parse` throws the reason a text is not a URL, so the parse sits in a `try` block and the
+// `catch` arm takes the reason.
 func Check(allocator: Allocator, text: char8[..]) {
-    match Url::Parse(allocator, text) {
-        .Success(url) => PrintLine("  {:<28} -> {}", text, url.Text()),
-        .Failure(error) => PrintLine("  {:<28} -> {}", text, Reason(error))
+    try {
+        let url = Url::Parse(allocator, text);
+        PrintLine("  {:<28} -> {}", text, url.Text());
+    } catch {
+        error => PrintLine("  {:<28} -> {}", text, Reason(error))
     }
 }
 
-func Main() -> ! UrlError {
+func Main() throws UrlError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
     // Parsing normalizes: the scheme and host are lower-cased, the default port is dropped, the
     // dot segments are removed from the path, and escapes use upper-case hexadecimal.
-    let page = Url::Parse(allocator,
-        "HTTPS://Rux-Lang.DEV:443/docs/./learn/../learn/url?q=caf%c3%a9&page=2#install")?;
+    let page = try Url::Parse(allocator,
+        "HTTPS://Rux-Lang.DEV:443/docs/./learn/../learn/url?q=caf%c3%a9&page=2#install");
     PrintLine("url       {}", page.Text());
     PrintLine("scheme    {}", page.Scheme());
     PrintLine("host      {}", page.Host() ?? "");
@@ -63,8 +66,8 @@ func Main() -> ! UrlError {
     //         error: argument 1 to 'Pairs' has type 'char8[..]?', but parameter 'query' requires
     //                'char8[..]'
     for pair in Pairs(page.Query() ?? "") {
-        let value = Decode(allocator, pair.value, true)?;
-        PrintLine("  {} = {}", pair.name, value);
+        let value = try Decode(allocator, pair.value, true);
+        PrintLine("  {} = {}", pair.name, value.View());
     }
 
     // Relative references, resolved against the page.
@@ -72,25 +75,25 @@ func Main() -> ! UrlError {
     let links: char8[..][6] = ["guide", "../packaging/manifest", "/blog", "?page=3", "#run-it",
         "//github.com/rux-lang"];
     for link in links {
-        let target = page.Resolve(link)?;
+        let target = try page.Resolve(link);
         PrintLine("  {:<22} -> {}", link, target.Text());
     }
 
     // Building a query. Each name and value is escaped as HTML forms do it: a space becomes `+`,
     // and `&` or `=` inside a value becomes `%26` or `%3D`, so it cannot end the pair early.
     var query = QueryBuilder(allocator);
-    query.Append("q", "fish & chips")?;
-    query.Append("sort", "price=asc")?;
-    var search = Url::Parse(allocator, "https://example.com/search")?;
-    search.SetQuery(query.Text())?;
+    query.Append("q", "fish & chips");
+    query.Append("sort", "price=asc");
+    var search = try Url::Parse(allocator, "https://example.com/search");
+    try search.SetQuery(query.Text());
     PrintLine("search    {}", search.Text());
 
     // One path segment from arbitrary text. The Encoding package's `PercentEncode` with the
     // `Component` set escapes everything but letters, digits and `-._~`, the `/` included, so the
     // text stays one segment.
     var segment: char8[64];
-    let length = PercentEncode("Kyiv 2026/10.txt", segment[..], PercentSet::Component) catch {
-        else => 0
+    let length = try PercentEncode("Kyiv 2026/10.txt", segment[..], PercentSet::Component) catch {
+        _ => 0
     };
     PrintLine("segment   {}", segment[..length]);
 

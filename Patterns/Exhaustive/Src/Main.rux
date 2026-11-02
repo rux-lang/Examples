@@ -2,19 +2,22 @@
 // could meet, and it insists that every one has an arm. Leave a case out and the program does not
 // build. Delete the `.Paused` arm below and the compiler names what is missing:
 //     error: match on 'Player' is not exhaustive; missing Player::Paused
+//     help: add arms for the missing cases, or a '_' arm
 //
 // That check is what makes a variant safe to grow. Add a case such as `Buffering` to `Player` next
 // year, and every match that forgot it fails to compile, pointing at the exact spot to fix. A match
-// that names every case therefore has no `else`, and should not have one.
+// that names every case therefore has no `_` arm, and should not have one.
 //
-// `else` is for the values you cannot list. An integer has billions of them, so a match that
-// produces a value from an integer must end with `else`, and deciding what the leftovers mean is
-// up to you. Delete the `else` arm in `Loudness` and the compiler stops with
+// `_` is for the values you cannot list. An integer has billions of them, so a match on an integer
+// must end with a `_` arm, and deciding what the leftovers mean is up to you. Delete the `_` arm in
+// `Loudness` and the compiler stops with
 //     error: match on 'int32' is not exhaustive; its arms do not cover every value
+//     help: add a '_' arm
 // A `bool` has just two values, so `true` and `false` arms cover it, and a missing one is named:
 //     error: match on 'bool8' is not exhaustive; missing false
-// A match used as a statement, producing no value, may leave integers and bools out: a value with
-// no arm simply skips it.
+//     help: add an arm for false, or a '_' arm
+// The rule holds for every match, including one used as a statement that produces no value. When
+// the other values should do nothing, say so with an empty `_ => {}` arm.
 import Io::PrintLine;
 
 variant Player {
@@ -23,7 +26,7 @@ variant Player {
     Paused(int32)
 }
 
-// Every case has an arm, so no `else` is needed. A guarded arm does not count towards that: the
+// Every case has an arm, so no `_` arm is needed. A guarded arm does not count towards that: the
 // guard might be false, so `.Playing(second)` still needs an unguarded arm of its own. Without it
 // the error would read `missing Player::Playing`.
 func Describe(player: Player) -> char8[..] {
@@ -35,24 +38,24 @@ func Describe(player: Player) -> char8[..] {
     };
 }
 
-// An `else` on a variant is allowed, but it is a promise you make on behalf of cases that do not
+// A `_` arm on a variant is allowed, but it is a promise you make on behalf of cases that do not
 // exist yet: a future `Buffering` would quietly count as "not playing" here, with no error to
 // warn you. Use it only when that is truly the right answer for any new case.
 func IsPlaying(player: Player) -> bool {
     return match player {
         .Playing(_) => true,
-        else => false
+        _ => false
     };
 }
 
-// The arms name a few volume levels, and `else` covers the rest. Even ranges that happened to reach
-// every value would not do instead: an integer match producing a value needs its `else`.
+// The arms name a few volume levels, and `_` covers the rest. Even ranges that happened to reach
+// every value would not do instead: a match on an integer needs its `_` arm.
 func Loudness(volume: int32) -> char8[..] {
     return match volume {
         0 => "muted",
         1..=3 => "quiet",
         10 => "maximum",
-        else => "normal"
+        _ => "normal"
     };
 }
 

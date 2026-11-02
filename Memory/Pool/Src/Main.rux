@@ -18,38 +18,40 @@ struct Point {
     y: int64;
 }
 
-func Main() -> ! AllocError {
+func Main() throws AllocError {
     var system = SystemAllocator();
     let backing: Allocator = system;
 
     // Each chunk is cut into eight blocks.
     var pool = Pool(backing, 8);
-    var handle = pool.Handle();
+    // Safety: `handle` and `allocator` are used only in this function, while `pool` lives and
+    // stays where it is.
+    var handle = unsafe { pool.Handle() };
     let allocator: Allocator = handle;
 
     PrintLine("block sizes: {} {} {} {} {}", pool.ClassSize(0), pool.ClassSize(1),
         pool.ClassSize(2), pool.ClassSize(3), pool.ClassSize(4));
-    let odd = Layout::New(20, 8) ?? fail AllocError::Unsupported;
+    let odd = Layout::Of(20, 8) ?? throw AllocError::Unsupported;
     PrintLine("a 20-byte request uses a {}-byte block", pool.ClassSize(ClassIndexFor(odd)));
 
     // Three 16-byte points, all out of the first chunk.
     let layout = Layout::ForValue<Point>();
-    let first = allocator.Allocate(layout)?;
-    let second = allocator.Allocate(layout)?;
-    let third = allocator.Allocate(layout)?;
+    let first = try allocator.Allocate(layout);
+    let second = try allocator.Allocate(layout);
+    let third = try allocator.Allocate(layout);
     PrintLine("three out:   {} live blocks, {} chunk", pool.LiveBlocks(), pool.ChunkCount());
 
     // Blocks can come back in any order. The middle one goes first.
-    allocator.Deallocate(second, layout)?;
+    try allocator.Deallocate(second, layout);
     PrintLine("one back:    {} live blocks", pool.LiveBlocks());
 
     // The next request of the same size gets that very block back.
-    let fourth = allocator.Allocate(layout)?;
+    let fourth = try allocator.Allocate(layout);
     PrintLine("fourth reuses the second's block: {}", fourth == second);
 
-    allocator.Deallocate(first, layout)?;
-    allocator.Deallocate(third, layout)?;
-    allocator.Deallocate(fourth, layout)?;
+    try allocator.Deallocate(first, layout);
+    try allocator.Deallocate(third, layout);
+    try allocator.Deallocate(fourth, layout);
 
     // Every block is back, and the chunk stays for the next requests.
     PrintLine("all back:    {} live blocks, {} chunk", pool.LiveBlocks(), pool.ChunkCount());

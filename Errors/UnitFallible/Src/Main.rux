@@ -1,11 +1,10 @@
 // Some operations have no answer to give back. When a withdrawal works, the money is gone from
-// the account and there is nothing more to say. Such a function is written `-> ! E`: an error
-// type after the `!`, and nothing before it.
+// the account and there is nothing more to say. Such a function declares only its error, after
+// the parameters: `func Withdraw(...) throws ShortOfFunds`, with no return type.
 //
-// `! E` is short for `() ! E`. The `()` is the unit, the empty tuple, whose only value is also
-// `()` — a success that carries no information beyond "it worked". Because there is no value to
-// return, the function succeeds simply by reaching its end. A bare `return;` succeeds early, and
-// only `fail` makes it fail.
+// The success then carries the unit `()`, the empty tuple — a success that carries no
+// information beyond "it worked". Because there is no value to return, the function succeeds
+// simply by reaching its end. A bare `return;` succeeds early, and only `throw` makes it fail.
 import Io::PrintLine;
 
 struct Account {
@@ -17,23 +16,26 @@ struct ShortOfFunds {
 }
 
 // Changes the account in place; the only thing to report is whether that happened.
-func Withdraw(account: &var Account, amount: int) -> ! ShortOfFunds {
+func Withdraw(account: &var Account, amount: int) throws ShortOfFunds {
     if amount == 0 {
         // Nothing to do, and that counts as success.
         return;
     }
     if amount > account.balance {
-        fail ShortOfFunds { missing: amount - account.balance };
+        throw ShortOfFunds { missing: amount - account.balance };
     }
     account.balance -= amount;
     // Falling off the end: success.
 }
 
 func Attempt(account: &var Account, amount: int) {
-    // The success pattern holds the unit, so it is written `.Success(())`.
-    match Withdraw(account, amount) {
-        .Success(()) => PrintLine("take {}: done, {} left", amount, account.balance),
-        .Failure(error) => PrintLine("take {}: refused, {} short", amount, error.missing)
+    // The call is still marked with `try`: it returns nothing, but it can throw. The statement
+    // after it runs only when the withdrawal worked.
+    try {
+        Withdraw(account, amount);
+        PrintLine("take {}: done, {} left", amount, account.balance);
+    } catch {
+        error => PrintLine("take {}: refused, {} short", amount, error.missing)
     }
 }
 

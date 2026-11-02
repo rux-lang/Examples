@@ -1,7 +1,6 @@
 # Unicode
 
-Count the same text three ways — bytes, scalars and graphemes — and find text where all three
-counts differ.
+Count the same text three ways — bytes, scalars and graphemes — and find text where all three counts differ.
 
 **You'll need:** [Encoding](https://rux-lang.dev/docs/learn/encoding), [Utf8](https://rux-lang.dev/docs/learn/utf8)
 

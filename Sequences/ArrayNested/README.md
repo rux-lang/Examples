@@ -1,7 +1,6 @@
 # ArrayNested
 
-Build a two-dimensional grid as an array of arrays, `int32[4][3]`, and walk it by rows and by
-columns.
+Build a two-dimensional grid as an array of arrays, `int32[4][3]`, and walk it by rows and by columns.
 
 **You'll need:** [Array](https://rux-lang.dev/docs/learn/array), [ArrayRepeat](https://rux-lang.dev/docs/learn/array-repeat)
 

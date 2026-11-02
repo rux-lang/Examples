@@ -24,12 +24,12 @@ struct Week {
 
 extend Week {
     // Reading: `week[day]` calls this and gives back a copy of the value.
-    func [](self: &Week, day: Day) -> int32 {
+    func [](&self, day: Day) -> int32 {
         return self.highs[day as uint];
     }
 
-    // Writing: `week[day] = value` calls this. It changes the week, so it takes `&var` self.
-    func []=(self: &var Week, day: Day, value: int32) {
+    // Writing: `week[day] = value` calls this. It changes the week, so it takes `&var self`.
+    func []=(&var self, day: Day, value: int32) {
         self.highs[day as uint] = value;
     }
 }

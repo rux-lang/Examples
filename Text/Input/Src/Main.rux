@@ -1,12 +1,12 @@
 // Reading what a person types needs somewhere to put text that does not exist yet, and that is
 // a job for a `StringBuilder`. `ReadLine` from the Io package appends the next line to one:
 //
-//     ReadLine(builder: &var StringBuilder) -> ! IoError
+//     ReadLine(builder: &var StringBuilder) throws IoError
 //
-// A success means a line arrived, without its line ending; an empty line is still a success.
-// Running out of input is not a special return value. It is a failure like any other, an
+// A return means a line arrived, without its line ending; an empty line is still a line.
+// Running out of input is not a special return value. It is an error like any other, an
 // `IoError` whose `kind` is `IoErrorKind::EndOfStream`, so a reading loop handles it in the same
-// `match` as a real error, and stops.
+// `catch` as a real error, and stops.
 //
 // A line is UTF-8 text, so "héllo" arrives as six bytes. A line that is not valid UTF-8 fails
 // with the kind `IoErrorKind::InvalidText`, but only after the rest of it has been read, so the
@@ -29,19 +29,18 @@ func Main() -> int {
     PrintLine("Type some lines, then end the input.");
     while true {
         builder.Clear();
-        match ReadLine(builder) {
-            .Success(_) => {},
-            .Failure(error) if error.kind == IoErrorKind::EndOfStream => break,
-            .Failure(error) if error.kind == IoErrorKind::InvalidText => {
+        try ReadLine(builder) catch {
+            error if error.kind == IoErrorKind::EndOfStream => break,
+            error if error.kind == IoErrorKind::InvalidText => {
                 count += 1;
                 PrintLine("line {} is not UTF-8 text", count);
                 continue;
             },
-            .Failure(_) => {
+            _ => {
                 PrintLine("the input could not be read");
                 return 1;
             }
-        }
+        };
 
         count += 1;
         let line = builder.View();

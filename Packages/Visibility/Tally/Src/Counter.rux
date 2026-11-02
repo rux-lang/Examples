@@ -14,11 +14,11 @@ extend Counter {
         return Counter { step: step, count: 0 };
     }
 
-    pub func Tick(self: &var Counter) {
+    pub func Tick(&var self) {
         self.count = Clamp(self.count + self.step);
     }
 
-    pub func Count(self: &Counter) -> int {
+    pub func Count(&self) -> int {
         return self.count;
     }
 }
@@ -26,5 +26,5 @@ extend Counter {
 const Limit: int = 10;
 
 func Clamp(value: int) -> int {
-    return value > Limit ? Limit : value;
+    return if value > Limit { Limit } else { value };
 }

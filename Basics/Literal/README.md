@@ -1,7 +1,6 @@
 # Literal
 
-Spell numbers in other bases, with digit separators, exponents and suffixes, and see how an
-unsuffixed literal takes the type of the value beside it.
+Spell numbers in other bases, with digit separators, exponents and suffixes, and see how an unsuffixed literal takes the type of the value beside it.
 
 **You'll need:** [Integer](https://rux-lang.dev/docs/learn/integer), [Float](https://rux-lang.dev/docs/learn/float)
 

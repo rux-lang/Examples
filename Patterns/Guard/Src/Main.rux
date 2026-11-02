@@ -32,7 +32,7 @@ func Parity(number: int32) -> char8[..] {
     return match number {
         0 => "zero",
         value if value % 2 == 0 => "even",
-        else => "odd"
+        _ => "odd"
     };
 }
 

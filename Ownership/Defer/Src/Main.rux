@@ -18,11 +18,11 @@ struct Valve {
 }
 
 extend Valve {
-    func Open(self: &Valve) {
+    func Open(&self) {
         PrintLine("    open {}", self.name);
     }
 
-    func Close(self: &Valve) {
+    func Close(&self) {
         PrintLine("    close {}", self.name);
     }
 }

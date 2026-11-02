@@ -7,7 +7,8 @@
 // stops exactly like a `Panic`, reporting the message and where it was:
 //
 //     Assertion failed: a median needs at least one score
-//       at Median (Src/Main.rux:43:5)
+//       at Median (Src/Main.rux:44:5)
+//       from Main
 //
 // Write the message as what was expected, since the failing value is not
 // printed.

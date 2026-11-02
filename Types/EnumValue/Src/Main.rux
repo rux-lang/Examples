@@ -22,7 +22,7 @@ func IsKnown(code: uint16) -> bool {
         201 => true,
         404 => true,
         500 => true,
-        else => false
+        _ => false
     };
 }
 

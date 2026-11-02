@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "NoCopy"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Prohibiting copies with a bodyless copy operator"
+Description = "Prohibiting copies of plain data with #NoCopy"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

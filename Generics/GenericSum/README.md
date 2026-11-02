@@ -1,7 +1,6 @@
 # GenericSum
 
-Build a sum from type parameters — `T | U` — see it collapse when `T` and `U` are the
-same type, and end its `match` in `else`.
+Build a sum from type parameters — `T | U` — see it collapse when `T` and `U` are the same type, and end its `match` with a `_` arm.
 
 **You'll need:** [Generic](https://rux-lang.dev/docs/learn/generic), [SumType](https://rux-lang.dev/docs/learn/sum-type), [TypedPattern](https://rux-lang.dev/docs/learn/typed-pattern)
 

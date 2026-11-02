@@ -1,7 +1,6 @@
 # CheckedArithmetic
 
-Detect overflow with `AddChecked`, `SubChecked` and `MulChecked`, which return `true` on overflow
-and the result through an out-parameter.
+Detect overflow with `AddChecked`, `SubChecked` and `MulChecked`, which return `true` on overflow and the result through an out-parameter.
 
 **You'll need:** [OutParameter](https://rux-lang.dev/docs/learn/out-parameter), [Optional](https://rux-lang.dev/docs/learn/optional), [Presence](https://rux-lang.dev/docs/learn/presence), [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [NumberLimit](https://rux-lang.dev/docs/learn/number-limit)
 

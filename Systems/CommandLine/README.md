@@ -1,9 +1,6 @@
 # CommandLine
 
-Describe a command's options, positional arguments and subcommands as a `CommandSpec`, check
-argument lists against it with `Parse` and `ParseProcess`, ask the result with `Has`, `Count`,
-`Integer` and `Positional`, report a `CommandLineError`, and print the help text the description
-writes for free.
+Describe a command's options, positional arguments and subcommands as a `CommandSpec`, check argument lists against it with `Parse` and `ParseProcess`, ask the result with `Has`, `Count`, `Integer` and `Positional`, report a `CommandLineError`, and print the help text the description writes for free.
 
 **You'll need:** [Environment](https://rux-lang.dev/docs/learn/environment), [Pointer](https://rux-lang.dev/docs/learn/pointer), [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice), [InterfaceParameter](https://rux-lang.dev/docs/learn/interface-parameter)
 

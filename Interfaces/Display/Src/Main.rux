@@ -4,8 +4,8 @@
 //
 // `Display` asks for a single method, `WriteDisplay`. It is handed a writer, which stands for
 // wherever the text is going, and it writes the value's text into it. Writing can fail (the
-// console may be closed, a buffer may be full), so the method returns `! FormatError`, and a
-// failure from any step is passed straight on with `?` or `return`.
+// console may be closed, a buffer may be full), so the method declares `throws FormatError`, and
+// every write in it is marked with `try`, which passes an error from any step straight on.
 import Format::WriteFormat;
 import Io::PrintLine;
 import Text::{ Display, FormatError, FormatSpec, TextWriter, WriteBytes };
@@ -18,16 +18,16 @@ struct Money {
 extend Money : Display {
     // `spec` carries what the placeholder asked for, such as the width in `{:>8}`. This
     // implementation ignores it, which a type is free to do.
-    func WriteDisplay(self: &Money, writer: &var TextWriter, spec: FormatSpec) -> ! FormatError {
+    func WriteDisplay(&self, writer: &var TextWriter, spec: FormatSpec) throws FormatError {
         var cents = self.cents;
         if cents < 0 {
-            // One write that may fail. `?` hands a failure to the caller and stops here.
-            WriteBytes(writer, "-")?;
+            // One write that may fail. `try` hands an error to the caller and stops here.
+            try WriteBytes(writer, "-");
             cents = -cents;
         }
         // `WriteFormat` is PrintLine's twin: the same placeholders, written into the writer.
         // `{:02}` pads the cents to two digits with zeros, so 5 cents shows as `05`.
-        return WriteFormat(writer, "${}.{:02}", cents / 100, cents % 100);
+        try WriteFormat(writer, "${}.{:02}", cents / 100, cents % 100);
     }
 }
 

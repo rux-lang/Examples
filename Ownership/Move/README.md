@@ -1,6 +1,6 @@
 # Move
 
-Hand a value on with `<-` in a binding, an argument and a return, and see the old name become unusable.
+Hand a value on with `move` in a binding, an argument and a return, and see the old name become unusable.
 
 **You'll need:** [Copy](https://rux-lang.dev/docs/learn/copy)
 

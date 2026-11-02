@@ -17,10 +17,13 @@ enum Direction {
 // here: a case is as small as a number.
 extend Direction {
     // Inside a `match` on a `Direction`, the type is already known, so a pattern may be written
-    // `.North` rather than `Direction::North`. A value outside a pattern is written in full:
-    // `.North => .East` stops with
-    //     error: '.East' must be written in full, as in 'Direction::East'
-    func TurnRight(self: Direction) -> Direction {
+    // `.North` rather than `Direction::North`. A value may be written short the same way wherever
+    // its type is already known, as in a value this method returns, but here each arm spells it
+    // in full. Where nothing says which type is meant, the short form is refused:
+    //     var heading = .North;
+    //         error: case '.North' needs an expected type to name its enum or variant
+    //         help: write 'Direction::North'
+    func TurnRight(self) -> Direction {
         return match self {
             .North => Direction::East,
             .East => Direction::South,
@@ -30,7 +33,7 @@ extend Direction {
     }
 
     // An enum cannot be printed with `{}` directly, so it is given a name to print.
-    func Name(self: Direction) -> char8[..] {
+    func Name(self) -> char8[..] {
         return match self {
             .North => "north",
             .East => "east",
@@ -41,7 +44,8 @@ extend Direction {
 }
 
 func Main() -> int {
-    // A case is named through its type.
+    // A case is named through its type. Nothing else here says the binding is a `Direction`,
+    // so the type has to be written.
     var heading = Direction::North;
     PrintLine("start facing {}", heading.Name());
 
@@ -54,7 +58,7 @@ func Main() -> int {
     PrintLine("back to north: {}", heading == Direction::North);
     PrintLine("facing east:   {}", heading == Direction::East);
 
-    // Neither `match` above needs an `else`: naming all four cases covers every value a
+    // Neither `match` above needs a `_` arm: naming all four cases covers every value a
     // `Direction` can hold. Add a fifth case, and both stop compiling until they handle it.
     return 0;
 }

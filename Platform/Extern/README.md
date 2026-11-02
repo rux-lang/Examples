@@ -2,8 +2,7 @@
 
 Call a function from a system library by declaring it with `extern` and naming its library with `#Link`.
 
-> **Windows only.** The functions come from `Kernel32.dll`. On any other system the build stops
-> with a `#Error` that says so.
+> **Windows only.** The functions come from `Kernel32.dll`. On any other system the build stops with a `#Error` that says so.
 
 **You'll need:** [Pointer](https://rux-lang.dev/docs/learn/pointer), [Target](https://rux-lang.dev/docs/learn/target), [CompileError](https://rux-lang.dev/docs/learn/compile-error)
 

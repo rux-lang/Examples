@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "ErrorMapping"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Add context to a failure on its way out with ? else"
+Description = "Add context to an error on its way out with try ... catch and throw"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

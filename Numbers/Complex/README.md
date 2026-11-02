@@ -1,8 +1,6 @@
 # Complex
 
-Do arithmetic on complex numbers with the Math package's `Complex` and its four operators, read
-one as a length and an angle with `Abs` and `Arg`, build one with `FromPolar`, and solve a
-quadratic whose roots are not real.
+Do arithmetic on complex numbers with the Math package's `Complex` and its four operators, read one as a length and an angle with `Abs` and `Arg`, build one with `FromPolar`, and solve a quadratic whose roots are not real.
 
 **You'll need:** [Math](https://rux-lang.dev/docs/learn/math), [OperatorOverload](https://rux-lang.dev/docs/learn/operator-overload), [FormatNumber](https://rux-lang.dev/docs/learn/format-number)
 

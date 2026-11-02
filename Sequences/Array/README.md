@@ -1,7 +1,6 @@
 # Array
 
-Store a fixed number of values inline in an `int32[4]`, index them from zero, and see that copying
-an array copies every element.
+Store a fixed number of values inline in an `int32[4]`, index them from zero, and see that copying an array copies every element.
 
 **You'll need:** [Mutable](https://rux-lang.dev/docs/learn/mutable), [For](https://rux-lang.dev/docs/learn/for)
 

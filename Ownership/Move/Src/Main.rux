@@ -1,10 +1,10 @@
 // A copy leaves two values behind. A move leaves one: the value is handed to its new owner and
-// the old name is finished. Rux writes a move as `<-`, the arrow pointing the way the value goes,
-// and it works in the same three places a copy happens.
+// the old name is finished. Rux writes a move as `move value`, and it works in the same three
+// places a copy happens.
 //
-//     let taken <- value;      a binding
-//     Run(<-value)             an argument
-//     return <-value;          a return
+//     let taken = move value;      a binding
+//     Run(move value)              an argument
+//     return move value;           a return
 //
 // A relay baton is the picture to keep in mind. One runner holds it at a time, and once it has
 // been handed on, the runner who passed it no longer has it. The compiler enforces exactly that:
@@ -16,42 +16,43 @@ struct Baton {
 }
 
 // Takes the baton, runs one lap with it, and hands it back. A parameter cannot be changed, so
-// `var held <- baton` moves it into a mutable local: still one baton, just under a new name.
+// `var held = move baton` moves it into a mutable local: still one baton, just under a new name.
 func Run(baton: Baton, runner: char8[..]) -> Baton {
-    var held <- baton;
+    var held = move baton;
     held.laps += 1;
     PrintLine("{} runs lap {}", runner, held.laps);
-    return <-held;
+    return move held;
 }
 
 func Main() -> int {
     let baton = Baton { laps: 0 };
 
     // A binding takes the baton over.
-    let first <- baton;
+    let first = move baton;
 
     // From here on, `baton` cannot be used:
     //
     //     PrintLine("{}", baton.laps);
     //
     // error: value 'baton' is used after it was moved
-    //   note: 'baton' was moved at 31:15
+    //   note: 'baton' was moved at 31:17
     //   help: clone 'baton' before moving it if both uses are required
     //
     // A move inside a loop is checked against the next pass too. The first pass would take the
     // baton, and the second would find nothing left to take:
     //
     //     for lap in 0..3 {
-    //         let runner <- first;
+    //         let runner = move first;
     //     }
     //
     // error: value 'first' may have been moved on some control-flow paths
+    //   help: initialize or preserve 'first' on every path before this use
 
     // Arguments and returns. What a call returns is a fresh value that nobody else holds, so it
-    // needs no arrow: `=` simply takes it.
-    let second = Run(<-first, "Ana");
-    let third = Run(<-second, "Ben");
-    let last = Run(<-third, "Cleo");
+    // needs no `move`: `=` simply takes it.
+    let second = Run(move first, "Ana");
+    let third = Run(move second, "Ben");
+    let last = Run(move third, "Cleo");
     PrintLine("laps run: {}", last.laps);
 
     // The same is true of any value made on the spot. There is no old name to give up.

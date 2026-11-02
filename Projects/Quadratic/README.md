@@ -1,7 +1,6 @@
 # Quadratic
 
-Read three coefficients and solve a x² + b x + c = 0, telling apart two real roots, a repeated
-root, a complex pair, a linear equation, an inconsistent one and an identity.
+Read three coefficients and solve a x² + b x + c = 0, telling apart two real roots, a repeated root, a complex pair, a linear equation, an inconsistent one and an identity.
 
 **You'll need:** Parts 1–14 — this project is the checkpoint for Text, and leans on [Input](https://rux-lang.dev/docs/learn/input), [Parse](https://rux-lang.dev/docs/learn/parse), [StringView](https://rux-lang.dev/docs/learn/string-view) and [ErrorVariant](https://rux-lang.dev/docs/learn/error-variant) — plus [FloatSpecial](https://rux-lang.dev/docs/learn/float-special) and [Math](https://rux-lang.dev/docs/learn/math) from Part 16.
 

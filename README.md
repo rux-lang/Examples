@@ -39,7 +39,7 @@ Choosing and repeating.
 
 - 3.1 **[If](ControlFlow/If/)** — run code only when a condition holds, with `if` and `else`
 - 3.2 **[ElseIf](ControlFlow/ElseIf/)** — choose one of several branches with an `else if` chain
-- 3.3 **[Ternary](ControlFlow/Ternary/)** — pick one of two values inside an expression with `? :`
+- 3.3 **[Ternary](ControlFlow/Ternary/)** — pick one of two values inside an expression with an `if` value, since Rux has no `? :`
 - 3.4 **[While](ControlFlow/While/)** — repeat while a condition holds — possibly zero times
 - 3.5 **[DoWhile](ControlFlow/DoWhile/)** — run the body first and test afterwards, so it runs at least once
 - 3.6 **[Loop](ControlFlow/Loop/)** — repeat forever with `loop` until a `break` leaves
@@ -48,7 +48,7 @@ Choosing and repeating.
 - 3.9 **[Range](ControlFlow/Range/)** — describe a run of numbers with `..` and `..=`
 - 3.10 **[For](ControlFlow/For/)** — walk a range with `for`
 - 3.11 **[Label](ControlFlow/Label/)** — name a loop, so `break` can leave an outer one
-- 3.12 **[Match](ControlFlow/Match/)** — select a branch by value with `match`, and default with `else`
+- 3.12 **[Match](ControlFlow/Match/)** — select a branch by value with `match`, and catch the rest with `_`
 - 3.13 **[MatchExpression](ControlFlow/MatchExpression/)** — use `match` as a value, not only as a statement
 
 ### 4. Functions
@@ -59,7 +59,7 @@ Naming a piece of work and reusing it.
 - 4.2 **[Return](Functions/Return/)** — return early, and write functions that return nothing
 - 4.3 **[Recursion](Functions/Recursion/)** — a function that calls itself, and the base case that stops it
 - 4.4 **[Overload](Functions/Overload/)** — give several functions one name, and let the arguments choose between them
-- 4.5 **[DefaultArgument](Functions/DefaultArgument/)** — give a parameter a default value so callers may leave it out
+- 4.5 **[DefaultArgument](Functions/DefaultArgument/)** — give a parameter a default value so callers may leave it out, and name an argument to skip the defaults before it
 - 4.6 **[Generic](Functions/Generic/)** — write one function that works for many types
 - 4.7 **[Callback](Functions/Callback/)** — pass a function to another function as an ordinary value
 
@@ -83,8 +83,8 @@ Declaring types of your own.
 - 6.1 **[Struct](Types/Struct/)** — group related values into a struct with named fields
 - 6.2 **[Reference](Types/Reference/)** — borrow a value with `&T` instead of copying it
 - 6.3 **[MutableReference](Types/MutableReference/)** — let a function change the caller's value through `&var T`
-- 6.4 **[Method](Types/Method/)** — give a struct behaviour with `extend` and a `self` receiver
-- 6.5 **[MutatingMethod](Types/MutatingMethod/)** — a method that changes its receiver through `self: &var T`
+- 6.4 **[Method](Types/Method/)** — give a struct behaviour with `extend` and a `&self` receiver
+- 6.5 **[MutatingMethod](Types/MutatingMethod/)** — a method that changes its receiver through `&var self`
 - 6.6 **[Constructor](Types/Constructor/)** — build a valid value in one place with a constructor
 - 6.7 **[Extension](Types/Extension/)** — add methods to a type you did not write
 - 6.8 **[Enum](Types/Enum/)** — name a fixed set of cases
@@ -103,14 +103,14 @@ Everything a `match` arm can say.
 - 7.3 **[TuplePattern](Patterns/TuplePattern/)** — match several values at once as a tuple
 - 7.4 **[StructPattern](Patterns/StructPattern/)** — take a struct-shaped variant case apart by field name
 - 7.5 **[CharacterPattern](Patterns/CharacterPattern/)** — match single characters
-- 7.6 **[Exhaustive](Patterns/Exhaustive/)** — why a match on a variant must cover every case, and when `else` is needed
+- 7.6 **[Exhaustive](Patterns/Exhaustive/)** — why a match must cover every value: name every case of a variant, and end an integer match with `_`
 
 ### 8. Optionals
 
 A value that may be absent: `T?`.
 
 - 8.1 **[Optional](Optionals/Optional/)** — a value that may be missing: `int?` and `none`
-- 8.2 **[Presence](Optionals/Presence/)** — match an optional with `value?` and `none` arms
+- 8.2 **[Presence](Optionals/Presence/)** — match an optional with `.Some(value)` and `none` arms, or test it with `if ... is .Some(value)`
 - 8.3 **[Coalesce](Optionals/Coalesce/)** — supply a fallback for a missing value with `??`
 - 8.4 **[CoalesceExit](Optionals/CoalesceExit/)** — leave with `?? return`, `?? continue` or `?? break` when a value is missing
 - 8.5 **[OptionalPropagate](Optionals/OptionalPropagate/)** — pass absence to the caller with `?`
@@ -118,22 +118,22 @@ A value that may be absent: `T?`.
 
 ### 9. Errors
 
-Operations that can fail: `T ! E`.
+Operations that can fail: `-> T throws E`, `throw` and `try`.
 
-- 9.1 **[Fallible](Errors/Fallible/)** — return either a value or an error with `T ! E`
-- 9.2 **[Fail](Errors/Fail/)** — report a failure with `fail`
-- 9.3 **[UnitFallible](Errors/UnitFallible/)** — a function that returns nothing but can still fail: `! E`
-- 9.4 **[Outcome](Errors/Outcome/)** — match a result as `.Success` or `.Failure`
-- 9.5 **[Discard](Errors/Discard/)** — why the compiler refuses to let a result be ignored, and how to discard one on purpose
-- 9.6 **[Catch](Errors/Catch/)** — handle the ways an operation can fail with `catch`
-- 9.7 **[CatchFallback](Errors/CatchFallback/)** — turn any failure into a default value with `catch { else => ... }`
-- 9.8 **[Propagate](Errors/Propagate/)** — hand a failure straight to the caller with `?` instead of matching it
+- 9.1 **[Fallible](Errors/Fallible/)** — return a value or throw an error with `-> T throws E`, and handle it with `try` and `catch`
+- 9.2 **[Fail](Errors/Fail/)** — leave a function with an error using `throw`
+- 9.3 **[UnitFallible](Errors/UnitFallible/)** — a function that returns nothing but can still throw: `func F() throws E`
+- 9.4 **[Outcome](Errors/Outcome/)** — keep an outcome as Core's `Result<T, E>` and match `.Success` or `.Failure`
+- 9.5 **[Discard](Errors/Discard/)** — why a call that can throw must be marked, and how to drop its error on purpose with `try?` or `catch { _ => {} }`
+- 9.6 **[Catch](Errors/Catch/)** — handle each way an operation can fail with `try ... catch { arms }`
+- 9.7 **[CatchFallback](Errors/CatchFallback/)** — turn any error into a default value with `catch { _ => ... }` or `(try? F()) ?? fallback`
+- 9.8 **[Propagate](Errors/Propagate/)** — pass an error straight to the caller with plain `try` instead of catching it
 - 9.9 **[ErrorVariant](Errors/ErrorVariant/)** — describe the ways an operation can fail with a variant
-- 9.10 **[ErrorMapping](Errors/ErrorMapping/)** — add context to an error as it passes through with `? else (e => ...)`
-- 9.11 **[ErrorSum](Errors/ErrorSum/)** — fail in more than one way with an error sum `A | B`
-- 9.12 **[FallibleMain](Errors/FallibleMain/)** — let `Main` itself fail, and see the exit status
-- 9.13 **[AbsenceToError](Errors/AbsenceToError/)** — turn a missing value into a failure with `?? fail`
-- 9.14 **[NestedFallible](Errors/NestedFallible/)** — results inside results: `T? ! E` and `(T ! E1) ! E2`
+- 9.10 **[ErrorMapping](Errors/ErrorMapping/)** — add context to an error as it passes through with `try F() catch { e => throw Mapped(e) }`
+- 9.11 **[ErrorSum](Errors/ErrorSum/)** — throw more than one kind of error with `throws A | B`
+- 9.12 **[FallibleMain](Errors/FallibleMain/)** — let `Main` throw with `func Main() throws E`, and see the exit status
+- 9.13 **[AbsenceToError](Errors/AbsenceToError/)** — turn a missing value into an error with `?? throw`
+- 9.14 **[NestedFallible](Errors/NestedFallible/)** — keep levels apart: `-> T? throws E` and `-> Result<T, E1> throws E2`
 - 9.15 **[Panic](Errors/Panic/)** — stop the program when something impossible happens
 - 9.16 **[Assert](Errors/Assert/)** — check an assumption while the program runs
 
@@ -153,11 +153,11 @@ Who owns a value, and when it is cleaned up.
 
 - 11.1 **[Exclusivity](Ownership/Exclusivity/)** — one writer at a time: the rule that keeps borrows safe
 - 11.2 **[Copy](Ownership/Copy/)** — assignment copies a value, and the copies are independent
-- 11.3 **[Move](Ownership/Move/)** — hand a value over with `<-` instead of copying it
+- 11.3 **[Move](Ownership/Move/)** — hand a value over with `move` instead of copying it
 - 11.4 **[Destructor](Ownership/Destructor/)** — run cleanup when a value goes out of scope with `~T`
-- 11.5 **[NoCopy](Ownership/NoCopy/)** — forbid copying a type that owns a resource
-- 11.6 **[CustomCopy](Ownership/CustomCopy/)** — write your own copy for a type that needs real work to duplicate
-- 11.7 **[PartialMove](Ownership/PartialMove/)** — move one field out of a struct, and what is cleaned up after
+- 11.5 **[NoCopy](Ownership/NoCopy/)** — mark plain data `#NoCopy` so it can only be moved
+- 11.6 **[CustomCopy](Ownership/CustomCopy/)** — copy a move-only type on purpose with a `Clone` method
+- 11.7 **[PartialMove](Ownership/PartialMove/)** — why one field cannot be moved out of a struct, and taking the struct apart with `move` instead
 - 11.8 **[Defer](Ownership/Defer/)** — schedule cleanup at the point you start the work, so it cannot be forgotten
 - 11.9 **[DeferReturn](Ownership/DeferReturn/)** — what a deferred action sees when the function returns a value
 - 11.10 **[Initialization](Ownership/Initialization/)** — a variable must be assigned before it is read
@@ -216,7 +216,7 @@ Strings, characters, formatting, parsing and input.
 Pointers, raw memory and allocators.
 
 - 15.1 **[Pointer](Memory/Pointer/)** — the difference between `*T` and `*var T`, and taking an address with `@`
-- 15.2 **[OutParameter](Memory/OutParameter/)** — return extra information through a pointer parameter
+- 15.2 **[OutParameter](Memory/OutParameter/)** — return an answer through a `&var T` out-parameter, and why an optional `T?` is usually better
 - 15.3 **[RawMemory](Memory/RawMemory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
 - 15.4 **[PointerArithmetic](Memory/PointerArithmetic/)** — step a pointer through memory one element at a time
 - 15.5 **[PointerSlice](Memory/PointerSlice/)** — turn a pointer and a length into a slice
@@ -335,7 +335,7 @@ Modules, packages, libraries and tools.
 - 22.8 **[SharedLibrary](Packages/SharedLibrary/)** — build a shared library
 - 22.9 **[Documentation](Packages/Documentation/)** — document your code with `///` comments
 - 22.10 **[Tooling](Packages/Tooling/)** — format, lint, test and document with the `rux` tool
-- 22.11 **[UnitTest](Packages/UnitTest/)** — write `#Test()` functions with `Expect` checks and run them with `rux test`
+- 22.11 **[UnitTest](Packages/UnitTest/)** — write `#Test` functions that throw `TestFailure` from `Expect` checks, and run them with `rux test`
 - 22.12 **[Benchmark](Packages/Benchmark/)** — measure how long code takes with the `Test` package's benchmarks
 
 ### 23. Compile time

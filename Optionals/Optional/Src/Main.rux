@@ -20,11 +20,12 @@ func FirstEven(values: int[..]) -> int? {
 }
 
 // An optional cannot be printed or added up as it is; first you have to find out whether there
-// is a value inside. This is the smallest `match` that does it. `value?` means "present, and call
-// what it holds `value`", and `none` means absent. The next lesson, Presence, explains it fully.
+// is a value inside. This is the smallest `match` that does it. `.Some(value)` means "present, and
+// call what it holds `value`", and `none` means absent. The next lesson, Presence, explains it
+// fully.
 func Show(label: char8[..], answer: int?) {
     match answer {
-        value? => PrintLine("{}: {}", label, value),
+        .Some(value) => PrintLine("{}: {}", label, value),
         none => PrintLine("{}: none", label)
     }
 }
@@ -43,7 +44,7 @@ func Main() -> int {
     // cannot combine left operand 'int?' with right operand 'int'" — because `known` might be
     // `none`. An `int?` is not an `int` until a match has shown that a value is there.
     //
-    // An optional says only that a value is missing, never why. When the reason matters, the
-    // fallible `int ! E` of the Errors part carries it.
+    // An optional says only that a value is missing, never why. When the reason matters, a
+    // function declares the error it throws, `-> int throws E`, as the Errors part shows.
     return 0;
 }

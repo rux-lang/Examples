@@ -1,7 +1,6 @@
 # MultipleBounds
 
-Require two interfaces at once with `<T: Scored + Display>`, so a generic can both compare
-and print its values.
+Require two interfaces at once with `<T: Scored + Display>`, so a generic can both compare and print its values.
 
 **You'll need:** [GenericBound](https://rux-lang.dev/docs/learn/generic-bound), [Display](https://rux-lang.dev/docs/learn/display)
 

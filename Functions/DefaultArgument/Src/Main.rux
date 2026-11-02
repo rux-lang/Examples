@@ -15,8 +15,9 @@ func Power(base: int, exponent: int = 2) -> int {
     return result;
 }
 
-// Several parameters may have defaults. Arguments still fill the parameters
-// from the left, so a call can stop early but cannot skip one in the middle.
+// Several parameters may have defaults. Positional arguments fill the
+// parameters from the left, so a call can stop early; skipping one in the
+// middle takes a named argument, shown in `Main`.
 func Clamp(value: int, low: int = 0, high: int = 100) -> int {
     if value < low {
         return low;
@@ -44,9 +45,15 @@ func Main() -> int {
     PrintLine("Clamp(-5)           {}", Clamp(-5));
     PrintLine("Clamp(42, 50)       {}", Clamp(42, 50));
 
-    // To change `high` the call must also give `low`, even when it wants the
-    // default there. There is no way to name an argument and skip the rest.
+    // Positional arguments fill the parameters from the left, so to change
+    // `high` this call must also give `low`, even though it wants the default
+    // there.
     PrintLine("Clamp(150, 0, 255)  {}", Clamp(150, 0, 255));
+
+    // Labeling an argument with its parameter's name lets the call skip the
+    // defaulted parameters before it, which keep their defaults. Labels must
+    // still come after the positional arguments, in parameter order.
+    PrintLine("Clamp(150, high: 255) {}", Clamp(150, high: 255));
 
     Rule();
     Rule(5);

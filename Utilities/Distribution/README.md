@@ -1,7 +1,6 @@
 # Distribution
 
-Shape a generator's raw numbers into die rolls with `UniformInRange`, a random order with
-`Shuffle`, and a bell curve with `NormalWith`.
+Shape a generator's raw numbers into die rolls with `UniformInRange`, a random order with `Shuffle`, and a bell curve with `NormalWith`.
 
 **You'll need:** [Random](https://rux-lang.dev/docs/learn/random), [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice), [FormatNumber](https://rux-lang.dev/docs/learn/format-number)
 

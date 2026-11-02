@@ -10,33 +10,33 @@
 // The price is that the small vector itself is larger, and that its elements move when it moves:
 // a view from `AsSlice` lasts only until the vector next changes or is moved.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, SmallVector };
+import Collections::SmallVector;
 import Io::{ Print, PrintLine };
 
 // Collects the prime factors of `number`, smallest first, by dividing out each factor in turn.
-func Factor(allocator: Allocator, number: uint64) -> SmallVector<uint64> ! CollectionError {
+func Factor(allocator: Allocator, number: uint64) -> SmallVector<uint64> {
     var factors = SmallVector<uint64>(allocator);
     var rest = number;
     var divisor: uint64 = 2;
     while divisor * divisor <= rest {
         while rest % divisor == 0 {
-            factors.Push(divisor)?;
+            factors.Push(divisor);
             rest = rest / divisor;
         }
         divisor = divisor + 1;
     }
     if rest > 1 {
-        factors.Push(rest)?;
+        factors.Push(rest);
     }
     // A small vector owns its elements and cannot be copied, so it is moved out. A plain
     // `return factors;` is refused:
     //
-    //     error: move-only value 'factors' requires an explicit '<-' in return
-    //     help: prefix the return value with '<-', as in 'return <-factors'
-    return <-factors;
+    //     error: cannot copy 'SmallVector<uint64>', which owns resources
+    //     help: write 'move factors' to transfer it, or 'factors.Clone()' to copy it
+    return move factors;
 }
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -46,21 +46,20 @@ func Main() -> ! CollectionError {
 
     let numbers: uint64[5] = [97, 360, 9699690, 1024, 3072000];
     for number in numbers[..] {
-        let factors = Factor(allocator, number)?;
+        let factors = Factor(allocator, number);
         Print("{:>8} =", number);
         for factor in factors.AsSlice() {
             Print(" {}", factor);
         }
         // `IsInline` says whether the elements still live inside the small vector.
-        let place = factors.IsInline() ? "inline" : "on the heap";
+        let place = if factors.IsInline() { "inline" } else { "on the heap" };
         PrintLine("   count {}, {}, capacity {}", factors.Length(), place, factors.Capacity());
     }
 
     // A small vector also pops, truncates and clears like a vector. Once its elements have moved
     // to the heap they stay there, even when only a few are left.
-    var factors = Factor(allocator, 1024)?;
-    var last: uint64 = 0;
-    if factors.TryPop(@last) {
+    var factors = Factor(allocator, 1024);
+    if factors.Pop() is .Some(last) {
         PrintLine("popped {}, {} left", last, factors.Length());
     }
     factors.Truncate(2);

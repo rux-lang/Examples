@@ -29,8 +29,9 @@ struct Teller {
 func Transfer(accounts: &Mutex<Accounts>, amount: int64) {
     // The guard holds the lock from here to the end of the function. While it does, no other
     // thread can see the money half moved.
-    let guard = accounts.Lock();
-    let book = guard.Get();
+    // `Get` would lend the value only for reading; `GetMutable` lends it for writing.
+    var guard = accounts.Lock();
+    let book = guard.GetMutable();
     book.checking = book.checking - amount;
     book.savings = book.savings + amount;
     book.transfers = book.transfers + 1;
@@ -56,13 +57,12 @@ func Main() -> int {
     // Each teller gets its own handle to the same accounts. A negative amount moves money back.
     // A handle is never copied, so `accounts: accounts` is refused; `Clone` is the way to share:
     //
-    //     error: move-only value 'accounts' requires an explicit '<-' in aggregate
-    var tellers: JoinHandle<()>[4] = [
-        Spawn(Work, Teller { amount: 3, accounts: accounts.Clone() }) catch { else => return 1 },
-        Spawn(Work, Teller { amount: 2, accounts: accounts.Clone() }) catch { else => return 1 },
-        Spawn(Work, Teller { amount: -1, accounts: accounts.Clone() }) catch { else => return 1 },
-        Spawn(Work, Teller { amount: -2, accounts: accounts.Clone() }) catch { else => return 1 }
-    ];
+    //     error: cannot copy 'Mutex<Accounts>', which owns resources
+    let first = try Spawn(Work, Teller { amount: 3, accounts: accounts.Clone() }) catch { _ => return 1 };
+    let second = try Spawn(Work, Teller { amount: 2, accounts: accounts.Clone() }) catch { _ => return 1 };
+    let third = try Spawn(Work, Teller { amount: -1, accounts: accounts.Clone() }) catch { _ => return 1 };
+    let fourth = try Spawn(Work, Teller { amount: -2, accounts: accounts.Clone() }) catch { _ => return 1 };
+    var tellers: JoinHandle<()>[4] = [move first, move second, move third, move fourth];
     for index in 0..4 {
         tellers[index].Join();
     }

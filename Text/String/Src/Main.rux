@@ -3,10 +3,10 @@
 // `String`: it keeps its own copy of the bytes, in memory it asked an allocator for, and gives
 // that memory back in its destructor when the value's life ends.
 //
-// Asking for memory can fail, and so can checking that bytes are UTF-8, so the calls that
-// make a `String` return `String ! TextError`. `Main` is fallible here, and `?` passes any such
-// failure on. The allocator itself is the subject of the Memory part; for now it is simply
-// where a String's bytes come from.
+// Checking that bytes are UTF-8 can fail, so the calls that make a `String` from bytes declare
+// `throws TextError`. `Main` throws here too, and `try` passes any such error on. The allocator
+// itself is the subject of the Memory part; for now it is simply where a String's bytes come
+// from.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Text::{ String, TextError };
@@ -15,32 +15,37 @@ import Text::{ String, TextError };
 // view of them would be left pointing at nothing, so the function returns a String that owns
 // a copy. `FromBytes` checks the bytes are text before copying them, and that check matters
 // here: reversed byte by byte, "né" puts the two bytes of `é` in the wrong order, and the
-// call fails with `TextError::InvalidUtf8`. The array has room for words of up to 16 bytes.
-func Reversed(allocator: Allocator, word: char8[..]) -> String ! TextError {
+// call throws `TextError::InvalidUtf8`. The array has room for words of up to 16 bytes.
+func Reversed(allocator: Allocator, word: char8[..]) -> String throws TextError {
     var letters: char8[16];
     for i in 0..word.length {
         letters[i] = word[word.length - 1 - i];
     }
-    return String::FromBytes(allocator, letters[..word.length]);
+    return try String::FromBytes(allocator, letters[..word.length]);
 }
 
-func Main() -> ! TextError {
+func Main() throws TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    var word = Reversed(allocator, "stressed")?;
-    PrintLine("word   {}, {} bytes", word, word.Length());
+    var word = try Reversed(allocator, "stressed");
+    PrintLine("word   {}, {} bytes", word.View(), word.Length());
 
     // `Clone` makes an independent copy with storage of its own. Replacing the original's text
     // afterwards leaves the clone exactly as it was.
-    let saved = word.Clone()?;
-    word.ReplaceWith(Reversed(allocator, "drawer")?);
-    PrintLine("word   {}", word);
-    PrintLine("saved  {}", saved);
+    let saved = word.Clone();
+    try word.ReplaceWith(Reversed(allocator, "drawer"));
+    PrintLine("word   {}", word.View());
+    PrintLine("saved  {}", saved.View());
 
-    // `let copy = saved;` would also copy, but plain assignment has no way to report failure,
-    // so it ends the program if memory runs out. `Clone` hands that failure back as a
-    // `TextError` instead, which is why it is the one to use when failure must be handled.
+    // A String owns its memory, so `=` never copies one: two owners would release the same
+    // bytes. Copying is always the visible call to `Clone`, and `move` hands the one value over:
+    //
+    //     let copy = saved;
+    //         error: cannot copy 'String', which owns resources
+    //
+    // `Clone` ends the program if memory runs out, as every allocation in a String does.
+    // `TryClone` throws an `AllocError` instead, for code where that must be handled.
 
     // A String lends out a view whenever borrowed text is enough, without copying anything.
     let view = saved.View();

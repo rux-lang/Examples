@@ -1,8 +1,10 @@
 # Outcome
 
-Store, pass, build and match a fallible's outcome through `.Success` and `.Failure`.
+Keep an outcome that must outlive its call in Core's `Result<T, E>`, then store, pass, build and match it through `.Success` and `.Failure`.
 
 **You'll need:** [Fail](https://rux-lang.dev/docs/learn/fail), [MatchExpression](https://rux-lang.dev/docs/learn/match-expression)
+
+`Share` declares `-> int throws NobodyToShare`. `Keep` turns one call into a stored value with `try .Success(Share(slices, people)) catch { e => .Failure(e) }`. `Result` is an ordinary variant, so it is passed to `Describe`, built by hand with `.Success(2)` and `.Failure(...)`, and taken apart with `match`, which must cover both cases.
 
 ```sh
 rux run

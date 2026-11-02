@@ -10,12 +10,12 @@
 // A bit set owns its words, so it cannot be copied:
 //
 //     var both = ann;
-//         error: move-only value 'ann' requires an explicit '<-' in initialization
+//         error: cannot copy 'BitSet', which owns resources
 //
-// Moving it with `<-` would use `ann` up. To combine sets and keep the originals, build the
+// Moving it with `move ann` would use `ann` up. To combine sets and keep the originals, build the
 // combination in a new set.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ BitSet, CollectionError };
+import Collections::BitSet;
 import Io::{ Print, PrintLine };
 
 // Prints the members in order. `NextSet(from)` finds the lowest set bit at or after `from`, so
@@ -31,20 +31,20 @@ func Show(label: char8[..], days: &BitSet) {
     PrintLine("   ({} days)", days.Count());
 }
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    // The days of June each person is free. `Set` may need another word, and so can fail.
+    // The days of June each person is free. `Set` grows the set by another word when it must.
     var ann = BitSet(allocator);
     let annFree: uint[7] = [2, 3, 9, 10, 16, 23, 30];
     for day in annFree[..] {
-        ann.Set(day)?;
+        ann.Set(day);
     }
     var ben = BitSet(allocator);
     let benFree: uint[6] = [3, 4, 10, 17, 23, 24];
     for day in benFree[..] {
-        ben.Set(day)?;
+        ben.Set(day);
     }
     Show("ann", ann);
     Show("ben", ben);
@@ -52,24 +52,24 @@ func Main() -> ! CollectionError {
 
     // Days both are free: start from Ann's days and keep only those Ben has too.
     var both = BitSet(allocator);
-    both.UnionWith(ann)?;
+    both.UnionWith(ann);
     both.IntersectWith(ben);
     Show("both", both);
 
     // Days either is free, and days only Ann is free.
     var either = BitSet(allocator);
-    either.UnionWith(ann)?;
-    either.UnionWith(ben)?;
+    either.UnionWith(ann);
+    either.UnionWith(ben);
     Show("either", either);
     var annOnly = BitSet(allocator);
-    annOnly.UnionWith(ann)?;
+    annOnly.UnionWith(ann);
     annOnly.DifferenceWith(ben);
     Show("ann only", annOnly);
 
     // Plans change: Ann books the 10th, and `Toggle` flips Ben's 17th off and his 18th on.
     ann.Reset(10);
-    ben.Toggle(17)?;
-    ben.Toggle(18)?;
+    ben.Toggle(17);
+    ben.Toggle(18);
     Show("ann now", ann);
     Show("ben now", ben);
 

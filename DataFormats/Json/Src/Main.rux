@@ -2,12 +2,12 @@
 // a document into a tree of `JsonValue`s, and every value in the tree is one of six kinds: text,
 // number, boolean, null, array or object.
 //
-//     Parse(allocator, text) -> JsonValue ! JsonParseError
+//     Parse(allocator, text) -> JsonValue throws JsonParseError
 //
-// Parsing hands back a whole document or the reason there is none, never half of one. Reading the
-// tree then means asking a value what it is before taking it apart: `Find` and `At` answer a
-// pointer that is null when the member or element is not there, and the conversions answer
-// `false`, through an out-parameter, when the value is some other kind.
+// Parsing hands back a whole document or throws the reason there is none, never half of one.
+// Reading the tree then means asking a value what it is before taking it apart: `Find` and `At`
+// answer `none` when the member or element is not there, and the conversions answer `none` when
+// the value is some other kind.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Json::{ JsonKind, JsonValue, Parse };
@@ -20,51 +20,60 @@ func KindName(kind: JsonKind) -> char8[..] {
         JsonKind::Boolean => "boolean",
         JsonKind::Array => "array",
         JsonKind::Object => "object",
-        else => "null"
+        _ => "null"
     };
 }
 
-// Member names are compared as text, so `Find` takes a `StringView`.
-func Member(object: &JsonValue, name: char8[..]) -> *JsonValue {
-    return object.Find(StringView::FromValidated(name));
+// Member names are compared as text, so `Find` takes a `StringView`. The answer borrows from the
+// value it was found in, so it is an optional reference, and the helper is a method: a reference
+// result borrows from the receiver.
+extend JsonValue {
+    func Member(&self, name: char8[..]) -> &JsonValue? {
+        return self.Find(StringView::FromValidated(name));
+    }
 }
 
 func Inspect(root: &JsonValue) {
-    PrintLine("root      {} of {} members", KindName(root.Kind()), root.Length());
+    PrintLine("root      {} of {} members", KindName(root.Kind()), root.Length() ?? 0);
 
-    // A member that is not there is a null pointer, so check before reading through it.
-    let name = Member(root, "name");
-    if name != null {
-        PrintLine("name      {}", (*name).AsText());
+    // A member that is not there is `none`, so check before reading it. Each `is` test binds a
+    // name for the tests after it in the `&&` chain, and for the body.
+    if root.Member("name") is .Some(name) && name.AsText() is .Some(text) {
+        PrintLine("name      {}", text);
     }
-    PrintLine("license   present: {}", Member(root, "license") != null);
+    PrintLine("license   present: {}", root.Member("license") is .Some(_));
 
     // A number keeps the text it was written with, and converting it is a question that can
-    // be answered `false`: the text may have a fraction, or not fit the type asked for.
-    var year: int64 = 0;
-    let number = (*Member(root, "year")).AsNumber();
-    let fits = (*number).AsInt64(@year);
-    PrintLine("year      {} (text \"{}\", fits an int64: {})", year, (*number).Text(), fits);
+    // be answered `none`: the text may have a fraction, or not fit the type asked for.
+    if root.Member("year") is .Some(member) && member.AsNumber() is .Some(number) {
+        let year = number.AsInt64();
+        PrintLine("year      {} (text \"{}\", fits an int64: {})", year ?? 0, number.Text(),
+            year is .Some(_));
+    }
 
     // An array is walked by index, and each element is asked its kind like any other value.
-    let tags = Member(root, "tags");
-    for i in 0..(*tags).Length() {
-        let tag = (*tags).At(i);
-        PrintLine("tags[{}]   {} {}", i, KindName((*tag).Kind()), (*tag).AsText());
+    if root.Member("tags") is .Some(tags) {
+        for i in 0..(tags.Length() ?? 0) {
+            if tags.At(i) is .Some(tag) && tag.AsText() is .Some(text) {
+                PrintLine("tags[{}]   {} {}", i, KindName(tag.Kind()), text);
+            }
+        }
     }
 
     // A nested object is just another value with members of its own.
-    var beta = false;
-    let flags = Member(root, "flags");
-    let isBoolean = (*Member(*flags, "beta")).AsBoolean(@beta);
-    PrintLine("beta      boolean: {}, value: {}", isBoolean, beta);
+    if root.Member("flags") is .Some(flags) && flags.Member("beta") is .Some(beta) {
+        let value = beta.AsBoolean();
+        PrintLine("beta      boolean: {}, value: {}", value is .Some(_), value ?? false);
+    }
 }
 
+// `Parse` throws, so the parse sits in a `try` block, and the `catch` arm takes the reason.
 func Check(allocator: Allocator, document: char8[..]) {
-    match Parse(allocator, document) {
-        .Success(root) => PrintLine("{:18} parsed as {}", document, KindName(root.Kind())),
-        .Failure(reason) =>
-            PrintLine("{:18} refused at byte {}: {}", document, reason.Offset(), reason)
+    try {
+        let root = Parse(allocator, document);
+        PrintLine("{:18} parsed as {}", document, KindName(root.Kind()));
+    } catch {
+        reason => PrintLine("{:18} refused at byte {}: {}", document, reason.Offset(), reason)
     }
 }
 
@@ -74,9 +83,11 @@ func Main() -> int {
 
     let document =
         "{\"name\":\"Rux\",\"year\":2026,\"tags\":[\"fast\",\"small\"],\"flags\":{\"beta\":true}}";
-    match Parse(allocator, document) {
-        .Success(root) => Inspect(root),
-        .Failure(reason) => PrintLine("refused at byte {}: {}", reason.Offset(), reason)
+    try {
+        let root = Parse(allocator, document);
+        Inspect(root);
+    } catch {
+        reason => PrintLine("refused at byte {}: {}", reason.Offset(), reason)
     }
 
     // Malformed input. The failure says why, and the byte where the parser stopped, so a message

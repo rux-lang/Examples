@@ -1,7 +1,6 @@
 # Math
 
-Tour the `Math` package — roots, powers, logarithms, trigonometry and rounding — with the
-domain of each and the limits of floating-point answers.
+Tour the `Math` package — roots, powers, logarithms, trigonometry and rounding — with the domain of each and the limits of floating-point answers.
 
 **You'll need:** [Float](https://rux-lang.dev/docs/learn/float), [FloatSpecial](https://rux-lang.dev/docs/learn/float-special), [Function](https://rux-lang.dev/docs/learn/function)
 

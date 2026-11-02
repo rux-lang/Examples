@@ -14,5 +14,4 @@ Allocator = { Namespace = "Rux", Version = "*" }
 FileSystem = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Path = { Namespace = "Rux", Version = "*" }
-Text = { Namespace = "Rux", Version = "*" }
 Time = { Namespace = "Rux", Version = "*" }

@@ -1,7 +1,6 @@
 # Float
 
-Store fractional numbers in `float64`, `float32` and the `float` alias, meet the narrow and wide
-widths from `float8` to `float512`, and see why a float is only ever an approximation.
+Store fractional numbers in `float64`, `float32` and the `float` alias, meet the narrow and wide widths from `float8` to `float512`, and see why a float is only ever an approximation.
 
 **You'll need:** [Variable](https://rux-lang.dev/docs/learn/variable), [Integer](https://rux-lang.dev/docs/learn/integer)
 

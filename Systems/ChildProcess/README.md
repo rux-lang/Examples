@@ -1,9 +1,6 @@
 # ChildProcess
 
-Start another program with a `Command`: `Run` it and read its `ExitStatus`, `Capture` its output
-and error streams, give it an environment variable of its own, talk to it through pipes with
-`Spawn`, check on it with `TryWait` and end it with `Kill`. The program plays the child itself, so
-it runs the same on every system.
+Start another program with a `Command`: `Run` it and read its `ExitStatus`, `Capture` its output and error streams, give it an environment variable of its own, talk to it through pipes with `Spawn`, check on it with `TryWait` and end it with `Kill`. The program plays the child itself, so it runs the same on every system.
 
 **You'll need:** [Environment](https://rux-lang.dev/docs/learn/environment), [Move](https://rux-lang.dev/docs/learn/move), [Input](https://rux-lang.dev/docs/learn/input), [Catch](https://rux-lang.dev/docs/learn/catch)
 

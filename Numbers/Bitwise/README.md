@@ -1,7 +1,6 @@
 # Bitwise
 
-Work on individual bits with `& | ^ ~`, and use masks to set, clear, flip and test flags packed
-into one byte.
+Work on individual bits with `& | ^ ~`, and use masks to set, clear, flip and test flags packed into one byte.
 
 **You'll need:** [Integer](https://rux-lang.dev/docs/learn/integer), [Literal](https://rux-lang.dev/docs/learn/literal), [Const](https://rux-lang.dev/docs/learn/const), [Assignment](https://rux-lang.dev/docs/learn/assignment)
 

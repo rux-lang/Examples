@@ -2,7 +2,7 @@
 // separator when the base already ends in one, writes `/` where Windows prefers `\`, and does
 // something odd when the second piece is itself a full path. `Path::Join` knows the rules:
 //
-//     func Join(allocator, base: Path, segment: OsStringView) -> PathBuffer ! TextError
+//     func Join(allocator, base: Path, segment: OsStringView) -> PathBuffer
 //
 // - a separator is added only where one is missing, and it is the platform's preferred one;
 // - a segment that starts with a separator is absolute, and replaces the base instead of
@@ -12,45 +12,45 @@
 // follows the same rules. A buffer is move-only, so to print it or pass it to anything that
 // reads a path, lend it out as a `Path` through `AsPath`.
 //
-// Joining is fallible only because the new buffer needs memory; it never looks at the disk.
-// On Windows the separators it adds are `\`; on Linux and macOS they are `/`.
+// Joining cannot fail, so neither `Join` nor `Push` throws: it never looks at the disk, and
+// running out of memory for the new buffer panics, as it does in every collection. On Windows
+// the separators it adds are `\`; on Linux and macOS they are `/`.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Path::{ Join, OsString, Path, PathBuffer };
-import Text::TextError;
 
 // Joins two pieces of text, both converted to native names first.
-func JoinText(allocator: Allocator, base: char8[..], segment: char8[..]) -> PathBuffer ! TextError {
-    var baseHolder = OsString::FromText(allocator, base)?;
-    var segmentHolder = OsString::FromText(allocator, segment)?;
+func JoinText(allocator: Allocator, base: char8[..], segment: char8[..]) -> PathBuffer {
+    var baseHolder = OsString::FromText(allocator, base);
+    var segmentHolder = OsString::FromText(allocator, segment);
     return Join(allocator, Path::FromView(baseHolder.View()), segmentHolder.View());
 }
 
-func Main() -> ! TextError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    let plain = JoinText(allocator, "Bin", "reports")?;
+    let plain = JoinText(allocator, "Bin", "reports");
     PrintLine("Bin  + reports     {}", plain.AsPath());
 
     // The base already ends in a separator, so none is added.
-    let trailing = JoinText(allocator, "Bin/", "reports")?;
+    let trailing = JoinText(allocator, "Bin/", "reports");
     PrintLine("Bin/ + reports     {}", trailing.AsPath());
 
     // An empty segment changes nothing.
-    let empty = JoinText(allocator, "Bin", "")?;
+    let empty = JoinText(allocator, "Bin", "");
     PrintLine("Bin  + (empty)     {}", empty.AsPath());
 
     // An absolute segment wins. Joining untrusted input onto a safe base can escape it.
-    let absolute = JoinText(allocator, "Bin", "/etc/passwd")?;
+    let absolute = JoinText(allocator, "Bin", "/etc/passwd");
     PrintLine("Bin  + /etc/passwd {}", absolute.AsPath());
 
     // Growing one buffer in place, a segment at a time.
     var built = PathBuffer(allocator);
     let pieces = ["Bin", "reports", "2026", "summary.txt"];
     for piece in pieces {
-        var holder = OsString::FromText(allocator, piece)?;
-        built.Push(holder.View())?;
+        var holder = OsString::FromText(allocator, piece);
+        built.Push(holder.View());
     }
     PrintLine("pushed four        {}", built.AsPath());
 }

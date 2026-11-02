@@ -1,5 +1,6 @@
-// A method that changes the value it is called on takes `self: &var T`, the writable reference
-// from the MutableReference lesson. Its writes land in the value before the dot.
+// A method that changes the value it is called on takes `&var self`, the writable reference from
+// the MutableReference lesson: inside `extend Stack` it is a `&var Stack`. Its writes land in the
+// value before the dot.
 //
 // This is where methods start to pay off. A `Stack` is an array plus a count of how much of it is
 // in use, and the two must change together. If every caller updated them by hand, one would
@@ -13,18 +14,18 @@ struct Stack {
 }
 
 extend Stack {
-    // A reading method still takes `&Stack`, and can be called on any stack.
-    func IsEmpty(self: &Stack) -> bool {
+    // A reading method still takes `&self`, a `&Stack`, and can be called on any stack.
+    func IsEmpty(&self) -> bool {
         return self.length == 0;
     }
 
-    func IsFull(self: &Stack) -> bool {
+    func IsFull(&self) -> bool {
         return self.length == 4;
     }
 
-    // A writing method takes `&var Stack`. It may also return a value: here, whether the push
+    // A writing method takes `&var self`, a `&var Stack`. It may also return a value: here, whether the push
     // happened, since a full stack has no room left.
-    func Push(self: &var Stack, value: int) -> bool {
+    func Push(&var self, value: int) -> bool {
         if self.IsFull() {
             return false;
         }
@@ -34,7 +35,7 @@ extend Stack {
     }
 
     // Only to be called on a stack that is not empty; the caller checks `IsEmpty` first.
-    func Pop(self: &var Stack) -> int {
+    func Pop(&var self) -> int {
         self.length -= 1;
         return self.items[self.length];
     }
@@ -43,7 +44,13 @@ extend Stack {
 func Main() -> int {
     // A writing method needs a `var` to work on, just as assigning a field would. Had `stack`
     // been declared with `let`, every `Push` and `Pop` below would be rejected, while `IsEmpty`
-    // and `IsFull` would still be allowed.
+    // and `IsFull` would still be allowed:
+    //
+    //     let stack = Stack { items: [0; 4], length: 0 };
+    //     stack.Push(10);
+    //         error: cannot call 'Push' on immutable 'stack'
+    //         note: 'Push' declares a writable receiver '&var Stack'
+    //         help: declare 'stack' with 'var' to make it mutable
     var stack = Stack { items: [0; 4], length: 0 };
 
     for value in 1..=5 {

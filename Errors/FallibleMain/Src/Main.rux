@@ -1,15 +1,19 @@
 // Every program so far ended with `return 0;` from `func Main() -> int`. `Main`
-// may also be fallible:
+// may also throw, with or without an `int` result:
 //
-//     func Main() -> ! SpaceError
+//     func Main() throws SpaceError
+//     func Main() -> int throws SpaceError
 //
-// Now `?` works at the top level too. Falling off the end of `Main` is
-// success, and the program exits with status 0. A failure — from `fail` or
-// from a `?` — ends the program with exit status 1.
+// Now plain `try` works at the top level too: an error that reaches `Main`
+// leaves it like any other error leaves a throwing function. Falling off the
+// end of a `Main` with no result is success, and the program exits with
+// status 0. An error — from a `throw` in `Main` or passed on by a `try` —
+// ends the program with exit status 1, after every `defer` and destructor on
+// the way out has run.
 //
-// The surprise is what a failure does *not* do: it prints nothing. The error
+// The surprise is what an error does *not* do: it prints nothing. The error
 // value is not shown anywhere, so a user only sees the program stop. If they
-// should learn why, print a message yourself before failing. The exit status
+// should learn why, print a message yourself before throwing. The exit status
 // is for whoever started the program: a script, a build tool or a shell. In
 // PowerShell, `echo $LASTEXITCODE` shows it right after the program ends.
 //
@@ -21,21 +25,22 @@ struct SpaceError {
     free: int;
 }
 
-func Reserve(needed: int, free: int) -> int ! SpaceError {
+func Reserve(needed: int, free: int) -> int throws SpaceError {
     if needed > free {
-        fail SpaceError { needed: needed, free: free };
+        throw SpaceError { needed: needed, free: free };
     }
     return free - needed;
 }
 
-func Main() -> ! SpaceError {
+func Main() throws SpaceError {
     var free = 100;
     PrintLine("Installing the editor (40 MB of {} MB free)", free);
-    free = Reserve(40, free)?;
+    free = try Reserve(40, free);
 
     PrintLine("Installing the compiler (90 MB of {} MB free)", free);
-    free = Reserve(90, free)?;
+    free = try Reserve(90, free);
 
-    // Never printed: the `?` above ended the program with status 1.
+    // Never printed: the `try` above passed the error out of `Main`, which
+    // ended the program with status 1.
     PrintLine("Everything is installed, {} MB left", free);
 }

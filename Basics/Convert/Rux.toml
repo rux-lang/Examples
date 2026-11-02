@@ -10,4 +10,5 @@ Description = "Converting between types with as, and what a value that does not 
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
+Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }

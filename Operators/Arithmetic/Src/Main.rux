@@ -32,9 +32,11 @@ func Main() -> int {
     // them first with `as`.
     PrintLine("{} / {} as floats = {}", a, b, (a as float64) / (b as float64));
 
-    // An integer that outgrows its type wraps around without any warning. A
-    // `uint8` holds 0 to 255, so 250 + 10 lands on 4.
+    // An integer that outgrows its type is a mistake the program will not hide.
+    // A `uint8` holds 0 to 255, so `level + 10` stops the program with
+    // "Panic: integer overflow in '+'". When wrapping around is the point, as in a
+    // hash, say so with `+%`: 250 +% 10 lands on 4.
     let level: uint8 = 250;
-    PrintLine("uint8 {} + 10 = {}", level, level + 10);
+    PrintLine("uint8 {} +% 10 = {}", level, level +% 10);
     return 0;
 }

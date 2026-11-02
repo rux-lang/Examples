@@ -1,8 +1,6 @@
 # RegexCapture
 
-Pull the parts of a match out with numbered and named groups through `Capture`, walk every match
-with `FindAll` and the text between them with `Split`, and make new text with `Replace` and
-`ReplaceFirst`.
+Pull the parts of a match out with numbered and named groups through `Capture`, walk every match with `FindAll` and the text between them with `Split`, and make new text with `Replace` and `ReplaceFirst`.
 
 **You'll need:** [Regex](https://rux-lang.dev/docs/learn/regex), [Iterator](https://rux-lang.dev/docs/learn/iterator)
 

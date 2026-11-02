@@ -30,11 +30,11 @@ func Summarize(label: char8[..], values: var float64[..]) {
 
     // The extremes answer with an optional index, so an empty slice is handled right here.
     match MinIndex(values) {
-        at? => PrintLine("  smallest   {}", values[at]),
+        .Some(at) => PrintLine("  smallest   {}", values[at]),
         none => PrintLine("  smallest   none")
     }
     match MaxIndex(values) {
-        at? => PrintLine("  largest    {}", values[at]),
+        .Some(at) => PrintLine("  largest    {}", values[at]),
         none => PrintLine("  largest    none")
     }
 

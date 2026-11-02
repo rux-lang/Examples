@@ -13,7 +13,7 @@ import Io::PrintLine;
 
 func Report(rolls: int[..], value: int) {
     match IndexOf(rolls, value) {
-        at? => PrintLine("{} first appears at {}", value, at),
+        .Some(at) => PrintLine("{} first appears at {}", value, at),
         none => PrintLine("{} was never rolled", value)
     }
 }
@@ -28,7 +28,7 @@ func Main() -> int {
     Report(rolls, 7);
 
     match LastIndexOf(rolls, 6) {
-        at? => PrintLine("6 last appears at {}", at),
+        .Some(at) => PrintLine("6 last appears at {}", at),
         none => PrintLine("6 was never rolled")
     }
 

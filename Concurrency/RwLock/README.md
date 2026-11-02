@@ -1,7 +1,6 @@
 # RwLock
 
-Let many threads read a value at once and one thread write it alone with an `RwLock<T>`, its
-`ReadGuard<T>` and its `WriteGuard<T>`.
+Let many threads read a value at once and one thread write it alone with an `RwLock<T>`, its `ReadGuard<T>` and its `WriteGuard<T>`.
 
 **You'll need:** [Mutex](https://rux-lang.dev/docs/learn/mutex)
 

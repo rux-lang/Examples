@@ -1,7 +1,6 @@
 # JoinLines
 
-Walk the lines of a text with `Lines`, put pieces back together with `Join`, and change the case of
-whole texts with `ToUpper`, `ToLower` and `FoldCase`, which follow Unicode's full mappings.
+Walk the lines of a text with `Lines`, put pieces back together with `Join`, and change the case of whole texts with `ToUpper`, `ToLower` and `FoldCase`, which follow Unicode's full mappings.
 
 **You'll need:** [String](https://rux-lang.dev/docs/learn/string), [UnicodeCase](https://rux-lang.dev/docs/learn/unicode-case), [Iterator](https://rux-lang.dev/docs/learn/iterator)
 

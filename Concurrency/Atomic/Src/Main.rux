@@ -8,8 +8,8 @@
 // between, and no increment is ever lost. No lock is taken: the hardware keeps the threads apart.
 //
 // `CompareExchange(expected, desired)` is the building block for everything else: it writes
-// `desired` only if the value is still `expected`. It succeeds with the old value, or fails with
-// the value it found instead, and a loop tries again from there.
+// `desired` only if the value is still `expected`. It returns the old value, or throws the value
+// it found instead, and a loop catches that and tries again from there.
 import Atomic::Atomic;
 import Core::MemoryOrder;
 import Io::PrintLine;
@@ -39,7 +39,7 @@ func Steps(value: uint64) -> uint64 {
     var current = value;
     var steps: uint64 = 0;
     while current != 1 {
-        current = current % 2 == 0 ? current / 2 : current * 3 + 1;
+        current = if current % 2 == 0 { current / 2 } else { current * 3 + 1 };
         steps = steps + 1;
     }
     return steps;
@@ -50,9 +50,11 @@ func Steps(value: uint64) -> uint64 {
 func RaiseTo(longest: &Atomic<uint64>, candidate: uint64) {
     var seen = longest.Load();
     while candidate > seen {
-        match longest.CompareExchange(seen, candidate) {
-            .Success(_) => return,
-            .Failure(found) => seen = found
+        try {
+            longest.CompareExchange(seen, candidate);
+            return;
+        } catch {
+            found => seen = found
         }
     }
 }
@@ -60,9 +62,13 @@ func RaiseTo(longest: &Atomic<uint64>, candidate: uint64) {
 // Each worker counts every number in its span and offers each chain length as a new longest.
 func Walk(span: Span) -> () {
     for value in span.first..=span.last {
-        // A plain count that nothing else depends on, so the cheapest order is enough.
-        span.shared.checked.FetchAddWith(1, MemoryOrder::Relaxed);
-        RaiseTo(span.shared.longest, Steps(value));
+        // Safety: `span.shared` addresses `Main`'s `shared`, which lives until `Main` has joined
+        // every worker, and is only reached through its atomics.
+        unsafe {
+            // A plain count that nothing else depends on, so the cheapest order is enough.
+            span.shared.checked.FetchAddWith(1, MemoryOrder::Relaxed);
+            RaiseTo(span.shared.longest, Steps(value));
+        }
     }
 }
 
@@ -70,12 +76,11 @@ func Main() -> int {
     let shared = Shared { checked: Atomic<uint64>(0), longest: Atomic<uint64>(0) };
 
     // Four threads explore a quarter of 1..=100000 each, all updating the same two atomics.
-    var workers: JoinHandle<()>[4] = [
-        Spawn(Walk, Span { first: 1, last: 25000, shared: @shared }) catch { else => return 1 },
-        Spawn(Walk, Span { first: 25001, last: 50000, shared: @shared }) catch { else => return 1 },
-        Spawn(Walk, Span { first: 50001, last: 75000, shared: @shared }) catch { else => return 1 },
-        Spawn(Walk, Span { first: 75001, last: 100000, shared: @shared }) catch { else => return 1 }
-    ];
+    let first = try Spawn(Walk, Span { first: 1, last: 25000, shared: @shared }) catch { _ => return 1 };
+    let second = try Spawn(Walk, Span { first: 25001, last: 50000, shared: @shared }) catch { _ => return 1 };
+    let third = try Spawn(Walk, Span { first: 50001, last: 75000, shared: @shared }) catch { _ => return 1 };
+    let fourth = try Spawn(Walk, Span { first: 75001, last: 100000, shared: @shared }) catch { _ => return 1 };
+    var workers: JoinHandle<()>[4] = [move first, move second, move third, move fourth];
     for index in 0..4 {
         workers[index].Join();
     }
@@ -89,10 +94,12 @@ func Main() -> int {
     let before = shared.checked.Exchange(20);
     PrintLine("exchange         {} -> {}", before, shared.checked.Load());
 
-    // A compare-exchange that expects the wrong value changes nothing and reports what it found.
-    match shared.checked.CompareExchange(10, 30) {
-        .Success(previous) => PrintLine("replaced {}", previous),
-        .Failure(found) => PrintLine("not replaced     found {}", found)
+    // A compare-exchange that expects the wrong value changes nothing and throws what it found.
+    try {
+        let previous = shared.checked.CompareExchange(10, 30);
+        PrintLine("replaced {}", previous);
+    } catch {
+        found => PrintLine("not replaced     found {}", found)
     }
     return 0;
 }

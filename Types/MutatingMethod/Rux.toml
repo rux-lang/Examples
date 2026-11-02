@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "MutatingMethod"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Methods that change the value they are called on, through self: &var T"
+Description = "Methods that change the value they are called on, through a &var self receiver"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

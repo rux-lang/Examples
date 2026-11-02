@@ -1,7 +1,6 @@
 # Encoding
 
-Write the same text as UTF-8, UTF-16 and UTF-32 with the `c8`, `c16` and `c32` prefixes, and see
-that lengths count code units, not characters.
+Write the same text as UTF-8, UTF-16 and UTF-32 with the `c8`, `c16` and `c32` prefixes, and see that lengths count code units, not characters.
 
 **You'll need:** [StringLiteral](https://rux-lang.dev/docs/learn/string-literal), [Function](https://rux-lang.dev/docs/learn/function), [Convert](https://rux-lang.dev/docs/learn/convert)
 

@@ -1,6 +1,6 @@
 # Destructor
 
-Write a destructor, `func ~T(self: &var T)`, and watch when the compiler runs it.
+Write a destructor, `func ~T(&var self)`, and watch when the compiler runs it.
 
 **You'll need:** [Move](https://rux-lang.dev/docs/learn/move), [Method](https://rux-lang.dev/docs/learn/method)
 

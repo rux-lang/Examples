@@ -21,8 +21,8 @@ import Text::StringBuilder;
 const Guesses = 7;
 
 func Main() -> int {
-    var generator = PcgFromEntropy() catch {
-        else => {
+    var generator = try PcgFromEntropy() catch {
+        _ => {
             PrintLine("There is no entropy to pick a number with, so there is no game.");
             return 1;
         }
@@ -39,22 +39,21 @@ func Main() -> int {
     while used < Guesses {
         Print("guess {}: ", used + 1);
         builder.Clear();
-        match ReadLine(builder) {
-            .Success(_) => {},
-            .Failure(error) if error.kind == IoErrorKind::EndOfStream => {
+        try ReadLine(builder) catch {
+            error if error.kind == IoErrorKind::EndOfStream => {
                 PrintLine();
                 PrintLine("Leaving already? It was {}.", secret);
                 return 0;
             },
-            .Failure(_) => {
+            _ => {
                 PrintLine("The input could not be read.");
                 return 1;
             }
-        }
+        };
 
         // Spaces around the number are forgiven; anything else that is not a number is not.
-        let guess = ParseInt32(builder.View().Trim()) catch {
-            else => {
+        let guess = try ParseInt32(builder.View().Trim()) catch {
+            _ => {
                 PrintLine("That is not a number. It does not count; try again.");
                 continue;
             }
@@ -69,7 +68,7 @@ func Main() -> int {
             PrintLine("Yes, {}! Found in {} of {} guesses.", secret, used, Guesses);
             return 0;
         }
-        PrintLine("{}", guess < secret ? "higher" : "lower");
+        PrintLine("{}", if guess < secret { "higher" } else { "lower" });
     }
     PrintLine("Out of guesses. It was {}.", secret);
     return 0;

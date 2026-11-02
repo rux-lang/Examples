@@ -25,8 +25,7 @@ func Reason(error: TimeZoneError) -> char8[..] {
         TimeZoneError::InvalidName => "not a zone name",
         TimeZoneError::InvalidData => "not a tz database file",
         TimeZoneError::InvalidRule => "not a POSIX TZ rule",
-        TimeZoneError::Unreadable => "the zone file could not be read",
-        TimeZoneError::OutOfMemory => "out of memory"
+        TimeZoneError::Unreadable => "the zone file could not be read"
     };
 }
 
@@ -39,8 +38,8 @@ func ShowMoment(zone: &TimeZone, moment: Timestamp) {
 
 // Which moments the local date and time `text` stands for in `zone`.
 func ShowLocal(zone: &TimeZone, text: char8[..]) {
-    let local = ParseDateTime(text) catch {
-        else => {
+    let local = try ParseDateTime(text) catch {
+        _ => {
             PrintLine("{} is not a date and time", text);
             return;
         }
@@ -60,25 +59,26 @@ func Main() -> int {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    // Building a zone allocates, and a rule can be malformed, so each returns
-    // `TimeZone ! TimeZoneError`. A zone owns that memory, so it is never copied by accident:
+    // A rule can be malformed, so `FromRule` throws a `TimeZoneError`; the UTC zone has no rule
+    // to get wrong, so `Utc` cannot fail. A zone owns the memory it was built in, so it is never
+    // copied by accident:
     //
     //     let copy = kyiv;
-    //         error: move-only value 'kyiv' requires an explicit '<-' in initialization
+    //         error: cannot copy 'TimeZone', which owns resources
     //
     // The functions below borrow it instead, as `&TimeZone`.
-    let utc = TimeZone::Utc(allocator) catch { else => return 1 };
-    let kyiv = TimeZone::FromRule(allocator, "Kyiv", "EET-2EEST,M3.5.0/3,M10.5.0/4") catch {
-        else => return 1
+    let utc = TimeZone::Utc(allocator);
+    let kyiv = try TimeZone::FromRule(allocator, "Kyiv", "EET-2EEST,M3.5.0/3,M10.5.0/4") catch {
+        _ => return 1
     };
-    let newYork = TimeZone::FromRule(allocator, "New York", "EST5EDT,M3.2.0,M11.1.0") catch {
-        else => return 1
+    let newYork = try TimeZone::FromRule(allocator, "New York", "EST5EDT,M3.2.0,M11.1.0") catch {
+        _ => return 1
     };
 
     // One moment in winter and one in summer, each read on three clocks. The offsets change with
     // the season, and by a different amount on different dates in each place.
-    let winter = ParseRfc3339("2026-01-15T12:00:00Z") catch { else => return 1 };
-    let summer = ParseRfc3339("2026-07-01T12:00:00Z") catch { else => return 1 };
+    let winter = try ParseRfc3339("2026-01-15T12:00:00Z") catch { _ => return 1 };
+    let summer = try ParseRfc3339("2026-07-01T12:00:00Z") catch { _ => return 1 };
     PrintLine("{}", winter);
     ShowMoment(utc, winter.ToTimestamp());
     ShowMoment(kyiv, winter.ToTimestamp());
@@ -101,9 +101,11 @@ func Main() -> int {
     ShowLocal(kyiv, "2026-10-25T03:30:00");
 
     // A rule must name its standard time with at least three letters, then give its offset.
-    match TimeZone::FromRule(allocator, "Nowhere", "X5") {
-        .Success(_) => PrintLine("rule X5 accepted"),
-        .Failure(error) => PrintLine("rule X5 refused: {}", Reason(error))
+    try {
+        TimeZone::FromRule(allocator, "Nowhere", "X5");
+        PrintLine("rule X5 accepted");
+    } catch {
+        error => PrintLine("rule X5 refused: {}", Reason(error))
     }
     return 0;
 }

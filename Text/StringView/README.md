@@ -1,7 +1,6 @@
 # StringView
 
-Borrow text with `StringView`, checked once to be UTF-8, then trim, search, cut and split it
-without copying a byte.
+Borrow text with `StringView`, checked once to be UTF-8, then trim, search, cut and split it without copying a byte.
 
 **You'll need:** [Encoding](https://rux-lang.dev/docs/learn/encoding), [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [Iterator](https://rux-lang.dev/docs/learn/iterator)
 

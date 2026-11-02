@@ -3,15 +3,16 @@
 // its text came from line 3 of a settings file. The function that *does* know
 // is the one calling it.
 //
-// Plain `?` passes an error on unchanged, so it cannot add that context — and
-// it is rejected here anyway, because a `DigitError` is not a `SettingError`.
-// The mapped form fixes both:
+// Plain `try` passes an error on unchanged, so it cannot add that context — and
+// it is rejected here anyway, because a `DigitError` is not a `SettingError`
+// and an error is never converted on its way out. The mapped form fixes both:
 //
-//     ParseNumber(text)? else (e => SettingError { ... })
+//     try ParseNumber(text) catch { e => throw SettingError { ... } }
 //
-// On success the expression is the number and the mapper never runs. On
-// failure `e` is the whole original error, the mapper builds the new one from
-// `e` plus anything else in scope, and the function fails with it.
+// On success the expression is the number and the arm never runs. On failure
+// `e` is the whole original error, the arm builds the new one from `e` plus
+// anything else in scope, and throws it. That `throw` leaves the function
+// directly; it is not caught by the same `catch` again.
 import Io::PrintLine;
 
 struct DigitError {
@@ -24,32 +25,33 @@ struct SettingError {
 }
 
 // Knows about characters, nothing about files or lines.
-func ParseNumber(text: char8[..]) -> int ! DigitError {
+func ParseNumber(text: char8[..]) -> int throws DigitError {
     var total = 0;
     for i in 0..text.length {
         let byte = text[i];
         if byte < c8'0' || byte > c8'9' {
-            fail DigitError { position: i };
+            throw DigitError { position: i };
         }
         total = total * 10 + ((byte as int) - 48);
     }
     return total;
 }
 
-// Reads a window size from two settings lines. Each `? else` adds the line
+// Reads a window size from two settings lines. Each `catch` arm adds the line
 // number, which only this function knows, and turns the 0-based position into
 // the 1-based column a person would look for.
-func WindowArea(width: char8[..], height: char8[..]) -> int ! SettingError {
-    let w = ParseNumber(width)? else (e => SettingError { line: 1, column: e.position + 1 });
-    let h = ParseNumber(height)? else (e => SettingError { line: 2, column: e.position + 1 });
+func WindowArea(width: char8[..], height: char8[..]) -> int throws SettingError {
+    let w = try ParseNumber(width) catch { e => throw SettingError { line: 1, column: e.position + 1 } };
+    let h = try ParseNumber(height) catch { e => throw SettingError { line: 2, column: e.position + 1 } };
     return w * h;
 }
 
 func Show(width: char8[..], height: char8[..]) {
-    match WindowArea(width, height) {
-        .Success(area) => PrintLine("{} x {}: area {}", width, height, area),
-        .Failure(e) => PrintLine("{} x {}: line {}, column {} is not a digit",
-            width, height, e.line, e.column)
+    try {
+        let area = WindowArea(width, height);
+        PrintLine("{} x {}: area {}", width, height, area);
+    } catch {
+        e => PrintLine("{} x {}: line {}, column {} is not a digit", width, height, e.line, e.column)
     }
 }
 

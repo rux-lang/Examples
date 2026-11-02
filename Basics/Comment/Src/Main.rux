@@ -40,7 +40,8 @@ func Main() -> int {
     // it is refused, because there is no declaration for it to describe:
     //
     //     error: documentation comment inside a block is not attached to a declaration
+    //     help: write an ordinary '//' comment here; '///' documents the declaration that follows it
     //
-    // Inside a function, use `//`.
+    // Inside a function, use `//`, as the help says.
     return 0;
 }

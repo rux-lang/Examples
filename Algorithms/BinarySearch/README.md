@@ -1,7 +1,6 @@
 # BinarySearch
 
-Search sorted data in logarithmic time with `BinarySearch`, and bracket duplicates with `LowerBound`
-and `UpperBound`.
+Search sorted data in logarithmic time with `BinarySearch`, and bracket duplicates with `LowerBound` and `UpperBound`.
 
 **You'll need:** [Search](https://rux-lang.dev/docs/learn/search), [Sort](https://rux-lang.dev/docs/learn/sort)
 

@@ -1,7 +1,6 @@
 # StringBuilder
 
-Build text a piece at a time in one growing buffer with `StringBuilder`, then hand it over as a
-`String` with `IntoString`.
+Build text a piece at a time in one growing buffer with `StringBuilder`, then hand it over as a `String` with `TakeString`.
 
 **You'll need:** [String](https://rux-lang.dev/docs/learn/string), [MutableReference](https://rux-lang.dev/docs/learn/mutable-reference), [UnitFallible](https://rux-lang.dev/docs/learn/unit-fallible), [Propagate](https://rux-lang.dev/docs/learn/propagate)
 

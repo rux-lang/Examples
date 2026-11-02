@@ -1,11 +1,17 @@
-// A fallible result cannot be ignored. Calling a fallible function as a bare statement, with
-// nothing looking at what it returns, is a compile error — otherwise a failure could vanish
-// without anyone noticing.
+// An error cannot be ignored by accident. Every call to a function that throws must be marked
+// with `try` in one of its forms, so calling one as a bare statement, with nothing saying where
+// its error goes, is a compile error — otherwise a failure could vanish without anyone noticing.
 //
 // Sometimes ignoring it is exactly right, though. A cash machine whose receipt printer has run
-// out of paper should still hand over the money. For that there is a deliberate discard:
-// `F() catch { else => {} };`. It says, in the code, "I know this can fail and it does not
-// matter here". `catch` is the subject of a later lesson; for now, read it as that one phrase.
+// out of paper should still hand over the money. For that the error is dropped on purpose, in
+// one of two spellings:
+//
+//     try PrintReceipt(printer, amount) catch { _ => {} };
+//     try? PrintReceipt(printer, amount);
+//
+// Both say, in the code, "I know this can fail and it does not matter here". `catch` is the
+// subject of a later lesson; for now, read the first as that one phrase. `try?` turns the error
+// into an absent optional, which a statement is then free to ignore.
 import Io::PrintLine;
 
 struct Printer {
@@ -15,10 +21,10 @@ struct Printer {
 struct OutOfPaper {
 }
 
-// A unit fallible: it either printed the receipt or it did not.
-func PrintReceipt(printer: &var Printer, amount: int) -> ! OutOfPaper {
+// Throws and returns nothing: it either printed the receipt or it did not.
+func PrintReceipt(printer: &var Printer, amount: int) throws OutOfPaper {
     if printer.paper == 0 {
-        fail OutOfPaper {};
+        throw OutOfPaper {};
     }
     printer.paper -= 1;
     PrintLine("    receipt: {} taken", amount);
@@ -31,18 +37,18 @@ func Withdraw(printer: &var Printer, amount: int) {
     //
     //     PrintReceipt(printer, amount);
     //
-    // error: fallible result of type '! OutOfPaper' is discarded
-    //   note: a failure that nothing handles is lost
-    //   help: propagate it with '?', recover with 'catch', or match both '.Success' and '.Failure'
+    // error: call to 'PrintReceipt' can throw 'OutOfPaper' but is not marked with 'try'
+    //   help: write 'try' before the expression
     //
-    // Writing `let _ = PrintReceipt(printer, amount);` is refused the same way: binding a
-    // fallible to `_` does not handle its failure either.
+    // Writing `let _ = PrintReceipt(printer, amount);` is refused the same way: binding the call
+    // to `_` does not say what happens to its error either. And plain `try` would pass the error
+    // on, which `Withdraw` cannot do, because it does not declare `throws`.
 
-    // The deliberate discard: a missing receipt is not worth stopping for. The empty block `{}`
-    // stands in for the missing success, so this works only for a `! E` function. One that
-    // succeeds with a value, such as an `int`, is discarded with a match whose arms are
-    // `.Success(_) => {}` and `.Failure(_) => {}`.
-    PrintReceipt(printer, amount) catch { else => {} };
+    // The deliberate drop: a missing receipt is not worth stopping for. The empty block `{}`
+    // stands in for the missing success, so this spelling works only for a call that returns
+    // nothing. For a call that succeeds with a value, such as an `int`, the arm would have to
+    // produce an `int`; `try? F();` drops the error of either kind.
+    try PrintReceipt(printer, amount) catch { _ => {} };
 }
 
 func Main() -> int {
@@ -51,8 +57,13 @@ func Main() -> int {
     Withdraw(printer, 50);
     Withdraw(printer, 10);
 
-    // `PrintLine` itself is not fallible. It returns an optional, `IoError?`, saying whether
-    // the console write had trouble, and an optional may be ignored — which is why every lesson
-    // so far could call it as a bare statement.
+    // The same drop with `try?`. The printer is out of paper by now, so this prints nothing, and
+    // the error is gone without a word.
+    try? PrintReceipt(printer, 10);
+
+    // A value is a different matter: only errors must be handled. `PrintLine` does not throw. It
+    // returns an optional, `IoError?`, saying whether the console write had trouble, and any
+    // value that is not an error may be ignored — which is why every lesson so far could call it
+    // as a bare statement.
     return 0;
 }

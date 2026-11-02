@@ -2,9 +2,7 @@
 
 Write the AArch64 version of an `asm func`, and use `when #target.arch` to pick the body that matches the machine being built for.
 
-> **The assembly runs only on AArch64**: Apple silicon Macs, Windows on ARM and ARM Linux. The
-> lesson still builds and runs on x86-64, but there `when` leaves the AArch64 functions out
-> and the program prints a note instead.
+> **The assembly runs only on AArch64**: Apple silicon Macs, Windows on ARM and ARM Linux. The lesson still builds and runs on x86-64, but there `when` leaves the AArch64 functions out and the program prints a note instead.
 
 **You'll need:** [Asm](https://rux-lang.dev/docs/learn/asm), [When](https://rux-lang.dev/docs/learn/when), [Target](https://rux-lang.dev/docs/learn/target)
 

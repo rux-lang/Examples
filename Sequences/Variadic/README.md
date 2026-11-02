@@ -1,7 +1,6 @@
 # Variadic
 
-Write a function that takes any number of arguments with `args: int32...`, and spread a slice back
-into arguments with `args...`.
+Write a function that takes any number of arguments with `args: int32...`, and spread a slice back into arguments with `args...`.
 
 **You'll need:** [Slice](https://rux-lang.dev/docs/learn/slice), [Convert](https://rux-lang.dev/docs/learn/convert)
 

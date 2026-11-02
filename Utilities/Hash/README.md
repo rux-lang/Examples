@@ -1,7 +1,6 @@
 # Hash
 
-Fingerprint bytes with `Fnv1a64Of`, `XxHash64Of` and `Crc32Of`, fast hashes that catch accidents
-but are not cryptographic.
+Fingerprint bytes with `Fnv1a64Of`, `XxHash64Of` and `Crc32Of`, fast hashes that catch accidents but are not cryptographic. They read through a raw pointer, so each call sits in an `unsafe` block with a `// Safety:` comment.
 
 **You'll need:** [Pointer](https://rux-lang.dev/docs/learn/pointer), [StringLiteral](https://rux-lang.dev/docs/learn/string-literal), [FormatNumber](https://rux-lang.dev/docs/learn/format-number)
 

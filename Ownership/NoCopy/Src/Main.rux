@@ -1,26 +1,24 @@
-// A hotel key stands for a room. If keys could be copied, two of them would each be handed back
-// at checkout: the destructor would run twice for one room. For a type like this the compiler's
-// automatic copy is wrong, and Rux lets the type turn it off.
+// A hotel key stands for a room. The key itself is plain data, a room number, so the compiler
+// would happily copy it, and then two guests could each check out of the same room. For a type
+// like this the automatic copy is wrong, and Rux lets the type turn it off.
 //
-// The copy operator is `=`. Declaring it with no body says "this type has no copy":
+// The attribute `#NoCopy` on the declaration says "this type has no copy":
 //
-//     func =(self: &var RoomKey, other: &RoomKey);
+//     #NoCopy
+//     struct RoomKey { room: int32; }
 //
 // From then on every use that would copy a key is an error, and the only way to hand one on is
-// to move it with `<-`. One key, one owner, one destructor call.
+// to move it with `move`. One key, one owner, one checkout.
+//
+// A type with a destructor needs no attribute: it owns resources, so it is already move-only, as
+// Destructor showed. `#NoCopy` is for plain data that must still never be duplicated, such as a
+// handle that something else releases. (Its sibling `#NoMove` goes further and keeps a value
+// where it was built.)
 import Io::PrintLine;
 
+#NoCopy
 struct RoomKey {
     room: int32;
-}
-
-extend RoomKey {
-    // No body: copying is prohibited.
-    func =(self: &var RoomKey, other: &RoomKey);
-
-    func ~RoomKey(self: &var RoomKey) {
-        PrintLine("    key {} handed back", self.room);
-    }
 }
 
 func CheckIn(room: int32) -> RoomKey {
@@ -28,9 +26,10 @@ func CheckIn(room: int32) -> RoomKey {
     return RoomKey { room: room };
 }
 
-// Takes ownership of the key, so the key's life ends when this function returns.
+// Takes ownership of the key, so after this call nobody holds it any more.
 func CheckOut(key: RoomKey) {
     PrintLine("    checking out of room {}", key.room);
+    PrintLine("    key {} handed back", key.room);
 }
 
 func Main() -> int {
@@ -41,18 +40,21 @@ func Main() -> int {
     //
     //     let spare = key;
     //
-    // error: move-only value 'key' requires an explicit '<-' in initialization
-    //   note: plain by-value use copies its source, but 'RoomKey' prohibits copying
-    //   help: write 'let destination <- key' to transfer ownership
+    // error: cannot copy 'RoomKey', which prohibits copying
+    //   note: a named value used by value in initialization position is copied, and only plain
+    //         data copies
+    //   help: write 'move key' to transfer it
 
     PrintLine("give the key to a friend:");
-    let friend <- key;
+    let friend = move key;
     PrintLine("    friend holds key {}", friend.room);
 
-    // Passing by value is a copy too, so the argument needs the arrow as well. Without it:
-    // error: move-only value 'friend' requires an explicit '<-' in argument
+    // Passing by value is a copy too, so the argument needs `move` as well. Without it:
+    //
+    //     error: cannot copy 'RoomKey', which prohibits copying
+    //       help: write 'move friend' to transfer it
     PrintLine("check out:");
-    CheckOut(<-friend);
+    CheckOut(move friend);
     PrintLine("    done");
     return 0;
 }

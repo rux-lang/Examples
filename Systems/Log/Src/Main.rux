@@ -21,7 +21,7 @@ func Main() -> int {
     let allocator: Allocator = system;
 
     // A logger over standard output, writing text. Its level starts at `Info`.
-    var log = Logger::New(allocator, StandardOut::Acquire(), LogFormat::Text);
+    var log = Logger(allocator, StandardOut::Acquire(), LogFormat::Text);
     log.SetTimestamps(false);
 
     // A message, then typed fields. Text with a space or a quote in it is quoted.
@@ -42,12 +42,12 @@ func Main() -> int {
     log.Info("handled", [Field::Integer("status", 200)]);
 
     // The same records as JSON lines: one object per line, ready for a log collector.
-    var json = Logger::New(allocator, StandardOut::Acquire(), LogFormat::JsonLines);
+    var json = Logger(allocator, StandardOut::Acquire(), LogFormat::JsonLines);
     json.SetTimestamps(false);
     json.Info("server started", [Field::Unsigned("port", 8080), Field::Boolean("tls", false)]);
     json.Warn("slow request", [Field::Text("path", "/search"), Field::Float("seconds", 2.5)]);
     let failed = log.Failure() != none || json.Failure() != none;
-    PrintLine("write failures: {}", failed ? "some" : "none");
+    PrintLine("write failures: {}", if failed { "some" } else { "none" });
 
     // The process-wide log needs no logger: `Info`, `Warn` and the rest write to standard error,
     // from any thread, with settings of their own.

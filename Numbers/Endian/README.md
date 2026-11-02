@@ -1,7 +1,6 @@
 # Endian
 
-Store and load integers as bytes in an explicit order, big endian or little endian, and see what
-reading them in the wrong order does.
+Store and load integers as bytes in an explicit order, big endian or little endian, and see what reading them in the wrong order does.
 
 **You'll need:** [Pointer](https://rux-lang.dev/docs/learn/pointer), [OutParameter](https://rux-lang.dev/docs/learn/out-parameter), [Slice](https://rux-lang.dev/docs/learn/slice), [Shift](https://rux-lang.dev/docs/learn/shift)
 

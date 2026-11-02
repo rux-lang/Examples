@@ -17,18 +17,17 @@ import Process::{
     Argument, ArgumentCount, Arguments, CurrentId, Environment, Exit, RemoveVariable, SetVariable,
     Variable
 };
-import Text::TextError;
 
 // `Variable` returns an optional: a variable that is not set is `none`, which is different
 // from one set to the empty string.
 func Show(name: char8[..]) {
     match Variable(name) {
-        value? => PrintLine("{:<13} = \"{}\"", name, value),
+        .Some(value) => PrintLine("{:<13} = \"{}\"", name, value),
         none => PrintLine("{:<13} is not set", name)
     }
 }
 
-func Main() -> ! (IoError | TextError) {
+func Main() throws IoError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -46,7 +45,7 @@ func Main() -> ! (IoError | TextError) {
     // An argument is native text, so it is compared with native text: `OsString::FromText`
     // turns a literal into the units this system uses. Run `rux run -- --quit` to take this
     // branch. `Exit` ends the process at once with a status; nothing after it runs.
-    var quit = OsString::FromText(allocator, "--quit")?;
+    var quit = OsString::FromText(allocator, "--quit");
     let wanted = quit.View();
     let first = Argument(1) ?? OsStringView();
     if first.Equals(wanted) {
@@ -58,15 +57,15 @@ func Main() -> ! (IoError | TextError) {
     // change is seen by this process and by every child it starts from now on, never by the
     // parent that started it.
     Show("LESSON_COLOUR");
-    SetVariable("LESSON_COLOUR", "teal")?;
+    try SetVariable("LESSON_COLOUR", "teal");
     Show("LESSON_COLOUR");
-    SetVariable("LESSON_COLOUR", "")?;
+    try SetVariable("LESSON_COLOUR", "");
     Show("LESSON_COLOUR");
 
     // `Environment` walks every variable, as `EnvironmentVariable` pairs of name and value.
     var found = false;
     var count: uint = 0;
-    var holder = OsString::FromText(allocator, "LESSON_COLOUR")?;
+    var holder = OsString::FromText(allocator, "LESSON_COLOUR");
     let name = holder.View();
     for variable in Environment() {
         count = count + 1;
@@ -77,22 +76,24 @@ func Main() -> ! (IoError | TextError) {
     PrintLine("found in walk {}", found);
     PrintLine("any at all    {}", count > 0);
 
-    RemoveVariable("LESSON_COLOUR")?;
+    try RemoveVariable("LESSON_COLOUR");
     Show("LESSON_COLOUR");
 
     // A name may not contain `=`, since `=` is what ends a name in the environment.
-    match SetVariable("LESSON=COLOUR", "teal") {
-        .Success(_) => PrintLine("a name with = was accepted?"),
-        .Failure(error) if error.kind == IoErrorKind::InvalidInput =>
+    try {
+        SetVariable("LESSON=COLOUR", "teal");
+        PrintLine("a name with = was accepted?");
+    } catch {
+        error if error.kind == IoErrorKind::InvalidInput =>
             PrintLine("LESSON=COLOUR refused as invalid input"),
-        .Failure(error) => fail error
+        error => throw error
     }
 
     // The process identifier is the system's number for this run, and changes every time.
     PrintLine("process id    {}", CurrentId());
 
     // Returning from `Main` is the ordinary way to finish: a success here is exit status 0, and
-    // a failure passed out with `?` is status 1.
+    // an error passed out with `try` is status 1.
     //
     //     let home: OsStringView = Variable("HOME");
     //         error: cannot assign 'OsStringView?' to 'OsStringView'

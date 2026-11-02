@@ -1,7 +1,6 @@
 # LruCache
 
-Put a slow lookup behind an `LruCache<K, V>` of three entries, and follow the hits, the misses and
-which entry each miss evicts when the cache is full.
+Put a slow lookup behind an `LruCache<K, V>` of three entries, and follow the hits, the misses and which entry each miss evicts when the cache is full.
 
 **You'll need:** [HashMap](https://rux-lang.dev/docs/learn/hash-map), [MutableReference](https://rux-lang.dev/docs/learn/mutable-reference)
 

@@ -1,7 +1,6 @@
 # UnicodeCase
 
-Change case beyond ASCII, where the full mapping can turn one character into several and the
-text grows.
+Change case beyond ASCII, where the full mapping can turn one character into several and the text grows.
 
 **You'll need:** [Unicode](https://rux-lang.dev/docs/learn/unicode), [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice)
 

@@ -4,8 +4,9 @@
 //
 // An `RwLock<T>` tells the two apart. `Read` returns a `ReadGuard<T>`, and any number of threads
 // may hold one at the same time. `Write` returns a `WriteGuard<T>`, which waits until nobody holds
-// the lock at all and then keeps everyone else out until it is dropped. A read guard's `Get` gives
-// a `*T`, so a reader cannot write by mistake; only a write guard gives a `*var T`.
+// the lock at all and then keeps everyone else out until it is dropped. A guard's `Get` gives a
+// read-only `&T`, so a reader cannot write by mistake; only a write guard's `GetMutable` gives a
+// `&var T`.
 //
 // Like `Mutex<T>`, an `RwLock<T>` is a handle: `Clone` gives each thread its own, and the value
 // lives until the last handle and the last guard are gone.
@@ -23,8 +24,8 @@ struct Stock {
 func Move(stock: RwLock<Stock>) -> uint64 {
     var moves: uint64 = 0;
     for round in 0..500 {
-        let guard = stock.Write();
-        let bins = guard.Get();
+        var guard = stock.Write();
+        let bins = guard.GetMutable();
         bins.north = bins.north - 1;
         bins.south = bins.south + 1;
         moves = moves + 1;
@@ -33,9 +34,9 @@ func Move(stock: RwLock<Stock>) -> uint64 {
 }
 
 // A reader looks at the total over and over, and counts how often it saw the right one. Its guard
-// gives a read-only `*Stock`, so `bins.north = 0;` here is refused:
+// gives a read-only `&Stock`, so `bins.north = 0;` here is refused:
 //
-//     error: cannot modify data through read-only pointer '*Stock'
+//     error: cannot modify data through immutable reference '&Stock'
 func Audit(stock: RwLock<Stock>) -> uint64 {
     var correct: uint64 = 0;
     for round in 0..2000 {
@@ -51,12 +52,11 @@ func Main() -> int {
 
     // One writer and three readers, all at once. The readers share the lock with each other, and
     // wait only while the writer holds it.
-    var writer = Spawn(Move, stock.Clone()) catch { else => return 1 };
-    var readers: JoinHandle<uint64>[3] = [
-        Spawn(Audit, stock.Clone()) catch { else => return 1 },
-        Spawn(Audit, stock.Clone()) catch { else => return 1 },
-        Spawn(Audit, stock.Clone()) catch { else => return 1 }
-    ];
+    var writer = try Spawn(Move, stock.Clone()) catch { _ => return 1 };
+    let one = try Spawn(Audit, stock.Clone()) catch { _ => return 1 };
+    let two = try Spawn(Audit, stock.Clone()) catch { _ => return 1 };
+    let three = try Spawn(Audit, stock.Clone()) catch { _ => return 1 };
+    var readers: JoinHandle<uint64>[3] = [move one, move two, move three];
     PrintLine("writer moved     {} items", writer.Join());
     for index in 0..3 {
         PrintLine("reader {} saw     {} of 2000 totals right", index + 1, readers[index].Join());

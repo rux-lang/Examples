@@ -1,9 +1,10 @@
 # NestedFallible
 
-Keep two meanings apart by nesting: `int? ! E` for "the next value, the end, or a failure", and
-`(int ! E1) ! E2` for an answer that can itself be a failure.
+Keep two meanings apart by nesting: `-> int? throws E` for "the next value, the end, or an error", and `-> Result<int, E1> throws E2` for an answer that can itself be a failure.
 
 **You'll need:** [NestedOptional](https://rux-lang.dev/docs/learn/nested-optional), [Outcome](https://rux-lang.dev/docs/learn/outcome)
+
+`Reading` returns an optional and can throw: `catch` handles the broken sensor (its arm leaves the loop with `break`), and a `match` on the optional tells a value from the end. `SelfTest` returns Core's `Result<int, RangeError>` — an outcome handed back as data — and can throw a `SensorError` when there is no answer at all. The levels never merge: `catch` sees only the thrown error, and the `Failure` inside the returned `Result` is reached with an ordinary `match`.
 
 ```sh
 rux run

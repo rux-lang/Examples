@@ -1,7 +1,6 @@
 # WrappingArithmetic
 
-Choose what overflow produces: `AddWrapping` and friends wrap around on purpose, `AddSaturating`
-and friends stop at the limit.
+Choose what overflow produces: `AddWrapping` and friends wrap around on purpose, `AddSaturating` and friends stop at the limit.
 
 **You'll need:** [CheckedArithmetic](https://rux-lang.dev/docs/learn/checked-arithmetic), [StringLiteral](https://rux-lang.dev/docs/learn/string-literal)
 

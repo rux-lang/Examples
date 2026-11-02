@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "OutParameter"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Return a result through a *var T parameter, and see why T ! E is usually better"
+Description = "Return a result through a &var T out-parameter, and see why an optional T? is usually better"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

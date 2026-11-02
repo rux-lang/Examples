@@ -1,7 +1,6 @@
 # Tuple
 
-Group values without declaring a type, `(int32, bool)`, reach the members with `.0` and `.1`, and
-return several results from one function.
+Group values without declaring a type, `(int32, bool)`, reach the members with `.0` and `.1`, and return several results from one function.
 
 **You'll need:** [Slice](https://rux-lang.dev/docs/learn/slice), [Return](https://rux-lang.dev/docs/learn/return)
 

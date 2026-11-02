@@ -1,7 +1,6 @@
 # Destructure
 
-Unpack a tuple into named bindings in one step with `let (x, y) = pair;`, including nested patterns
-and `_`.
+Unpack a tuple into named bindings in one step with `let (x, y) = pair;`, including nested patterns and `_`.
 
 **You'll need:** [Tuple](https://rux-lang.dev/docs/learn/tuple)
 

@@ -1,8 +1,6 @@
 # Url
 
-Read a URL with `Url::Parse`, which normalizes it, take it apart into its components, resolve
-relative links against it with `Resolve`, walk and decode its query with `Pairs` and `Decode`, and
-build a query safely with `QueryBuilder`.
+Read a URL with `Url::Parse`, which normalizes it, take it apart into its components, resolve relative links against it with `Resolve`, walk and decode its query with `Pairs` and `Decode`, and build a query safely with `QueryBuilder`.
 
 **You'll need:** [BaseEncoding](https://rux-lang.dev/docs/learn/base-encoding), [Allocator](https://rux-lang.dev/docs/learn/allocator), [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [Propagate](https://rux-lang.dev/docs/learn/propagate), [FallibleMain](https://rux-lang.dev/docs/learn/fallible-main)
 

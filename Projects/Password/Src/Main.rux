@@ -23,14 +23,15 @@ import Io::PrintLine;
 const Alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 // An index into the alphabet, every one equally likely, or why no entropy was available.
-func DrawIndex() -> uint ! EntropyError {
+func DrawIndex() -> uint throws EntropyError {
     let count = Alphabet.length;
     // The largest multiple of `count` that fits in a byte's 256 values: 228 for 57 characters.
     // Bytes below it split evenly among the characters; bytes from it upwards are rejected.
     let limit = 256 - 256 % count;
     loop {
         var drawn: byte = 0;
-        Fill(@drawn as *var opaque, 1)?;
+        // Safety: `drawn` is a local `byte`, so its address is writable for exactly 1 byte.
+        unsafe { try Fill(@drawn as *var opaque, 1); }
         if (drawn as uint) < limit {
             return (drawn as uint) % count;
         }
@@ -53,7 +54,7 @@ func Main() -> int {
     // nothing on the screen that could be mistaken for a shorter password.
     var password: char8[16];
     for i in 0..password.length {
-        let index = DrawIndex() catch {
+        let index = try DrawIndex() catch {
             error => {
                 PrintLine("no password: {}", Reason(error));
                 return 1;

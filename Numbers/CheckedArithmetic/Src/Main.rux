@@ -1,7 +1,9 @@
-// Ordinary `+`, `-` and `*` never complain: a result too big for its type wraps around and the
-// program carries on with a wrong number. When a wrong number would matter, as in a size, a price
-// or a count, ask `Core` to check instead. `AddChecked`, `SubChecked` and `MulChecked` work at
-// every integer width, signed or unsigned.
+// Ordinary `+`, `-` and `*` refuse to carry on with a wrong number: a result too big for its type
+// stops the program with `Panic: integer overflow in '+'`. When overflow is a case the program
+// should handle rather than a bug, as in a size, a price or a count read from outside, ask `Core`
+// to check instead. `AddChecked`, `SubChecked` and `MulChecked` work at every integer width,
+// signed or unsigned. (Each integer type also has `CheckedAdd`, `CheckedSub` and `CheckedMul`
+// methods, as in `width.CheckedMul(height)`, which answer with an optional instead.)
 //
 // Each one hands back two things, so it uses an out-parameter: the result is written through the
 // pointer, and the return value is a `bool` that answers "did it overflow?". That reads backwards
@@ -29,7 +31,7 @@ func Main() -> int {
     let first = AddChecked(uint8::Max - 5, 5, @sum);
     PrintLine("250 + 5    overflow {:5}  result {}", first, sum);
 
-    // One step too far: the flag is raised, and the result is what `+` would have wrapped to.
+    // One step too far: the flag is raised, and the result is what the wrapping `+%` gives.
     let second = AddChecked(uint8::Max, 1, @sum);
     PrintLine("255 + 1    overflow {:5}  result {}", second, sum);
 
@@ -46,7 +48,7 @@ func Main() -> int {
     // The check, hidden behind a function that says what went wrong in its type.
     PrintLine("area       {}", Area(1920, 1080) ?? 0);
     match Area(100000, 100000) {
-        area? => PrintLine("area       {}", area),
+        .Some(area) => PrintLine("area       {}", area),
         none => PrintLine("area       too large")
     }
     return 0;

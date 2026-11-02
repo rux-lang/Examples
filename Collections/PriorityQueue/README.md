@@ -1,8 +1,6 @@
 # PriorityQueue
 
-Serve support tickets most urgent first with a `PriorityQueue<T>`, which always hands out its
-largest element, and turn it into an earliest-first queue of timers by reversing the element type's
-`<`.
+Serve support tickets most urgent first with a `PriorityQueue<T>`, which always hands out its largest element, and turn it into an earliest-first queue of timers by reversing the element type's `<`.
 
 **You'll need:** [OperatorOverload](https://rux-lang.dev/docs/learn/operator-overload), [CoalesceExit](https://rux-lang.dev/docs/learn/coalesce-exit), [Vector](https://rux-lang.dev/docs/learn/vector)
 

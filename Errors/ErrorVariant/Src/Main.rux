@@ -15,22 +15,22 @@ variant TransferError {
 }
 
 // Turns an account number into a position in the list of balances.
-func Find(number: int) -> int ! TransferError {
+func Find(number: int) -> int throws TransferError {
     if number < 1 || number > 3 {
-        fail TransferError::UnknownAccount(number);
+        throw TransferError::UnknownAccount(number);
     }
     return number - 1;
 }
 
-func Transfer(balances: &var int[3], from: int, to: int, amount: int) -> ! TransferError {
+func Transfer(balances: &var int[3], from: int, to: int, amount: int) throws TransferError {
     if from == to {
-        fail TransferError::SameAccount;
+        throw TransferError::SameAccount;
     }
-    // The same error type all the way through, so `?` passes each failure on unchanged.
-    let source = Find(from)?;
-    let target = Find(to)?;
+    // The same error type all the way through, so `try` passes each failure on unchanged.
+    let source = try Find(from);
+    let target = try Find(to);
     if balances[source] < amount {
-        fail TransferError::ShortOfFunds { balance: balances[source], requested: amount };
+        throw TransferError::ShortOfFunds { balance: balances[source], requested: amount };
     }
     balances[source] -= amount;
     balances[target] += amount;
@@ -48,10 +48,11 @@ func Explain(error: TransferError) {
 
 func Attempt(balances: &var int[3], from: int, to: int, amount: int) {
     PrintLine("move {} from account {} to account {}", amount, from, to);
-    match Transfer(balances, from, to, amount) {
-        .Success(()) => PrintLine("    done: balances {}, {}, {}", balances[0], balances[1],
-            balances[2]),
-        .Failure(error) => Explain(error)
+    try {
+        Transfer(balances, from, to, amount);
+        PrintLine("    done: balances {}, {}, {}", balances[0], balances[1], balances[2]);
+    } catch {
+        error => Explain(error)
     }
 }
 

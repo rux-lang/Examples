@@ -19,22 +19,22 @@ extend Labeled<T> {
         return Labeled<T> { label: label, value: value };
     }
 
-    func Get(self: &Labeled<T>) -> T {
+    func Get(&self) -> T {
         return self.value;
     }
 
-    func Set(self: &var Labeled<T>, value: T) {
+    func Set(&var self, value: T) {
         self.value = value;
     }
 
     // `T` comes from the receiver; `U` comes from this call's argument.
-    func With<U>(self: &Labeled<T>, other: U) -> (T, U) {
+    func With<U>(&self, other: U) -> (T, U) {
         return (self.value, other);
     }
 
     // The result can be a different instantiation of the same type: a `Labeled<T>` becomes a
     // `Labeled<U>`, keeping its label and changing its value through `change`.
-    func Map<U>(self: &Labeled<T>, change: func(T) -> U) -> Labeled<U> {
+    func Map<U>(&self, change: func(T) -> U) -> Labeled<U> {
         return Labeled<U> { label: self.label, value: change(self.value) };
     }
 }

@@ -19,7 +19,7 @@ type Setting = int32 | bool | char8[..];
 func Show(key: char8[..], value: Setting) {
     match value {
         seconds: int32 => PrintLine("{:8} = {} ms", key, seconds * 1000),
-        flag: bool => PrintLine("{:8} = {}", key, flag ? "on" : "off"),
+        flag: bool => PrintLine("{:8} = {}", key, if flag { "on" } else { "off" }),
         word: char8[..] => PrintLine("{:8} = \"{}\"", key, word)
     }
 }
@@ -29,7 +29,7 @@ func Show(key: char8[..], value: Setting) {
 func Weight(value: Setting) -> int32 {
     return match value {
         n: int32 => n,
-        flag: bool => flag ? 1 : 0,
+        flag: bool => if flag { 1 } else { 0 },
         _: char8[..] => -1
     };
 }

@@ -4,7 +4,7 @@
 // year, except a century divisible by 400. So 2000 was a leap year and 1900 was not.
 //
 // That makes text such as "2023-02-29" well-formed but wrong. `ParseDate` reads the ISO 8601
-// form `YYYY-MM-DD` and returns `Date ! TimeParseError`, and the error says which mistake it
+// form `YYYY-MM-DD` and returns a `Date` or throws a `TimeParseError`, which says which mistake it
 // was (a bad shape, a month that does not exist, a day the month does not have) and at which
 // byte of the text, so a program can point at the problem rather than just reject it.
 import Io::PrintLine;
@@ -22,9 +22,11 @@ func Reason(error: TimeParseError) -> char8[..] {
 }
 
 func Show(text: char8[..]) {
-    match ParseDate(text) {
-        .Success(date) => PrintLine("{}  ok, day {} of the year", date, date.DayOfYear()),
-        .Failure(error) => PrintLine("{}  {}, at byte {}", text, Reason(error), error.Offset())
+    try {
+        let date = ParseDate(text);
+        PrintLine("{}  ok, day {} of the year", date, date.DayOfYear());
+    } catch {
+        error => PrintLine("{}  {}, at byte {}", text, Reason(error), error.Offset())
     }
 }
 
@@ -47,9 +49,9 @@ func Main() -> int {
     // Date arithmetic follows the calendar, so the day after 28 February depends on the year.
     // `PlusDays` returns `Date?`, because a date far enough out leaves the supported range.
     for text in ["2023-02-28", "2024-02-28"] {
-        let date = ParseDate(text) catch { else => continue };
+        let date = try ParseDate(text) catch { _ => continue };
         match date.PlusDays(1) {
-            next? => PrintLine("the day after {} is {}", date, next),
+            .Some(next) => PrintLine("the day after {} is {}", date, next),
             none => PrintLine("the day after {} is out of range", date)
         }
     }

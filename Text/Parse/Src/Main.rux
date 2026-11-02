@@ -1,15 +1,14 @@
 // Parsing is formatting in reverse: text in, value out. Unlike formatting, it fails all the time,
 // because the text usually comes from a person or a file and may not spell a number at all.
-// So every parser in the Format package returns a fallible:
+// So every parser in the Format package declares the error it throws:
 //
-//     ParseInt32(text) -> int32 ! ParseError
+//     ParseInt32(text) -> int32 throws ParseError
 //
 // `ParseError` is a variant, and every case says where in the text the trouble was found:
 //
 //     Empty                  there was no text at all
 //     InvalidCharacter(at)   the byte at `at` is not part of a number
 //     Overflow(at)           a well-formed number too large for an `int32`, usually at its end
-//     OutOfMemory(at)        only the very widest number types can hit this one
 import Format::{ ParseError, ParseInt32 };
 import Io::{ Print, PrintLine };
 
@@ -17,15 +16,16 @@ func Describe(error: ParseError) {
     match error {
         .Empty => PrintLine("empty text"),
         .InvalidCharacter(at) => PrintLine("not a digit at byte {}", at),
-        .Overflow(at) => PrintLine("too large for an int32, at byte {}", at),
-        .OutOfMemory(_) => PrintLine("out of memory")
+        .Overflow(at) => PrintLine("too large for an int32, at byte {}", at)
     }
 }
 
 func Read(text: char8[..]) {
-    match ParseInt32(text) {
-        .Success(value) => PrintLine("[{}]  {}", text, value),
-        .Failure(error) => {
+    try {
+        let value = ParseInt32(text);
+        PrintLine("[{}]  {}", text, value);
+    } catch {
+        error => {
             Print("[{}]  refused, ", text);
             Describe(error);
         }
@@ -39,7 +39,7 @@ func Main() -> int {
     Read("0x1F");
 
     // Malformed text. The parser does not skip spaces or stop at the first non-digit: the
-    // whole text must be a number, or the answer is a failure saying which byte is wrong.
+    // whole text must be a number, or the parser throws an error saying which byte is wrong.
     Read("");
     Read(" 42");
     Read("12abc");
@@ -50,8 +50,8 @@ func Main() -> int {
     Read("2147483648");
     Read("-2147483648");
 
-    // With `catch`, a failure can become a fallback value in one expression.
-    let fallback = ParseInt32("seven") catch { else => 0 };
+    // With `catch`, an error can become a fallback value in one expression.
+    let fallback = try ParseInt32("seven") catch { _ => 0 };
     PrintLine("[seven] with a fallback  {}", fallback);
     return 0;
 }

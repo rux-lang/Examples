@@ -5,10 +5,10 @@
 // that number points at. So a lookup costs about the same whether the map holds ten entries or
 // ten million.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, EqualsSlice, HashMap, HashSlice };
+import Collections::{ EqualsSlice, HashMap, HashSlice };
 import Io::PrintLine;
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -18,26 +18,26 @@ func Main() -> ! CollectionError {
     // package provides both for text keys.
     var stock = HashMap<char8[..], int32>(allocator, HashSlice, EqualsSlice);
 
-    // Inserting may need more room, and so can fail; `?` hands that failure to `Main`.
-    stock.Insert("apples", 12)?;
-    stock.Insert("pears", 4)?;
-    stock.Insert("plums", 30)?;
+    // Inserting may need more room, which the map asks its allocator for.
+    stock.Insert("apples", 12);
+    stock.Insert("pears", 4);
+    stock.Insert("plums", 30);
     PrintLine("entries        {}", stock.Length());
 
     // `Get` returns an optional, `int32?`, because the key may not be there.
     match stock.Get("pears") {
-        count? => PrintLine("pears          {}", count),
+        .Some(count) => PrintLine("pears          {}", count),
         none => PrintLine("pears          not stocked")
     }
     match stock.Get("kiwis") {
-        count? => PrintLine("kiwis          {}", count),
+        .Some(count) => PrintLine("kiwis          {}", count),
         none => PrintLine("kiwis          not stocked")
     }
 
     // A key appears at most once. Inserting it again replaces its value, and the map does not
     // grow. `Replace` does the same and also hands back the value it displaced.
-    stock.Insert("apples", 15)?;
-    let previous = stock.Replace("apples", 20)?;
+    stock.Insert("apples", 15);
+    let previous = stock.Replace("apples", 20);
     PrintLine("apples         {} (was {}), {} entries", stock.Get("apples") ?? 0, previous ?? 0,
         stock.Length());
 

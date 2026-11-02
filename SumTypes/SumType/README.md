@@ -1,7 +1,6 @@
 # SumType
 
-Store a value that is one of several types — `int32 | bool` — and see that a sum is a set of
-types, where order and duplicates do not matter.
+Store a value that is one of several types — `int32 | bool` — and see that a sum is a set of types, where order and duplicates do not matter.
 
 **You'll need:** [TypeAlias](https://rux-lang.dev/docs/learn/type-alias), [Variant](https://rux-lang.dev/docs/learn/variant), [ErrorSum](https://rux-lang.dev/docs/learn/error-sum)
 

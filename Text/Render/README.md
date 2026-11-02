@@ -1,7 +1,6 @@
 # Render
 
-Format into a `String` you keep with `Render`, which returns `String ! FormatError` and refuses a
-wrong pattern before writing anything.
+Format into a `String` you keep with `Render`, which throws a `FormatError` for a wrong pattern before writing anything, and keep each outcome as a `Result<String, FormatError>` to report it later.
 
 **You'll need:** [FormatNumber](https://rux-lang.dev/docs/learn/format-number), [String](https://rux-lang.dev/docs/learn/string), [Outcome](https://rux-lang.dev/docs/learn/outcome), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
 

@@ -1,7 +1,6 @@
 # Convert
 
-Convert between numeric, character and boolean types with `as`, and see what a value that does
-not fit becomes.
+Convert between numeric, character and boolean types with `as`, keep only the low bits of an integer on purpose with `Truncate`, and see what a value that does not fit becomes.
 
 **You'll need:** [Integer](https://rux-lang.dev/docs/learn/integer), [Float](https://rux-lang.dev/docs/learn/float), [Boolean](https://rux-lang.dev/docs/learn/boolean), [Character](https://rux-lang.dev/docs/learn/character)
 
@@ -11,6 +10,7 @@ rux run
 
 ```text
 widen        int8 100 becomes int32 100
+narrow       int32 100 becomes int8 100
 narrow       int32 300 becomes int8 44
 sign         int32 -1 becomes uint8 255
 float->int   3.9 becomes 3

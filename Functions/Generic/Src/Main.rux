@@ -35,9 +35,11 @@ func Main() -> int {
     // `T` can also be given explicitly in angle brackets at the call. That
     // matters when the arguments alone would choose a different type. Bare
     // literals become `int`, but with `<uint8>` they become `uint8`, and so
-    // does the result — which is why adding 100 wraps around here.
+    // does the result. 200 + 100 does not fit in a `uint8`: plain `+` would
+    // stop the program with an overflow panic, so the wrapping `+%` is used,
+    // and it comes round to 44.
     PrintLine("Larger(200, 7) + 100          {}", Larger(200, 7) + 100);
-    PrintLine("Larger<uint8>(200, 7) + 100   {}", Larger<uint8>(200, 7) + 100);
+    PrintLine("Larger<uint8>(200, 7) +% 100  {}", Larger<uint8>(200, 7) +% 100);
 
     // `Larger` uses `>` on a `T` it knows nothing about. That is checked once
     // `T` is known: calling `Larger` with a type that has no `>` is rejected

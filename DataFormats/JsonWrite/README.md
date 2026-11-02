@@ -1,6 +1,6 @@
 # JsonWrite
 
-Build a JSON value by hand, write it compact and pretty with `WriteValue`, and parse the output back to the same text.
+Build a JSON value by hand, write it compact and pretty with `WriteValue`, parse the output back to the same text, and see a number JSON cannot spell refused.
 
 **You'll need:** [Json](https://rux-lang.dev/docs/learn/json), [StringBuilder](https://rux-lang.dev/docs/learn/string-builder), [Display](https://rux-lang.dev/docs/learn/display), [Move](https://rux-lang.dev/docs/learn/move), [ErrorSum](https://rux-lang.dev/docs/learn/error-sum)
 
@@ -22,7 +22,7 @@ pretty, 103 bytes:
   "license": null
 }
 round trip gives the same text: true
-NaN refused: value out of range for the form requested
+NaN refused: not a JSON number
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/json-write

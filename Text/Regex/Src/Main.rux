@@ -3,9 +3,9 @@
 // nothing else". One pattern can check what a person typed, or find what you are looking for in
 // a page of text, where the same job by hand would be a loop full of special cases.
 //
-// `Regex::New` compiles a pattern once, and the compiled `Regex` is then searched as often as
-// needed. Compiling can fail — the pattern may be malformed — so it returns `Regex ! RegexError`,
-// and the error says what went wrong and at which byte of the pattern.
+// `Regex` compiles a pattern once, and the compiled `Regex` is then searched as often as
+// needed. Compiling can fail — the pattern may be malformed — so it is declared
+// `-> Self throws RegexError`, and the error says what went wrong and at which byte of the pattern.
 //
 // The package matches in linear time: a search never takes more than a fixed amount of work per
 // byte of text, whatever the pattern. The price is that it refuses the few features that would
@@ -20,20 +20,21 @@ func Reason(kind: RegexErrorKind) -> char8[..] {
         .UnclosedClass => "a [ with no ]",
         .NothingToRepeat => "nothing before the repetition",
         .Unsupported => "needs backtracking",
-        else => "another mistake"
+        _ => "another mistake"
     };
 }
 
 // Compiles `pattern` only to see whether it is one, and reports why not.
 func Check(allocator: Allocator, pattern: char8[..]) {
-    match Regex::New(allocator, pattern) {
-        .Success(_) => PrintLine("{:<10} compiles", pattern),
-        .Failure(error) => PrintLine("{:<10} {} at byte {}", pattern, Reason(error.kind),
-            error.offset)
+    try {
+        Regex(allocator, pattern);
+        PrintLine("{:<10} compiles", pattern);
+    } catch {
+        error => PrintLine("{:<10} {} at byte {}", pattern, Reason(error.kind), error.offset)
     }
 }
 
-func Main() -> ! RegexError {
+func Main() throws RegexError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -44,22 +45,23 @@ func Main() -> ! RegexError {
     //
     // `^` and `$` pin the match to the start and end of the text: without them, `IsMatch` would
     // also accept a code with something before or after it.
-    let code = Regex::New(allocator, "^[A-Z]{3}-\\d{4}$")?;
+    let code = try Regex(allocator, "^[A-Z]{3}-\\d{4}$");
     for text in ["ABC-1234", "abc-1234", "ABC-12345", "XY-0001"] {
-        PrintLine("{:<10} {}", text, code.IsMatch(text)?);
+        PrintLine("{:<10} {}", text, code.IsMatch(text));
     }
 
-    // Even `IsMatch` can fail, since a search takes working memory from the allocator, so the `?`
-    // is needed. `if code.IsMatch(text) { … }` is refused with:
+    // Only compiling throws. A search cannot fail, so `IsMatch` answers a plain `bool` and `Find`
+    // an optional, and neither call is marked. Leaving the mark off the compile is refused:
     //
-    //     error: condition for 'if' must have type 'bool', but found 'bool8 ! RegexError'
+    //     let code = Regex(allocator, "^[A-Z]{3}-\\d{4}$");
+    //         error: call to 'Regex' can throw 'RegexError' but is not marked with 'try'
 
     // `Find` answers with where the leftmost match is, as a `Match` of byte positions, or `none`.
     // `Slice` cuts the matched text out of the text that was searched.
     let log = "disk 91% full at 09:41; retry at 09:45, give up at 10:15";
-    let time = Regex::New(allocator, "\\d{2}:\\d{2}")?;
-    match time.Find(log)? {
-        found? => PrintLine("first     {} at bytes {}..{}", found.Slice(log), found.start,
+    let time = try Regex(allocator, "\\d{2}:\\d{2}");
+    match time.Find(log) {
+        .Some(found) => PrintLine("first     {} at bytes {}..{}", found.Slice(log), found.start,
             found.end),
         none => PrintLine("no time")
     }
@@ -68,7 +70,7 @@ func Main() -> ! RegexError {
     // match ended walks through every match in turn.
     var at: uint = 0;
     while true {
-        let found = time.FindAt(log, at)? ?? break;
+        let found = time.FindAt(log, at) ?? break;
         PrintLine("time      {}", found.Slice(log));
         at = found.end;
     }
@@ -76,11 +78,11 @@ func Main() -> ! RegexError {
     // In a pattern `.` means "any character", so the pattern "v1.2" also matches "v102". `Escape`
     // turns text into a pattern that matches exactly that text, here `v1\.2`.
     let release = "v102 was replaced by v1.2";
-    let loose = Regex::New(allocator, "v1.2")?;
-    let pattern = Escape(allocator, "v1.2")?;
-    let exact = Regex::New(allocator, pattern.Bytes())?;
-    PrintLine("loose     {}", (loose.Find(release)? ?? return).Slice(release));
-    PrintLine("exact     {} from {}", (exact.Find(release)? ?? return).Slice(release), pattern);
+    let loose = try Regex(allocator, "v1.2");
+    let pattern = Escape(allocator, "v1.2");
+    let exact = try Regex(allocator, pattern.Bytes());
+    PrintLine("loose     {}", (loose.Find(release) ?? return).Slice(release));
+    PrintLine("exact     {} from {}", (exact.Find(release) ?? return).Slice(release), pattern.View());
 
     // A malformed pattern is refused when it is compiled, never halfway through a search.
     Check(allocator, "\\d+-\\d+");

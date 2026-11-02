@@ -9,9 +9,10 @@
 // `when` below stops the build with an `#Error`, instead of letting it fail to link a function
 // that does not exist there.
 //
-// A foreign function reports failure its own way, not through a Rux fallible. `Beep` returns a
-// `bool32` that is false when no tone could be played, so every call is checked, and the tune
-// stops at the first note that fails rather than printing notes nobody heard.
+// A foreign function reports failure its own way, not by throwing. `Beep` returns a `bool32`
+// that is false when no tone could be played, so every call is checked, and the tune stops at
+// the first note that fails rather than printing notes nobody heard. The compiler cannot check
+// what a foreign function does, so each call sits in an `unsafe` block that says why it holds.
 import Core::{ #Error, #target };
 import Io::{ Print, PrintLine };
 
@@ -22,7 +23,7 @@ when #target.os {
             func Beep(frequency: uint32, duration: uint32) -> bool32;
         }
     },
-    else => #Error("Melody plays through the Windows Beep function, so it builds only for Windows")
+    _ => #Error("Melody plays through the Windows Beep function, so it builds only for Windows")
 }
 
 // Note frequencies in hertz, near the middle of a piano. Naming them keeps the tune readable as
@@ -62,7 +63,9 @@ func Main() -> int {
     PrintLine("Ode to Joy, through the console speaker:");
     for note in tune {
         Print("{} ", note.name);
-        if !Beep(note.frequency, note.milliseconds) {
+        // Safety: `Beep` takes two plain integers by value and touches no memory of ours.
+        let played = unsafe { Beep(note.frequency, note.milliseconds) };
+        if !played {
             PrintLine();
             PrintLine("Windows could not play a tone, so the tune stops here.");
             return 1;

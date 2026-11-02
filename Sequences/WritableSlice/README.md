@@ -1,7 +1,6 @@
 # WritableSlice
 
-Change an array's elements through a writable view, `var int32[..]`, and see that a view's
-writability is separate from its binding's mutability.
+Change an array's elements through a writable view, `var int32[..]`, and see that a view's writability is separate from its binding's mutability.
 
 **You'll need:** [Slice](https://rux-lang.dev/docs/learn/slice)
 

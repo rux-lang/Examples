@@ -2,7 +2,7 @@
 
 Parse a JSON document, read typed values out of it, and see malformed input refused with a reason and a position.
 
-**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Pointer](https://rux-lang.dev/docs/learn/pointer), [OutParameter](https://rux-lang.dev/docs/learn/out-parameter), [Outcome](https://rux-lang.dev/docs/learn/outcome), [StringView](https://rux-lang.dev/docs/learn/string-view)
+**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Optional](https://rux-lang.dev/docs/learn/optional), [Catch](https://rux-lang.dev/docs/learn/catch), [StringView](https://rux-lang.dev/docs/learn/string-view)
 
 ```sh
 rux run
@@ -18,9 +18,9 @@ tags[1]   text small
 beta      boolean: true, value: true
 
 [1, 2, 3]          parsed as array
-[1, 2, 3,]         refused at byte 10: token that cannot appear here
+[1, 2, 3,]         refused at byte 9: token that cannot appear here
 {'name': 'Rux'}    refused at byte 1: byte that begins no token
-{"open": [1, 2}    refused at byte 15: token that cannot appear here
+{"open": [1, 2}    refused at byte 14: token that cannot appear here
 {"a": 1} extra     refused at byte 9: text after the end of the document
                    refused at byte 0: document ended in the middle of a value
 ```

@@ -1,7 +1,7 @@
-// `as` always produces a value of the new type, and says nothing when the old value did not fit:
-// 300 as a `uint8` is quietly 44, and -1 is quietly 255. That is fine where the value is known to
-// fit, and a hidden bug everywhere else. `Core::ConvertChecked` converts the same way and also
-// tells you whether anything was lost.
+// Between integer types, `as` keeps the value or stops the program: 300 or -1 as a `uint8` ends it
+// with `Panic: integer cast out of range`. That is right where the value is known to fit, and a
+// crash everywhere else, where the program would rather decide for itself. `Core::ConvertChecked`
+// converts without ever stopping and tells you whether anything was lost.
 //
 // It follows the out-parameter shape of the checked arithmetic: the converted value is written
 // through a pointer, which also names the destination type, and the `bool` it returns is `true`
@@ -9,8 +9,8 @@
 // too large, negative into an unsigned type, a fraction cut off a float, and a NaN or infinity.
 //
 // Two relatives decide what to do with a value that does not fit, without reporting it.
-// `ConvertWrapping` is `as` with a name that says the loss is intended, and `ConvertSaturating`
-// clamps to the nearest value the destination can hold.
+// `ConvertWrapping` keeps whatever fits, the low bits of an integer, with a name that says the
+// loss is intended, and `ConvertSaturating` clamps to the nearest value the destination can hold.
 import Core::{ ConvertChecked, ConvertSaturating, float64 };
 import Io::PrintLine;
 
@@ -55,7 +55,7 @@ func Main() -> int {
     // A checking function turns the report into a type.
     PrintLine("ToByte(99)     {}", ToByte(99) ?? 0);
     match ToByte(999) {
-        value? => PrintLine("ToByte(999)    {}", value),
+        .Some(value) => PrintLine("ToByte(999)    {}", value),
         none => PrintLine("ToByte(999)    does not fit")
     }
     return 0;

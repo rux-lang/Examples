@@ -1,7 +1,6 @@
 # Duration
 
-Build a `Duration` from any unit and do arithmetic on it, where `FromHours`, `Plus` and `Times`
-return `Duration?` because they can overflow.
+Build a `Duration` from any unit and do arithmetic on it, where `FromHours`, `Plus` and `Times` return `Duration?` because they can overflow.
 
 **You'll need:** [Presence](https://rux-lang.dev/docs/learn/presence), [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [OptionalPropagate](https://rux-lang.dev/docs/learn/optional-propagate)
 

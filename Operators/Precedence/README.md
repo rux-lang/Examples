@@ -1,7 +1,6 @@
 # Precedence
 
-Predict which operator applies first, how same-rank operators group left to right,
-and when to add parentheses.
+Predict which operator applies first, how same-rank operators group left to right, and when to add parentheses.
 
 **You'll need:** [Arithmetic](https://rux-lang.dev/docs/learn/arithmetic), [Comparison](https://rux-lang.dev/docs/learn/comparison), [Logical](https://rux-lang.dev/docs/learn/logical), [Convert](https://rux-lang.dev/docs/learn/convert)
 

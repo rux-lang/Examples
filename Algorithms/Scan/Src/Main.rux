@@ -9,13 +9,14 @@
 // is too short by returning false. `Iota` fills a slice with a counting sequence.
 //
 // `Midpoint` finds the number halfway between two others. That sounds like `(a + b) / 2`, but
-// the sum can be too large for the type even when the answer is not, and then it wraps round to
-// a nonsense value. `Midpoint` never forms the sum, so it is right for any two values.
+// the sum can be too large for the type even when the answer is not: `+` then stops the program
+// with an overflow panic, and the wrapping `+%` gives a nonsense value. `Midpoint` never forms the
+// sum, so it is right for any two values.
 import Algorithms::{ ExclusiveScan, InclusiveScan, Iota, Midpoint, PartialSum };
 import Io::{ Print, PrintLine };
 
 func Larger(left: int32, right: int32) -> int32 {
-    return left > right ? left : right;
+    return if left > right { left } else { right };
 }
 
 func Add(left: int32, right: int32) -> int32 {
@@ -61,11 +62,12 @@ func Main() -> int {
     PrintLine("fits in 3? {}", PartialSum<int32>(sales[..], short[..]));
 
     // Halfway between two large positions. Their sum, 4100000000, does not fit in an `int32`, so
-    // `(low + high) / 2` wraps round to a negative number. `Midpoint` takes the distance between
-    // them instead — always representable as a `uint32` — and adds half of it to `low`.
+    // `(low + high) / 2` stops with an overflow panic, and `(low +% high) / 2` wraps round to a
+    // negative number. `Midpoint` takes the distance between them instead — always representable
+    // as a `uint32` — and adds half of it to `low`.
     let low: int32 = 2000000000;
     let high: int32 = 2100000000;
-    PrintLine("(low + high) / 2  {}", (low + high) / 2);
+    PrintLine("(low +% high) / 2 {}", (low +% high) / 2);
     PrintLine("Midpoint          {}", Midpoint(low, high));
 
     // With an odd distance there is no exact middle; integers round towards the first argument.

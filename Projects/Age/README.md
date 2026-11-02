@@ -1,7 +1,6 @@
 # Age
 
-Work out an age in completed years, months and days, where a month that is missing its day ends
-on its last day.
+Work out an age in completed years, months and days, where a month that is missing its day ends on its last day.
 
 **You'll need:** Parts 1–20 — this project is a checkpoint for Utilities, and leans on [Date](https://rux-lang.dev/docs/learn/date), [Fail](https://rux-lang.dev/docs/learn/fail) and [AbsenceToError](https://rux-lang.dev/docs/learn/absence-to-error).
 

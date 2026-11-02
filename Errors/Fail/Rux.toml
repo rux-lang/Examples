@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "Fail"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Leave a fallible function through its failure channel with fail"
+Description = "Leave a throwing function through its throws channel with throw"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

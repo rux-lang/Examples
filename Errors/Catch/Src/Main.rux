@@ -1,6 +1,6 @@
-// `catch` turns a fallible back into a plain value. `outcome catch { arms }` lets a success
-// straight through, unchanged. A failure goes to the arms, which see only the error and must
-// produce a value of the success type in its place.
+// `catch` turns a call that can throw back into a plain value. `try call catch { arms }` lets a
+// success straight through, unchanged. An error goes to the arms, which see only the error and
+// must produce a value of the success type in its place.
 //
 // When the error is a variant, each arm names a case, just as in a `match`, and an arm may add a
 // guard with `if`. Together the arms must cover every error, so no failure is left over.
@@ -15,22 +15,22 @@ variant DigitError {
     Symbol(char)
 }
 
-func ReadDigit(c: char) -> int ! DigitError {
+func ReadDigit(c: char) -> int throws DigitError {
     if c == ' ' {
-        fail DigitError::Blank;
+        throw DigitError::Blank;
     }
     if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') {
-        fail DigitError::Letter(c);
+        throw DigitError::Letter(c);
     }
     if c < '0' || c > '9' {
-        fail DigitError::Symbol(c);
+        throw DigitError::Symbol(c);
     }
     return (c as int) - ('0' as int);
 }
 
 // The result is a plain `int`: after the `catch`, there is no failure left to handle.
 func ForgivingDigit(c: char) -> int {
-    return ReadDigit(c) catch {
+    return try ReadDigit(c) catch {
         DigitError::Letter(letter) if letter == 'O' => 0,
         DigitError::Letter(letter) if letter == 'l' => 1,
         DigitError::Letter(_) => -1,

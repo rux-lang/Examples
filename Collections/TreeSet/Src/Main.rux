@@ -5,10 +5,10 @@
 // in alphabetical order, a list of free seat numbers lowest first — or when the question is
 // "which member comes next after this one?".
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, CompareSlice, TreeSet };
+import Collections::{ CompareSlice, TreeSet };
 import Io::{ Print, PrintLine };
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -20,7 +20,7 @@ func Main() -> ! CollectionError {
     // duplicate is not added a second time.
     let incoming: char8[..][7] = ["rust", "memory", "arena", "rux", "memory", "pool", "arena"];
     for tag in incoming {
-        let isNew = tags.Insert(tag)?;
+        let isNew = tags.Insert(tag);
         if !isNew {
             PrintLine("duplicate  {}", tag);
         }

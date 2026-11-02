@@ -28,9 +28,9 @@ enum AgeError {
 }
 
 // The age on `on` of someone born on `birth`, or why there is none.
-func AgeOn(birth: Date, on: Date) -> Age ! AgeError {
+func AgeOn(birth: Date, on: Date) -> Age throws AgeError {
     if on.DaysSince(birth) < 0 {
-        fail AgeError::BornLater;
+        throw AgeError::BornLater;
     }
 
     // Counting the calendar months between the two gives the right answer, or one too many
@@ -39,34 +39,38 @@ func AgeOn(birth: Date, on: Date) -> Age ! AgeError {
     // is 31 March, not 28 March.
     var months = ((on.year - birth.year) as int64) * 12 + (on.month as int64)
         - (birth.month as int64);
-    var reached = birth.PlusMonths(months) ?? fail AgeError::OutOfRange;
+    var reached = birth.PlusMonths(months) ?? throw AgeError::OutOfRange;
     if on.DaysSince(reached) < 0 {
         months -= 1;
-        reached = birth.PlusMonths(months) ?? fail AgeError::OutOfRange;
+        reached = birth.PlusMonths(months) ?? throw AgeError::OutOfRange;
     }
     return Age { years: months / 12, months: months % 12, days: on.DaysSince(reached) };
 }
 
 func Show(birthText: char8[..], onText: char8[..]) {
-    let birth = ParseDate(birthText) catch {
-        else => {
+    let birth = try ParseDate(birthText) catch {
+        _ => {
             PrintLine("{}  {}  {} is not a date", birthText, onText, birthText);
             return;
         }
     };
-    let on = ParseDate(onText) catch {
-        else => {
+    let on = try ParseDate(onText) catch {
+        _ => {
             PrintLine("{}  {}  {} is not a date", birthText, onText, onText);
             return;
         }
     };
-    match AgeOn(birth, on) {
-        .Success(age) => PrintLine("{}  {}  {:5} {:7} {:5}", birth, on,
-            age.years, age.months, age.days),
-        .Failure(AgeError::BornLater) => PrintLine("{}  {}  refused, born after that date",
-            birth, on),
-        .Failure(AgeError::OutOfRange) => PrintLine("{}  {}  outside the calendar", birth, on)
-    }
+    let age = try AgeOn(birth, on) catch {
+        AgeError::BornLater => {
+            PrintLine("{}  {}  refused, born after that date", birth, on);
+            return;
+        },
+        AgeError::OutOfRange => {
+            PrintLine("{}  {}  outside the calendar", birth, on);
+            return;
+        }
+    };
+    PrintLine("{}  {}  {:5} {:7} {:5}", birth, on, age.years, age.months, age.days);
 }
 
 func Main() -> int {

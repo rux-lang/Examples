@@ -4,6 +4,8 @@ Write one function with a type parameter `<T>` that works for many types, inferr
 
 **You'll need:** [Overload](https://rux-lang.dev/docs/learn/overload), [Convert](https://rux-lang.dev/docs/learn/convert)
 
+Given `<uint8>`, the result of `Larger` is a `uint8`, so adding 100 to 200 no longer fits: the example uses the wrapping `+%`, since plain `+` traps on overflow.
+
 ```sh
 rux run
 ```
@@ -14,7 +16,7 @@ Larger(2.5, 1.5)              2.5
 Larger('a', 'z')              z
 Pick(true, "yes", "no")       yes
 Larger(200, 7) + 100          300
-Larger<uint8>(200, 7) + 100   44
+Larger<uint8>(200, 7) +% 100  44
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/generic

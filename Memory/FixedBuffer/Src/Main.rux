@@ -17,35 +17,42 @@ struct Point {
     y: int64;
 }
 
-func Main() -> ! AllocError {
+func Main() throws AllocError {
     var storage: byte[64];
-    var buffer = FixedBuffer(@storage[0] as *var opaque, 64);
-    var handle = buffer.Handle();
+    // Safety: `storage` is a local of this function, so it outlives `buffer`, and nothing else
+    // touches it while the buffer hands it out.
+    var buffer = unsafe { FixedBuffer(@storage[0] as *var opaque, 64) };
+    // Safety: `handle` and `allocator` are used only in this function, while `buffer` lives and
+    // stays where it is.
+    var handle = unsafe { buffer.Handle() };
     let allocator: Allocator = handle;
 
     // Each point needs 16 bytes, so four fit.
     let layout = Layout::ForValue<Point>();
     var made: int64 = 0;
     loop {
-        match allocator.Allocate(layout) {
-            .Success(block) => {
-                made += 1;
-                let point = block as *var Point;
-                *point = Point { x: made, y: made * made };
-                PrintLine("point {} at ({}, {}), {} bytes left",
-                    made, point.x, point.y, buffer.BytesRemaining());
-            },
-            .Failure(error) => {
+        let block = try allocator.Allocate(layout) catch {
+            error => {
                 let full = error == AllocError::OutOfMemory;
                 PrintLine("point {} refused, out of memory: {}", made + 1, full);
                 break;
             }
-        }
+        };
+        made += 1;
+        // Safety: `block` is a fresh allocation of `Layout::ForValue<Point>()`, so it is aligned
+        // and large enough for one `Point`, and nothing else uses it.
+        let point = unsafe { block as *var Point };
+        // Safety: as above, `point` addresses fresh storage for one `Point`.
+        let (x, y) = unsafe {
+            *point = Point { x: made, y: made * made };
+            (point.x, point.y)
+        };
+        PrintLine("point {} at ({}, {}), {} bytes left", made, x, y, buffer.BytesRemaining());
     }
 
     // After a reset the next request starts again at the front of `storage`.
     buffer.Reset();
     PrintLine("after reset, {} bytes left", buffer.BytesRemaining());
-    let again = allocator.Allocate(layout)?;
+    let again = try allocator.Allocate(layout);
     PrintLine("starts at storage[0]: {}", (again as uint) == (@storage[0] as uint));
 }

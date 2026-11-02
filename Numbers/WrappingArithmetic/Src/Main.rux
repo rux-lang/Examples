@@ -4,9 +4,10 @@
 //     AddWrapping, SubWrapping, MulWrapping           wrap around, like a car's odometer
 //     AddSaturating, SubSaturating, MulSaturating     stop at the type's limit and stay there
 //
-// Wrapping computes exactly what `+`, `-` and `*` already do. The point of the name is the reader:
-// `AddWrapping` says "this wraps on purpose", so nobody mistakes it for a bug or "fixes" it.
-// Hashes, checksums and clock arithmetic all want it.
+// Plain `+`, `-` and `*` stop the program when a result overflows. Wrapping computes what the
+// operators `+%`, `-%` and `*%` do, and the point of the name is the reader: `AddWrapping` says
+// "this wraps on purpose", so nobody mistakes it for a bug or "fixes" it. Hashes, checksums and
+// clock arithmetic all want it.
 //
 // Saturating suits quantities with a natural ceiling and floor, such as a volume control, a
 // brightness or a health bar: adding to the maximum keeps it at the maximum, and taking from zero

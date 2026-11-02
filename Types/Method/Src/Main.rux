@@ -3,9 +3,15 @@
 // `card.Area()`. The value comes first, and the reader sees at once what is being asked about.
 //
 // Methods are declared in an `extend` block, apart from the struct, which stays a plain list of
-// fields. The value a method works on is its first parameter, which is always named `self` and
-// has its type written out like any other parameter. `self: &Rectangle` is the read-only
-// reference from the Reference lesson, so these methods may read the rectangle but not change it.
+// fields. The value a method works on is its first parameter, the receiver, which is always named
+// `self`. The `extend` block already says which type it is, so the receiver is written only by
+// how the method takes it: `&self` is the read-only reference from the Reference lesson, here a
+// `&Rectangle`, so these methods may read the rectangle but not change it. Writing the type out
+// is refused:
+//
+//     func Area(self: &Rectangle) -> float64 { ... }
+//         error: a receiver does not name its type
+//         help: write '&self'; the 'extend' block or interface gives the type
 import Io::PrintLine;
 
 struct Rectangle {
@@ -15,17 +21,17 @@ struct Rectangle {
 
 extend Rectangle {
     // Inside a method, fields are always reached through `self`. A bare `width` would be an
-    // unknown name: `self` is an ordinary parameter, not an implied scope.
-    func Area(self: &Rectangle) -> float64 {
+    // unknown name: `self` is a parameter, not an implied scope.
+    func Area(&self) -> float64 {
         return self.width * self.height;
     }
 
-    func IsSquare(self: &Rectangle) -> bool {
+    func IsSquare(&self) -> bool {
         return self.width == self.height;
     }
 
     // Further parameters come after `self`.
-    func FitsInside(self: &Rectangle, other: &Rectangle) -> bool {
+    func FitsInside(&self, other: &Rectangle) -> bool {
         return self.width <= other.width && self.height <= other.height;
     }
 }
@@ -37,7 +43,7 @@ struct Circle {
 // Each type has its own methods, so `Circle` can have an `Area` of its own without clashing with
 // the one on `Rectangle`. Which one runs is decided by the value before the dot.
 extend Circle {
-    func Area(self: &Circle) -> float64 {
+    func Area(&self) -> float64 {
         return 3.14159 * self.radius * self.radius;
     }
 }

@@ -12,6 +12,8 @@
 //
 // They work through pointers, as in the Memory part: a store writes from a pointer to the first
 // byte onwards, and a load reads from one and hands the value back through an out-parameter.
+// Nothing checks that the pointer has room for the value, so each call sits in `unsafe`, with a
+// `// Safety:` comment saying why the bytes are there.
 // The order is part of the data: bytes written big endian must be read big endian, on every
 // machine.
 import Core::{ LoadBigEndian, ReverseBytes, StoreBigEndian, StoreLittleEndian,
@@ -35,8 +37,11 @@ func Main() -> int {
 
     var little: uint8[4];
     var big: uint8[4];
-    StoreLittleEndian(value, @little[0]);
-    StoreBigEndian(value, @big[0]);
+    // Safety: `little` and `big` are four writable bytes each, the size of a `uint32`.
+    unsafe {
+        StoreLittleEndian(value, @little[0]);
+        StoreBigEndian(value, @big[0]);
+    }
     ShowBytes("little endian ", little[..]);
     ShowBytes("big endian    ", big[..]);
 
@@ -47,7 +52,8 @@ func Main() -> int {
     // Reading: two bytes from a network packet, where a port number is big endian.
     let packet: uint8[2] = [0x01, 0xBB];
     var port: uint16 = 0;
-    LoadBigEndian(@packet[0], @port);
+    // Safety: `packet` holds two readable bytes, the size of the `uint16` written to `port`.
+    unsafe { LoadBigEndian(@packet[0], @port); }
     PrintLine("port           {}", port);
 
     // The same bytes read in the wrong order give a different number entirely.

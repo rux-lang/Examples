@@ -17,11 +17,11 @@ struct Player {
 }
 
 extend Player {
-    func ==(self: &Player, other: Player) -> bool {
+    func ==(&self, other: Player) -> bool {
         return self.score == other.score;
     }
 
-    func <(self: &Player, other: Player) -> bool {
+    func <(&self, other: Player) -> bool {
         return self.score < other.score;
     }
 }

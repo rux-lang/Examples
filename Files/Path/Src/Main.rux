@@ -11,10 +11,11 @@
 // separators count as one, so splitting the text on "/" by hand would invent empty pieces.
 // Nothing here asks the filesystem anything: a path need not name a file that exists.
 //
-// Text goes in through `OsString::FromText` and comes back out through `ToText`. Both return
-// `T ! TextError`, and the way out is the one that can really fail: a name from the system may
-// not be text at all. `{}` shows a path anyway, swapping any unit that is not text for U+FFFD,
-// which is fine for a message and useless for reopening the file.
+// Text goes in through `OsString::FromText` and comes back out through `ToText`. Only the way
+// out declares `throws TextError`, because it is the one that can really fail: a name from the
+// system may not be text at all, while valid text always makes a name. `{}` shows a path
+// anyway, swapping any unit that is not text for U+FFFD, which is fine for a message and useless
+// for reopening the file.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::{ Print, PrintLine };
 import Path::{ OsString, OsStringView, Path };
@@ -23,16 +24,16 @@ import Text::TextError;
 // The named parts are optional: a root has no file name, and `Makefile` has no extension.
 func ShowPart(label: char8[..], part: OsStringView?) {
     match part {
-        name? => PrintLine("{:10} {}", label, name),
+        .Some(name) => PrintLine("{:10} {}", label, name),
         none => PrintLine("{:10} (none)", label)
     }
 }
 
-func Main() -> ! TextError {
+func Main() throws TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    var holder = OsString::FromText(allocator, "Bin//reports/summary.txt")?;
+    var holder = OsString::FromText(allocator, "Bin//reports/summary.txt");
     let path = Path::FromView(holder.View());
     PrintLine("{:10} {}", "path", path);
 
@@ -52,6 +53,6 @@ func Main() -> ! TextError {
     PrintLine("{:10} {}", "parent", parent);
 
     // The exact conversion back to text. It succeeds here because the name began as text.
-    let text = path.AsView().ToText(allocator)?;
-    PrintLine("{:10} {}", "as text", text);
+    let text = try path.AsView().ToText(allocator);
+    PrintLine("{:10} {}", "as text", text.View());
 }

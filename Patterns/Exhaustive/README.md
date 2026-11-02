@@ -1,6 +1,6 @@
 # Exhaustive
 
-See why a match on a variant must name every case, and why an integer match needs `else`.
+See why a match on a variant must name every case, and why an integer match needs a `_` arm.
 
 **You'll need:** [Enum](https://rux-lang.dev/docs/learn/enum), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match), [Guard](https://rux-lang.dev/docs/learn/guard), [RangePattern](https://rux-lang.dev/docs/learn/range-pattern)
 

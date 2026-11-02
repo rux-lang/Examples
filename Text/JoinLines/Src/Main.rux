@@ -12,7 +12,7 @@ import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Text::{ FoldCase, Join, StringView, TextError, ToLower, ToUpper };
 
-func Main() -> ! TextError {
+func Main() throws TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -41,8 +41,8 @@ func Main() -> ! TextError {
     }
 
     // Four names, three separators. `Join` allocates the result once, at its final length.
-    let joined = Join(allocator, names[..kept], StringView::FromValidated(", "))?;
-    PrintLine("joined   {}", joined);
+    let joined = Join(allocator, names[..kept], StringView::FromValidated(", "));
+    PrintLine("joined   {}", joined.View());
 
     // The parts and the separator are views, not bare literals. Passing ", " as it is fails:
     //
@@ -51,10 +51,10 @@ func Main() -> ! TextError {
 
     // Case changes make new text. `ß` has no single capital letter, so in upper case it becomes
     // "SS": six characters in, seven out.
-    let upper = ToUpper(allocator, StringView::FromValidated("Straße"))?;
-    let lower = ToLower(allocator, StringView::FromValidated("ÉCOLE"))?;
-    PrintLine("upper    {} ({} characters)", upper, upper.View().ScalarCount());
-    PrintLine("lower    {}", lower);
+    let upper = try ToUpper(allocator, StringView::FromValidated("Straße"));
+    let lower = try ToLower(allocator, StringView::FromValidated("ÉCOLE"));
+    PrintLine("upper    {} ({} characters)", upper.View(), upper.View().ScalarCount());
+    PrintLine("lower    {}", lower.View());
 
     // To compare without regard to case, fold both sides and compare the folds with `Equals`.
     // Folding the query once and each name once finds "grace hopper" however it was typed.
@@ -62,16 +62,16 @@ func Main() -> ! TextError {
     //
     //     error: structural equality for 'String' is unavailable because element type
     //     'Allocator' has no '==' operator
-    let query = FoldCase(allocator, StringView::FromValidated("GRACE HOPPER"))?;
+    let query = try FoldCase(allocator, StringView::FromValidated("GRACE HOPPER"));
     for i in 0..kept {
-        let folded = FoldCase(allocator, names[i])?;
+        let folded = try FoldCase(allocator, names[i]);
         if folded.Equals(query) {
             PrintLine("found    {} at position {}", names[i], i + 1);
         }
     }
 
     // `Straße` and `STRASSE` differ in case and in length, and still fold to the same text.
-    let street = FoldCase(allocator, StringView::FromValidated("Straße"))?;
-    let shouted = FoldCase(allocator, StringView::FromValidated("STRASSE"))?;
+    let street = try FoldCase(allocator, StringView::FromValidated("Straße"));
+    let shouted = try FoldCase(allocator, StringView::FromValidated("STRASSE"));
     PrintLine("same     {}", street.Equals(shouted));
 }

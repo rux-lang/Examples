@@ -1,6 +1,6 @@
 # DefaultArgument
 
-Give a parameter a default value so calls can leave that argument out.
+Give a parameter a default value so calls can leave that argument out, and name an argument to skip the defaults before it.
 
 **You'll need:** [Function](https://rux-lang.dev/docs/learn/function), [Return](https://rux-lang.dev/docs/learn/return), [Character](https://rux-lang.dev/docs/learn/character)
 
@@ -15,6 +15,7 @@ Clamp(150)          100
 Clamp(-5)           0
 Clamp(42, 50)       50
 Clamp(150, 0, 255)  150
+Clamp(150, high: 255) 150
 ------------
 -----
 =====

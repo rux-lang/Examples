@@ -1,7 +1,6 @@
 # StringLiteral
 
-See that a string literal is a read-only `char8[..]` slice: its length counts bytes, escapes
-write awkward characters, and changing text means copying it first.
+See that a string literal is a read-only `char8[..]` slice: its length counts bytes, escapes write awkward characters, and changing text means copying it first.
 
 **You'll need:** [Character](https://rux-lang.dev/docs/learn/character), [For](https://rux-lang.dev/docs/learn/for), [Slice](https://rux-lang.dev/docs/learn/slice), [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice)
 

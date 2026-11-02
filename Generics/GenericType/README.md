@@ -1,7 +1,6 @@
 # GenericType
 
-Declare a struct and a variant that take a type parameter — `Pair<T>`, `Reading<T>` — and
-use them at several types.
+Declare a struct and a variant that take a type parameter — `Pair<T>`, `Reading<T>` — and use them at several types.
 
 **You'll need:** [Generic](https://rux-lang.dev/docs/learn/generic), [Struct](https://rux-lang.dev/docs/learn/struct), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
 

@@ -40,8 +40,8 @@ func IsPrime(value: uint64) -> bool {
 }
 
 func Store(results: &Mutex<Results>, slot: uint, count: uint64) {
-    let guard = results.Lock();
-    guard.Get().primes[slot] = count;
+    var guard = results.Lock();
+    guard.GetMutable().primes[slot] = count;
 }
 
 func CountPrimes(job: Job) -> () {
@@ -69,11 +69,11 @@ func Main() -> int {
         // The job holds handles, so it cannot be copied and is moved in. `Spawn(CountPrimes, job)`
         // is refused:
         //
-        //     error: move-only value 'job' requires an explicit '<-' in argument
-        //     help: prefix the argument with '<-', as in 'Take(<-job)'
+        //     error: cannot copy 'Job', which owns resources
+        //     help: write 'move job' to transfer it, or 'job.Clone()' to copy it
         //
         // Nobody joins these threads, so their handles are let go at once.
-        var worker = Spawn(CountPrimes, <-job) catch { else => return 1 };
+        var worker = try Spawn(CountPrimes, move job) catch { _ => return 1 };
         worker.Detach();
     }
 

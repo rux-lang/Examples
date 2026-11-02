@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "AbsenceToError"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Turn a missing value into a failure with ?? fail"
+Description = "Turn a missing value into an error with ?? throw"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

@@ -6,17 +6,18 @@
 // copied, and the function sees the caller's value as it is right now. Written with `&var`, the
 // borrow is writable, so a change made through the interface lands on the caller's own variable.
 //
-// The interface has to say which of its requirements write. A requirement with no `self` only
-// reads the value; one that changes it declares `self: &var Self`, where `Self` stands for
-// whichever type implements the interface. Leave that out and every `Adjust` below is refused:
-// "method 'Adjust' of 'Thermostat' writes through its receiver, but requirement 'Adjust' of
-// interface 'Gauge' only reads it".
+// The interface has to say which of its requirements write. A requirement with no receiver, or
+// with `&self`, only reads the value; one that changes it declares the receiver `&var self`, which
+// borrows whichever type implements the interface for writing. Leave that out and every `Adjust`
+// below is refused: "method 'Adjust' of 'Thermostat' writes through its receiver, but requirement
+// 'Adjust' of interface 'Gauge' only reads it", with the help "declare '&var self' on requirement
+// 'Adjust' in interface 'Gauge', or take '&self'".
 import Io::PrintLine;
 
 interface Gauge {
     func Label() -> char8[..];
     func Read() -> int32;
-    func Adjust(self: &var Self, amount: int32);
+    func Adjust(&var self, amount: int32);
 }
 
 struct Thermostat {
@@ -28,31 +29,31 @@ struct Volume {
 }
 
 extend Thermostat : Gauge {
-    func Label(self: &Thermostat) -> char8[..] {
+    func Label(&self) -> char8[..] {
         return "thermostat";
     }
 
-    func Read(self: &Thermostat) -> int32 {
+    func Read(&self) -> int32 {
         return self.degrees;
     }
 
-    // Adjusting changes the value, so this method takes `&var` self.
-    func Adjust(self: &var Thermostat, amount: int32) {
+    // Adjusting changes the value, so this method takes `&var self`.
+    func Adjust(&var self, amount: int32) {
         self.degrees += amount;
     }
 }
 
 extend Volume : Gauge {
-    func Label(self: &Volume) -> char8[..] {
+    func Label(&self) -> char8[..] {
         return "volume";
     }
 
-    func Read(self: &Volume) -> int32 {
+    func Read(&self) -> int32 {
         return self.level;
     }
 
     // A volume knob stops at 10, however far it is turned.
-    func Adjust(self: &var Volume, amount: int32) {
+    func Adjust(&var self, amount: int32) {
         self.level += amount;
         if self.level > 10 {
             self.level = 10;
@@ -67,7 +68,7 @@ func Show(gauge: &Gauge) {
 
 // Calls `Adjust`, which changes the value, so the borrow must be writable too. Written as
 // `gauge: &Gauge`, the call below is refused: "cannot call 'Adjust' through immutable reference
-// '&Gauge'".
+// '&Gauge'", with the help "declare the reference as '&var Gauge'".
 func TurnUp(gauge: &var Gauge, amount: int32) {
     gauge.Adjust(amount);
 }

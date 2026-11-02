@@ -5,15 +5,15 @@
 // A program describes what it accepts as plain values: a `CommandSpec` with its options —
 // `Flag`s that are present or not, `ValueOption`s that take a value — its positional
 // arguments — `Required`, `Optional` or `Remaining` — and its subcommands. `Parse` checks a
-// list of arguments against that description and returns `Parsed ! CommandLineError`; the
-// parse then answers questions such as `Has`, `Count`, `Value` and `Positional`. The same
-// description writes the help text, so the two can never disagree.
+// list of arguments against that description and returns a `Parsed`, or throws a
+// `CommandLineError`; the parse then answers questions such as `Has`, `Count`, `Value` and
+// `Positional`. The same description writes the help text, so the two can never disagree.
 //
 // `ParseProcess` reads the program's own arguments. To print the same thing on every run, this
 // lesson mostly parses fixed lists instead, written as one string and split at the spaces.
 import Allocator::{ Allocator, SystemAllocator };
 import CommandLine::{
-    Command, CommandSpec, Flag, OptionSpec, Optional, Parse, Parsed, ParseProcess, PositionalSpec,
+    Command, CommandLineError, CommandSpec, Flag, OptionSpec, Optional, Parse, Parsed, ParseProcess, PositionalSpec,
     Remaining, Required, ValueOption, WriteUsage
 };
 import Io::{ ConsoleWriter, IoError, PrintLine };
@@ -45,23 +45,25 @@ func IsCommand(parsed: &Parsed, word: char8[..]) -> bool {
 
 // What the program would do with a successful parse. Asking for help is a successful parse too,
 // and `WriteHelp` on a subcommand's parse names the command above it.
-func Describe(parsed: &Parsed, screen: &var TextWriter) -> ! FormatError {
+func Describe(parsed: &Parsed, screen: &var TextWriter) throws FormatError {
     if parsed.HelpRequested() {
-        parsed.WriteHelp(screen)?;
+        try parsed.WriteHelp(screen);
         return;
     }
     let verbose = parsed.Count("verbose");
     let sub = parsed.Subcommand() ?? return;
     if sub.HelpRequested() {
-        sub.WriteHelp(screen)?;
+        try sub.WriteHelp(screen);
         return;
     }
     if IsCommand(parsed, "add") {
         // `Integer` reads a value as a number, and fails when it is not one.
-        match sub.Integer("priority") {
-            .Success(priority) => PrintLine("  add [{}] priority {}, verbosity {}",
-                sub.Positional("title") ?? OsStringView(), priority ?? 3, verbose),
-            .Failure(error) => PrintLine("  error: {}", error)
+        try {
+            let priority = sub.Integer("priority");
+            PrintLine("  add [{}] priority {}, verbosity {}", sub.Positional("title") ?? OsStringView(),
+                priority ?? 3, verbose);
+        } catch {
+            error => PrintLine("  error: {}", error)
         }
         for tag in sub.Positionals("tags") {
             PrintLine("  tag {}", tag);
@@ -72,9 +74,9 @@ func Describe(parsed: &Parsed, screen: &var TextWriter) -> ! FormatError {
     }
 }
 
-func Try(spec: *CommandSpec, allocator: Allocator, line: char8[..]) -> ! (TextError | FormatError) {
+func Try(spec: *CommandSpec, allocator: Allocator, line: char8[..]) throws (TextError | FormatError) {
     PrintLine("$ todo {}", line);
-    var holder = OsString::FromText(allocator, line)?;
+    var holder = OsString::FromText(allocator, line);
     var words: OsStringView[8] = [OsStringView(); 8];
     let count = Split(holder.View(), words[..]);
 
@@ -82,13 +84,16 @@ func Try(spec: *CommandSpec, allocator: Allocator, line: char8[..]) -> ! (TextEr
     var failure: IoError? = none;
     var console = ConsoleWriter(@failure);
     let screen: &var TextWriter = console;
-    match Parse(spec, words[..count]) {
-        .Success(parsed) => Describe(parsed, screen)?,
-        .Failure(error) => PrintLine("  error: {}", error)
+    try {
+        let parsed = Parse(spec, words[..count]);
+        Describe(parsed, screen);
+    } catch {
+        error: CommandLineError => PrintLine("  error: {}", error),
+        error: FormatError => throw error
     }
 }
 
-func Main() -> ! (TextError | FormatError) {
+func Main() throws (TextError | FormatError) {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -109,18 +114,18 @@ func Main() -> ! (TextError | FormatError) {
         .WithOptions(options[..]).WithCommands(commands[..]);
 
     // Lines that parse, and lines that do not.
-    Try(@todo, allocator, "add milk")?;
-    Try(@todo, allocator, "-vv add --priority=1 milk shop home")?;
-    Try(@todo, allocator, "list -a home")?;
-    Try(@todo, allocator, "add -p high milk")?;
-    Try(@todo, allocator, "add")?;
-    Try(@todo, allocator, "add -x milk")?;
-    Try(@todo, allocator, "remove milk")?;
-    Try(@todo, allocator, "list home work")?;
+    try Try(@todo, allocator, "add milk");
+    try Try(@todo, allocator, "-vv add --priority=1 milk shop home");
+    try Try(@todo, allocator, "list -a home");
+    try Try(@todo, allocator, "add -p high milk");
+    try Try(@todo, allocator, "add");
+    try Try(@todo, allocator, "add -x milk");
+    try Try(@todo, allocator, "remove milk");
+    try Try(@todo, allocator, "list home work");
 
     // The help text, written from the same description, for the program and for a subcommand.
-    Try(@todo, allocator, "--help")?;
-    Try(@todo, allocator, "add -h")?;
+    try Try(@todo, allocator, "--help");
+    try Try(@todo, allocator, "add -h");
 
     // And this run's own arguments. `rux run` passes none, and a command is required, so this
     // ends the way a real program would: the reason, then the usage line.
@@ -128,12 +133,15 @@ func Main() -> ! (TextError | FormatError) {
     var failure: IoError? = none;
     var console = ConsoleWriter(@failure);
     let screen: &var TextWriter = console;
-    match ParseProcess(@todo) {
-        .Success(parsed) => Describe(parsed, screen)?,
-        .Failure(error) => {
+    try {
+        let parsed = ParseProcess(@todo);
+        Describe(parsed, screen);
+    } catch {
+        error: CommandLineError => {
             PrintLine("error: {}", error);
-            WriteUsage(todo, screen)?;
-        }
+            try WriteUsage(todo, screen);
+        },
+        error: FormatError => throw error
     }
 
     // A slice cannot be compared with `==`, which is why `IsCommand` compares `StringView`s:

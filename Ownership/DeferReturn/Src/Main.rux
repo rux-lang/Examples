@@ -22,7 +22,7 @@ struct Dispenser {
 
 extend Dispenser {
     // Returns the current ticket, then advances the dispenser.
-    func Take(self: &var Dispenser) -> int32 {
+    func Take(&var self) -> int32 {
         defer self.next += 1;
         return self.next;
     }

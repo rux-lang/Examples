@@ -1,9 +1,8 @@
 # DateTime
 
-Pair a `DateTime` with a `UtcOffset` to name one moment, and read and write it as RFC 3339 text
-with `ParseRfc3339`.
+Pair a `DateTime` with a `UtcOffset` to name one moment, and read and write it as RFC 3339 text with `ParseRfc3339`.
 
-**You'll need:** [Date](https://rux-lang.dev/docs/learn/date), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
+**You'll need:** [Date](https://rux-lang.dev/docs/learn/date), [Catch](https://rux-lang.dev/docs/learn/catch), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
 
 ```sh
 rux run

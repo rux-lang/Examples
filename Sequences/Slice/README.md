@@ -1,7 +1,6 @@
 # Slice
 
-Pass arrays of any length to one function through a read-only view, `int32[..]`, and take views of
-part of an array with ranges.
+Pass arrays of any length to one function through a read-only view, `int32[..]`, and take views of part of an array with ranges.
 
 **You'll need:** [Array](https://rux-lang.dev/docs/learn/array), [Function](https://rux-lang.dev/docs/learn/function)
 

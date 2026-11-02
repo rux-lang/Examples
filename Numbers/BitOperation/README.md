@@ -1,7 +1,6 @@
 # BitOperation
 
-Ask questions about bits with `CountOnes`, `LeadingZeros` and `TrailingZeros`, and turn them around
-with `RotateLeft` and `RotateRight`.
+Ask questions about bits with `CountOnes`, `LeadingZeros` and `TrailingZeros`, and turn them around with `RotateLeft` and `RotateRight`.
 
 **You'll need:** [Bitwise](https://rux-lang.dev/docs/learn/bitwise), [Shift](https://rux-lang.dev/docs/learn/shift)
 

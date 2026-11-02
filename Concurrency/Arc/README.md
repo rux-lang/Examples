@@ -1,7 +1,6 @@
 # Arc
 
-Share one value between threads with `Arc<T>`, a counted handle whose copies may be made and dropped
-on any thread, and change what must change inside it through an `Atomic<T>`.
+Share one value between threads with `Arc<T>`, a counted handle whose clones may be made and dropped on any thread, and change what must change inside it through an `Atomic<T>`.
 
 **You'll need:** [Rc](https://rux-lang.dev/docs/learn/rc), [Thread](https://rux-lang.dev/docs/learn/thread), [Atomic](https://rux-lang.dev/docs/learn/atomic)
 

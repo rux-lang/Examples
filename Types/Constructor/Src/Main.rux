@@ -26,11 +26,11 @@ extend Time {
         return Time { hours: inDay / 60, minutes: inDay % 60 };
     }
 
-    func TotalMinutes(self: &Time) -> int {
+    func TotalMinutes(&self) -> int {
         return self.hours * 60 + self.minutes;
     }
 
-    func Show(self: &Time) {
+    func Show(&self) {
         PrintLine("{:02}:{:02}", self.hours, self.minutes);
     }
 }

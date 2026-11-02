@@ -13,5 +13,4 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 Allocator = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Text = { Namespace = "Rux", Version = "*" }
-Time = { Namespace = "Rux", Version = "*" }
 Toml = { Namespace = "Rux", Version = "*" }

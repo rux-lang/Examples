@@ -1,7 +1,7 @@
 // `TomlWriteDocument` turns a `TomlValue` table back into TOML text, written into any
 // `TextWriter`:
 //
-//     TomlWriteDocument(writer, table) -> ! FormatError
+//     TomlWriteDocument(writer, table) throws FormatError
 //
 // The parser keeps values, not spelling, so writing a parsed document back gives an equivalent
 // document rather than the same file. Comments and blank lines are gone, `0xFF` becomes `255`,
@@ -13,26 +13,26 @@
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Text::{ FormatError, String, StringBuilder, StringView, TextError, TextWriter };
-import Toml::{ TomlParse, TomlParseFailure, TomlValue, TomlWriteDocument };
+import Toml::{ TomlError, TomlParse, TomlParseFailure, TomlValue, TomlWriteDocument };
 
-func Lines(allocator: Allocator, lines: char8[..][..]) -> String ! TextError {
+func Lines(allocator: Allocator, lines: char8[..][..]) -> String {
     var builder = StringBuilder(allocator);
     for i in 0..lines.length {
-        builder.Append(lines[i])?;
-        builder.Append("\n")?;
+        builder.Append(lines[i]);
+        builder.Append("\n");
     }
-    return builder.IntoString();
+    return builder.TakeString();
 }
 
 // Writes `table` as TOML and hands the text back as a String the caller owns.
-func Written(allocator: Allocator, table: &TomlValue) -> String ! FormatError {
+func Written(allocator: Allocator, table: &TomlValue) -> String throws FormatError {
     var builder = StringBuilder(allocator);
     let sink: &var TextWriter = builder;
-    TomlWriteDocument(sink, table)?;
-    return builder.IntoString();
+    try TomlWriteDocument(sink, table);
+    return builder.TakeString();
 }
 
-func Main() -> ! (TextError | FormatError | TomlParseFailure) {
+func Main() throws (TextError | FormatError | TomlParseFailure | TomlError) {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -45,21 +45,23 @@ func Main() -> ! (TextError | FormatError | TomlParseFailure) {
         "",
         "tags = [\"web\", \"api\"]"
     ];
-    let text = Lines(allocator, lines)?;
-    PrintLine("read:\n{}", text);
-    var root = TomlParse(allocator, text.View().Bytes())?;
+    let text = Lines(allocator, lines);
+    PrintLine("read:\n{}", text.View());
+    var root = try TomlParse(allocator, text.View().Bytes());
 
-    // Change the tree before writing it. `FindMutable` lends a table for changing, and
-    // `Insert` takes ownership of a new key and value.
-    let server = root.FindMutable(StringView::FromValidated("server"));
-    (*server).Insert(String::FromBytes(allocator, "debug")?, TomlValue::Boolean(allocator, true));
+    // Change the tree before writing it. `FindMutable` lends a table for changing, or answers
+    // `none` when the key is missing, and `Insert` takes ownership of a new key and value. It
+    // throws `TomlError::WrongKind` when the value it is asked of is not a table.
+    if root.FindMutable(StringView::FromValidated("server")) is .Some(server) {
+        try server.Insert(String::FromBytes(allocator, "debug"), TomlValue::Boolean(allocator, true));
+    }
 
-    let once = Written(allocator, root)?;
-    PrintLine("written:\n{}", once);
+    let once = try Written(allocator, root);
+    PrintLine("written:\n{}", once.View());
 
     // Read the output back and write it again: nothing moves the second time.
-    let again = TomlParse(allocator, once.View().Bytes())?;
-    let twice = Written(allocator, again)?;
+    let again = try TomlParse(allocator, once.View().Bytes());
+    let twice = try Written(allocator, again);
     let first = once.View();
     PrintLine("written twice, same text: {}", twice.View().Equals(first));
 }

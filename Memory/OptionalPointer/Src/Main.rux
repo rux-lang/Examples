@@ -25,9 +25,10 @@ func Find(values: var int[..], wanted: int) -> (*var int)? {
 }
 
 // Keeps the largest value seen so far in the caller's `int?`, which starts out empty.
-func KeepLargest(best: *var int?, value: int) {
+// Safety: `best` must address a live `int?` that nothing else is using during the call.
+unsafe func KeepLargest(best: *var int?, value: int) {
     let current = *best ?? value;
-    *best = value > current ? value : current;
+    *best = if value > current { value } else { current };
 }
 
 func Main() -> int {
@@ -35,8 +36,9 @@ func Main() -> int {
 
     // Absence has to be handled before the address can be used.
     match Find(scores[..], 3) {
-        found? => {
-            *found = 30;
+        .Some(found) => {
+            // Safety: `found` addresses an element of `scores`, which is alive and not borrowed.
+            unsafe { *found = 30; }
             PrintLine("found 3, changed it to {}", scores[1]);
         },
         none => {
@@ -44,8 +46,9 @@ func Main() -> int {
         }
     }
     match Find(scores[..], 5) {
-        found? => {
-            *found = 50;
+        .Some(found) => {
+            // Safety: as above, `found` addresses an element of `scores`.
+            unsafe { *found = 50; }
         },
         none => {
             PrintLine("5 is not there");
@@ -56,7 +59,8 @@ func Main() -> int {
     var best: int? = none;
     PrintLine("best before: {}", best ?? -1);
     for score in scores {
-        KeepLargest(@best, score);
+        // Safety: `@best` addresses the live local `best`, which nothing else uses meanwhile.
+        unsafe { KeepLargest(@best, score); }
     }
     PrintLine("best after:  {}", best ?? -1);
 

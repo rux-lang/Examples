@@ -6,7 +6,7 @@
 // values. The everyday use is a queue: work joins at the back and is served from the front,
 // which is exactly the pair of operations a vector is bad at.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, Deque };
+import Collections::Deque;
 import Io::{ Print, PrintLine };
 
 func Show(label: char8[..], queue: &Deque<int>) {
@@ -17,21 +17,21 @@ func Show(label: char8[..], queue: &Deque<int>) {
     PrintLine();
 }
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
     var queue = Deque<int>(allocator);
 
-    // Tickets join at the back, in the order they arrive. Each push may need more room, and so
-    // can fail; `?` hands that failure to `Main`.
-    queue.PushBack(101)?;
-    queue.PushBack(102)?;
-    queue.PushBack(103)?;
+    // Tickets join at the back, in the order they arrive. A push may need more room, which the
+    // deque asks its allocator for.
+    queue.PushBack(101);
+    queue.PushBack(102);
+    queue.PushBack(103);
     Show("arrived", queue);
 
     // An urgent ticket jumps the line by going in at the front.
-    queue.PushFront(900)?;
+    queue.PushFront(900);
     Show("urgent", queue);
 
     // Serving takes from the front. Both pops return an optional, `int?`, since an empty deque
@@ -45,7 +45,7 @@ func Main() -> ! CollectionError {
 
     PrintLine("served   {}", queue.PopFront() ?? -1);
     match queue.PopFront() {
-        ticket? => PrintLine("served   {}", ticket),
+        .Some(ticket) => PrintLine("served   {}", ticket),
         none => PrintLine("empty    nobody is waiting")
     }
 

@@ -8,25 +8,27 @@
 //
 // Two things differ from `Alloc`. A request is a `Layout`, a size and an alignment together,
 // built here by `Layout::ForArray<T>(count)`. And failure is a real error, not a `null`:
-// `Allocate` returns `(*var opaque) ! AllocError`, so there is no address to misuse until the
-// failure has been handled. A block must go back through `Deallocate` with the same layout it
-// was asked for with.
+// `Allocate` is declared `-> *var opaque throws AllocError`, so there is no address to misuse
+// until the failure has been handled. A block must go back through `Deallocate` with the same
+// layout it was asked for with.
 import Allocator::{ AllocError, Allocator, Layout, SystemAllocator };
 import Io::PrintLine;
 
 // Borrows `count` numbers' worth of memory, uses it, and gives it back.
-func SumOfSquares(allocator: Allocator, count: uint) -> int64 ! AllocError {
+func SumOfSquares(allocator: Allocator, count: uint) -> int64 throws AllocError {
     // `ForArray` is `none` when `count` elements could not even be described.
-    let layout = Layout::ForArray<int64>(count) ?? fail AllocError::Unsupported;
+    let layout = Layout::ForArray<int64>(count) ?? throw AllocError::Unsupported;
 
-    // `?` passes a refusal on to the caller. Past this line, `block` is real storage.
-    let block = allocator.Allocate(layout)?;
+    // `try` passes a refusal on to the caller. Past this line, `block` is real storage.
+    let block = try allocator.Allocate(layout);
 
     // Registered at once, so every path out returns the block with its layout. A refused release
     // here would be the allocator's own bug, and there is nobody to report it to.
-    defer allocator.Deallocate(block, layout) catch { else => {} };
+    defer try allocator.Deallocate(block, layout) catch { _ => {} };
 
-    let numbers = (block as *var int64)[..count];
+    // Safety: `block` is a live allocation of `layout`, which holds `count` `int64`s at their
+    // alignment, and it stays allocated until the deferred release at the end of this function.
+    let numbers = unsafe { (block as *var int64)[..count] };
     var total: int64 = 0;
     for i in 0..count {
         numbers[i] = (i * i) as int64;
@@ -44,9 +46,11 @@ func Reason(error: AllocError) -> char8[..] {
 }
 
 func Try(allocator: Allocator, count: uint) {
-    match SumOfSquares(allocator, count) {
-        .Success(total) => PrintLine("{} squares add up to {}", count, total),
-        .Failure(error) => PrintLine("{} squares: refused, {}", count, Reason(error))
+    try {
+        let total = try SumOfSquares(allocator, count);
+        PrintLine("{} squares add up to {}", count, total);
+    } catch {
+        error => PrintLine("{} squares: refused, {}", count, Reason(error))
     }
 }
 

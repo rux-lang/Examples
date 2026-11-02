@@ -1,14 +1,26 @@
 // `if` chooses which statements run. Sometimes the choice is smaller than that: one of two
-// *values*, in the middle of an expression. `condition ? whenTrue : whenFalse` makes that choice.
-// It is an expression, so it goes anywhere a value goes.
+// *values*, in the middle of an expression. Rux makes that choice with `if` itself: written where
+// a value is expected, `if condition { whenTrue } else { whenFalse }` is an expression, and each
+// branch ends with the value it gives, written without a `;`. It goes anywhere a value goes.
 //
-// The whole conditional is one value with one type, so both sides must have the same type:
+// Many languages spell this `condition ? whenTrue : whenFalse`. Rux has no such operator, and the
+// compiler points at the `if` that replaces it:
 //
-//     let answer = ready ? "yes" : 0;
-//         error: conditional branch type mismatch: expected 'char8[..]', found 'int'
-//         help: make both branches produce the same type
+//     let answer = ready ? "yes" : "no";
+//         error: the conditional operator 'c ? a : b' is not supported
+//         help: write 'if c { a } else { b }'
 //
-// Give both sides text, or both numbers.
+// The whole `if` is one value with one type, so both branches must have the same type, and there
+// must be an `else`, or there would be no value when the condition is false:
+//
+//     let answer = if ready { "yes" } else { 0 };
+//         error: 'if' branch type mismatch: expected 'char8[..]', found 'int'
+//
+//     let answer = if ready { "yes" };
+//         error: an 'if' used as a value needs an 'else' branch
+//         help: add 'else { ... }' with the value for when the condition is false
+//
+// Give both branches text, or both numbers.
 import Io::PrintLine;
 
 func Main() -> int {
@@ -23,27 +35,27 @@ func Main() -> int {
         labelTheLongWay = "odd";
     }
 
-    // Written as a conditional, the binding gets its value where it is declared, so it can be a
+    // Written as an `if` value, the binding gets its value where it is declared, so it can be a
     // `let`. That is the real gain, more than the shorter line.
-    let label = n % 2 == 0 ? "even" : "odd";
+    let label = if n % 2 == 0 { "even" } else { "odd" };
     PrintLine("{} is {} ({} the long way)", n, label, labelTheLongWay);
 
     // Being a value, it can be passed straight to a call or used inside arithmetic.
     let a: int32 = 3;
     let b: int32 = 5;
-    PrintLine("the larger of {} and {} is {}", a, b, a > b ? a : b);
+    PrintLine("the larger of {} and {} is {}", a, b, if a > b { a } else { b });
 
     let count: int32 = 3;
-    PrintLine("{} item{}", count, count == 1 ? "" : "s");
+    PrintLine("{} item{}", count, if count == 1 { "" } else { "s" });
 
     let price: int32 = 40;
     let member = true;
-    let total = price - (member ? 5 : 0);
+    let total = price - (if member { 5 } else { 0 });
     PrintLine("members pay {}", total);
 
-    // A conditional may take the place of the false side of another, which reads as a list of
-    // cases tested from the left. Past two or three cases, an `else if` chain is clearer.
-    let sign = n < 0 ? "negative" : n == 0 ? "zero" : "positive";
+    // An `else if` chain is a value too, and reads as a list of cases tested from the top. Past
+    // two or three cases, a statement chain or a `match` is clearer.
+    let sign = if n < 0 { "negative" } else if n == 0 { "zero" } else { "positive" };
     PrintLine("{} is {}", n, sign);
     return 0;
 }

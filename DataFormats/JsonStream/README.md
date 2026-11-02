@@ -2,7 +2,7 @@
 
 Read JSON as a stream of events with `JsonEventReader`, keeping only the fields you want and stopping cleanly on a broken document.
 
-**You'll need:** [Json](https://rux-lang.dev/docs/learn/json), [InterfaceValue](https://rux-lang.dev/docs/learn/interface-value), [Destructor](https://rux-lang.dev/docs/learn/destructor), [ErrorSum](https://rux-lang.dev/docs/learn/error-sum), [TypedPattern](https://rux-lang.dev/docs/learn/typed-pattern), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
+**You'll need:** [Json](https://rux-lang.dev/docs/learn/json), [InterfaceValue](https://rux-lang.dev/docs/learn/interface-value), [Destructor](https://rux-lang.dev/docs/learn/destructor), [Catch](https://rux-lang.dev/docs/learn/catch), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match), [Optional](https://rux-lang.dev/docs/learn/optional)
 
 ```sh
 rux run

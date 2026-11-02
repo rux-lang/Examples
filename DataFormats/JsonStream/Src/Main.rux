@@ -9,14 +9,15 @@
 //   - Lifetimes. `Text()` borrows the reader's buffer, which the next `Next()` reuses, so the text
 //     of an event must be used or copied before asking for another. The reader owns that buffer,
 //     and its destructor gives it back however the function holding it ends.
-//   - Errors. `Next()` answers `JsonEvent::Error` when the document goes wrong, and `Failure()`
-//     then says why and at which byte of the whole document, however it was split into reads.
-//     A source that fails is reported as `JsonParseError::Source`, its own `IoError` kept by
-//     `SourceError()`. Events before the mistake were already delivered, so a program must be
-//     ready to find out late that its input was bad.
+//   - Errors. `Next()` answers `none` at the end of the document and throws a `JsonReadError`
+//     when the document goes wrong. Its `Malformed` case holds the `JsonParseError` that says why
+//     and at which byte of the whole document, however it was split into reads; a source that
+//     fails is its `Source` case, with the source's own `IoError` and how far it got. Events
+//     before the mistake were already delivered, so a program must be ready to find out late
+//     that its input was bad.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::{ IoError, IoErrorKind, PrintLine, Reader };
-import Json::{ JsonEvent, JsonEventReader, JsonLimits, JsonParseError };
+import Json::{ JsonEvent, JsonEventReader, JsonLimits, JsonReadError };
 import Text::StringView;
 
 // Stands in for a file or a socket: serves its text at most 8 bytes per read, so tokens arrive
@@ -27,10 +28,10 @@ struct TextSource {
 }
 
 extend TextSource : Reader {
-    func Read(self: &var TextSource, into: var char8[..]) -> uint ! IoError {
+    func Read(&var self, into: var char8[..]) -> uint throws IoError {
         let remaining = self.text.length - self.offset;
         if remaining == 0 {
-            fail IoError::Of(IoErrorKind::EndOfStream);
+            throw IoError::Of(IoErrorKind::EndOfStream);
         }
         var count: uint = 8;
         if remaining < count { count = remaining; }
@@ -49,20 +50,15 @@ func IsTitle(text: char8[..]) -> bool {
 }
 
 // Prints the title of every book and counts the books, without ever building a tree.
-func Titles(allocator: Allocator, document: char8[..]) -> uint ! (IoError | JsonParseError) {
+func Titles(allocator: Allocator, document: char8[..]) -> uint throws JsonReadError {
     let source: Reader = TextSource { text: document, offset: 0 };
     // The reader's buffer lives as long as `reader` does. Whether this function ends at the
-    // `return` or at an early `fail`, the destructor frees it on the way out.
-    var reader = JsonEventReader::New(allocator, source, JsonLimits::Default())?;
+    // `return` or with an error passed on from `Next()`, the destructor frees it on the way out.
+    var reader = JsonEventReader(allocator, source, JsonLimits::Default());
     var books: uint = 0;
     var wantTitle = false;
-    var event = reader.Next();
-    while event != JsonEvent::End {
-        if event == JsonEvent::Error {
-            // After an `Error` event `Failure()` always holds the reason; the fallback is
-            // only there because the type allows `none`.
-            fail reader.Failure() ?? JsonParseError::Unexpected(0);
-        }
+    // `try` passes a failure on to the caller; the loop ends when `Next()` answers `none`.
+    while (try reader.Next()) is .Some(event) {
         // Each book is an object one level inside the top-level array.
         if event == JsonEvent::ObjectStart && reader.Depth() == 2 {
             books += 1;
@@ -72,20 +68,18 @@ func Titles(allocator: Allocator, document: char8[..]) -> uint ! (IoError | Json
             PrintLine("  title: {}", reader.Text());
         }
         wantTitle = event == JsonEvent::Name && IsTitle(reader.Text());
-        event = reader.Next();
     }
     return books;
 }
 
 func Report(allocator: Allocator, document: char8[..]) {
     PrintLine("{}", document);
-    match Titles(allocator, document) {
-        .Success(books) => PrintLine("  {} books", books),
-        .Failure(error) => match error {
-            reason: JsonParseError =>
-                PrintLine("  refused at byte {}: {}", reason.Offset(), reason),
-            _: IoError => PrintLine("  could not start reading")
-        }
+    try {
+        let books = Titles(allocator, document);
+        PrintLine("  {} books", books);
+    } catch {
+        .Malformed(reason) => PrintLine("  refused at byte {}: {}", reason.Offset(), reason),
+        .Source(_, read) => PrintLine("  the source failed after {} bytes", read)
     }
 }
 

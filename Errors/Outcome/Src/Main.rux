@@ -1,27 +1,39 @@
-// What a fallible call hands back is an outcome: one value that is either a success or a
-// failure. It is an ordinary value. It can sit in a variable, be passed to a function, and be
-// looked at later.
+// A call that can throw is handled right where it is made, so it usually leaves nothing to keep.
+// Sometimes an outcome has to outlive the call: it is stored in a variable, passed to a function
+// and looked at later. Core's `Result<T, E>` holds one. It is an ordinary variant,
 //
-// `.Success(...)` and `.Failure(...)` are the two shapes an outcome can have. In a `match` they
-// are patterns, and whatever is written inside the parentheses is matched against the payload —
-// a name binds it, a literal compares it. Outside a match they are constructors, so an outcome
-// can also be built by hand, without calling anything.
+//     variant Result<T, E> { Success(T), Failure(E) }
+//
+// with no special support from the compiler, so it is used like any other variant.
+//
+// `try .Success(Share(12, 4)) catch { e => .Failure(e) }` turns a call into a stored outcome:
+// the success is wrapped in `.Success`, and the `catch` arm wraps the error in `.Failure`.
+// `.Success(...)` and `.Failure(...)` are the two shapes a result can have. In a `match` they are
+// patterns, and whatever is written inside the parentheses is matched against the payload — a
+// name binds it, a literal compares it. Outside a match they are constructors, so a result can
+// also be built by hand, without calling anything.
+import Core::Result;
 import Io::PrintLine;
 
 struct NobodyToShare {
     slices: int;
 }
 
-// Shares out pizza slices evenly. It fails when there is nobody to share them with.
-func Share(slices: int, people: int) -> int ! NobodyToShare {
+// Shares out pizza slices evenly. It throws when there is nobody to share them with.
+func Share(slices: int, people: int) -> int throws NobodyToShare {
     if people == 0 {
-        fail NobodyToShare { slices: slices };
+        throw NobodyToShare { slices: slices };
     }
     return slices / people;
 }
 
-// An outcome arrives as a parameter like any other value.
-func Describe(outcome: int ! NobodyToShare) {
+// Keeps the outcome of one call as a value instead of handling it here.
+func Keep(slices: int, people: int) -> Result<int, NobodyToShare> {
+    return try .Success(Share(slices, people)) catch { e => .Failure(e) };
+}
+
+// A result arrives as a parameter like any other value.
+func Describe(outcome: Result<int, NobodyToShare>) {
     match outcome {
         .Success(0) => PrintLine("not even one slice each"),
         .Success(each) => PrintLine("{} slices each", each),
@@ -31,15 +43,15 @@ func Describe(outcome: int ! NobodyToShare) {
 
 func Main() -> int {
     // Each call's outcome is stored first and examined afterwards.
-    let party = Share(12, 4);
-    let empty = Share(12, 0);
+    let party = Keep(12, 4);
+    let empty = Keep(12, 0);
     Describe(party);
     Describe(empty);
-    Describe(Share(3, 4));
+    Describe(Keep(3, 4));
 
-    // The same two shapes as constructors. The type annotation says which fallible is meant.
-    let promised: int ! NobodyToShare = .Success(2);
-    let refused: int ! NobodyToShare = .Failure(NobodyToShare { slices: 8 });
+    // The same two shapes as constructors. The type annotation says which result is meant.
+    let promised: Result<int, NobodyToShare> = .Success(2);
+    let refused: Result<int, NobodyToShare> = .Failure(NobodyToShare { slices: 8 });
     Describe(promised);
     Describe(refused);
 
@@ -50,8 +62,8 @@ func Main() -> int {
     };
     PrintLine("eaten at the party: {}", eaten);
 
-    // A match on an outcome must cover both shapes. Drop the `.Failure` arm above and the
-    // compiler refuses: "match on 'int ! NobodyToShare' is not exhaustive; missing .Failure(_)".
+    // A match on a result must cover both shapes. Drop the `.Failure` arm above and the compiler
+    // refuses: "match on 'Result<int, NobodyToShare>' is not exhaustive; missing Result::Failure".
     // A failure can never slip through unnoticed.
     return 0;
 }

@@ -11,8 +11,6 @@ Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
 Allocator = { Namespace = "Rux", Version = "*" }
-Core = { Namespace = "Rux", Version = "*" }
 FileSystem = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }
 Path = { Namespace = "Rux", Version = "*" }
-Text = { Namespace = "Rux", Version = "*" }

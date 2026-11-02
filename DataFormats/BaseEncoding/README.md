@@ -1,10 +1,8 @@
 # BaseEncoding
 
-Write bytes as text in hexadecimal, Base64 and its URL-safe and unpadded variants, Base32 and
-Base58, into buffers you provide, and decode them back strictly, with a `DecodeError` that says
-what is wrong and where.
+Write bytes as text in hexadecimal, Base64 and its URL-safe and unpadded variants, Base32 and Base58, into buffers you provide, and decode them back strictly, with a `DecodeError` that says what is wrong and where.
 
-**You'll need:** [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice), [Outcome](https://rux-lang.dev/docs/learn/outcome), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [Encoding](https://rux-lang.dev/docs/learn/encoding)
+**You'll need:** [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice), [Catch](https://rux-lang.dev/docs/learn/catch), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [Encoding](https://rux-lang.dev/docs/learn/encoding)
 
 ```sh
 rux run

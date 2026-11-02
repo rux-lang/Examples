@@ -19,7 +19,7 @@ struct Player {
 }
 
 extend Player : Scored {
-    func Score(self: &Player) -> int32 {
+    func Score(&self) -> int32 {
         return self.points;
     }
 }
@@ -27,7 +27,7 @@ extend Player : Scored {
 // Primitives satisfy a bound the same way: only through an implementation. `int32` has no
 // `Score` until this block gives it one, and then a bare number is its own score.
 extend int32 : Scored {
-    func Score(self: &int32) -> int32 {
+    func Score(&self) -> int32 {
         return self;
     }
 }
@@ -58,6 +58,7 @@ func Main() -> int {
     PrintLine("best number  {}", Best<int32>(3, 9));
 
     // `Best(2.5, 1.5)` is rejected: "type argument 'float64' does not satisfy interface bound
-    // 'Scored'". A `float64` can be compared with `>`, but nothing has made it `Scored`.
+    // 'Scored' on type parameter 'T'", with a note that 'Scored' requires method 'Score'. A
+    // `float64` can be compared with `>`, but nothing has made it `Scored`.
     return 0;
 }

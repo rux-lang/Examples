@@ -1,8 +1,6 @@
 # IpAddress
 
-Read IPv4 and IPv6 addresses with `IpAddress::Parse`, write their canonical form with
-`WriteText`, tell loopback, private and public addresses apart, and read socket addresses — an
-address and a port — with `SocketAddress::Parse`. Text that is not an address is `none`.
+Read IPv4 and IPv6 addresses with `IpAddress::Parse`, write their canonical form with `WriteText`, tell loopback, private and public addresses apart, and read socket addresses — an address and a port — with `SocketAddress::Parse`. Text that is not an address is `none`.
 
 **You'll need:** [Optional](https://rux-lang.dev/docs/learn/optional), [Presence](https://rux-lang.dev/docs/learn/presence), [Struct](https://rux-lang.dev/docs/learn/struct), [Bitwise](https://rux-lang.dev/docs/learn/bitwise)
 

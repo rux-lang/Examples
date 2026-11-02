@@ -1,6 +1,6 @@
 # MutatingMethod
 
-Write methods that change the value they are called on, with `self: &var T`.
+Write methods that change the value they are called on, with a `&var self` receiver.
 
 **You'll need:** [Method](https://rux-lang.dev/docs/learn/method), [MutableReference](https://rux-lang.dev/docs/learn/mutable-reference)
 

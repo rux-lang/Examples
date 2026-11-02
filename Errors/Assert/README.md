@@ -1,7 +1,6 @@
 # Assert
 
-Check what the program relies on with `Assert`, kept in every build, and `DebugAssert`, which a
-release build removes.
+Check what the program relies on with `Assert`, kept in every build, and `DebugAssert`, which a release build removes.
 
 **You'll need:** [Panic](https://rux-lang.dev/docs/learn/panic), [Slice](https://rux-lang.dev/docs/learn/slice)
 

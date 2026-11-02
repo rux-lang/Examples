@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "GenericOutcome"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Generic helper functions over optionals and fallibles, which cannot be extended"
+Description = "Generic helper functions over optionals and Core's Result"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

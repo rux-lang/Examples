@@ -3,16 +3,19 @@
 //
 // A type makes the promise with `extend Type : Interface { ... }`, and the compiler holds it to
 // it: leave a function out and the `extend` is rejected. Copy each signature exactly as well — a
-// different parameter or result type breaks the promise, though the compiler does not catch that
-// yet. That checked promise is this lesson. The next two show what other code can do with a
+// different parameter or result type breaks the promise, and the compiler rejects that too:
+// "method 'Area' does not match the requirement of interface 'Shape'". That checked promise is
+// this lesson. The next two show what other code can do with a
 // type once it has made one.
 //
 // Any type can make the promise, including one you did not write: `extend int32 : Shape` would be
 // just as valid as the two below.
 import Io::PrintLine;
 
-// The requirements. They carry no `self`: the interface says what each implementation must be
-// able to answer, and each implementation supplies its own receiver.
+// The requirements. They carry no receiver: the interface says what each implementation must be
+// able to answer, and each implementation supplies its own `&self`. A requirement with no
+// receiver only reads the value; one that changes it writes `&var self`, as the
+// InterfaceParameter lesson shows.
 interface Shape {
     func Area() -> float64;
     func Name() -> char8[..];
@@ -28,29 +31,29 @@ struct Rectangle {
 }
 
 // `: Shape` after the type name is the promise. Inside, each requirement is written as an
-// ordinary method, now with `self` as its first parameter.
+// ordinary method, now with the receiver `&self` as its first parameter.
 extend Circle : Shape {
-    func Area(self: &Circle) -> float64 {
+    func Area(&self) -> float64 {
         return 3.14 * self.radius * self.radius;
     }
 
-    func Name(self: &Circle) -> char8[..] {
+    func Name(&self) -> char8[..] {
         return "circle";
     }
 }
 
 extend Rectangle : Shape {
-    func Area(self: &Rectangle) -> float64 {
+    func Area(&self) -> float64 {
         return self.width * self.height;
     }
 
-    func Name(self: &Rectangle) -> char8[..] {
+    func Name(&self) -> char8[..] {
         return "rectangle";
     }
 
     // An implementation may add methods beyond the promised ones. This one belongs to
     // Rectangle alone; Shape knows nothing about it.
-    func IsSquare(self: &Rectangle) -> bool {
+    func IsSquare(&self) -> bool {
         return self.width == self.height;
     }
 }

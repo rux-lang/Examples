@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "FallibleMain"
 Version = "0.1.0"
 Type = "Executable"
-Description = "A fallible Main, where a failure exits with status 1"
+Description = "A Main that throws, where an error exits with status 1"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

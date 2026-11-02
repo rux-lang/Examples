@@ -1,9 +1,8 @@
 # Utf8
 
-Check bytes with `Validate`, which fails with a `Utf8Failure` saying what is wrong and where, and
-walk text one character at a time with `DecodeAt`.
+Check bytes with `Validate`, which throws a `Utf8Failure` saying what is wrong and where, and walk text one character at a time with `DecodeAt`.
 
-**You'll need:** [Encoding](https://rux-lang.dev/docs/learn/encoding), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Catch](https://rux-lang.dev/docs/learn/catch)
+**You'll need:** [Encoding](https://rux-lang.dev/docs/learn/encoding), [Catch](https://rux-lang.dev/docs/learn/catch)
 
 ```sh
 rux run

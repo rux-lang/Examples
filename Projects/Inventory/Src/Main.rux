@@ -1,15 +1,15 @@
 // Inventory: the stock list of a small shop, kept as structs in a `Vector`, and a day of orders
 // applied to it, some of which cannot be carried out.
 //
-// Every change to the stock is a fallible function, and each way it can be refused is a case of
+// Every change to the stock is a function that throws, and each way it can be refused is a case of
 // `StockError` carrying the details: which item is unknown, how many were wanted and how many
 // were there. A refused order changes nothing, so the stock is never left half-updated.
 //
-// A delivery of something new adds an item to the vector, and adding can run out of memory. That
-// is a `CollectionError`, a different kind of failure altogether, so `Apply` fails with the sum
-// `StockError | CollectionError` and both kinds pass through its `?` unchanged.
-import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, EqualsSlice, Vector };
+// A delivery of something new adds an item to the vector with `TryPush`, and adding can run out
+// of memory. That is an `AllocError`, a different kind of failure altogether, so `Apply` throws
+// the sum `StockError | AllocError` and both kinds pass through its `try` unchanged.
+import Allocator::{ AllocError, Allocator, SystemAllocator };
+import Collections::{ EqualsSlice, Vector };
 import Io::PrintLine;
 
 struct StockItem {
@@ -43,57 +43,57 @@ func Find(stock: &Vector<StockItem>, name: char8[..]) -> uint? {
     return none;
 }
 
-func Sell(stock: &var Vector<StockItem>, name: char8[..], amount: int32) -> ! StockError {
+func Sell(stock: &var Vector<StockItem>, name: char8[..], amount: int32) throws StockError {
     if amount <= 0 {
-        fail StockError::BadAmount(amount);
+        throw StockError::BadAmount(amount);
     }
     // An absent position becomes a failure on the spot.
-    let index = Find(stock, name) ?? fail StockError::UnknownItem(name);
+    let index = Find(stock, name) ?? throw StockError::UnknownItem(name);
     var items = stock.AsMutableSlice();
     if items[index].count < amount {
-        fail StockError::NotEnough { name: name, have: items[index].count, wanted: amount };
+        throw StockError::NotEnough { name: name, have: items[index].count, wanted: amount };
     }
     items[index].count -= amount;
 }
 
 func Deliver(stock: &var Vector<StockItem>, name: char8[..], amount: int32)
-    -> ! (StockError | CollectionError) {
+    throws (StockError | AllocError) {
     if amount <= 0 {
-        fail StockError::BadAmount(amount);
+        throw StockError::BadAmount(amount);
     }
     match Find(stock, name) {
-        index? => {
+        .Some(index) => {
             var items = stock.AsMutableSlice();
             items[index].count += amount;
         },
-        none => stock.Push(StockItem { name: name, count: amount })?
+        none => try stock.TryPush(StockItem { name: name, count: amount })
     }
 }
 
 // An item leaves the list only once it has sold out.
-func Retire(stock: &var Vector<StockItem>, name: char8[..]) -> ! StockError {
-    let index = Find(stock, name) ?? fail StockError::UnknownItem(name);
+func Retire(stock: &var Vector<StockItem>, name: char8[..]) throws StockError {
+    let index = Find(stock, name) ?? throw StockError::UnknownItem(name);
     let count = stock.AsSlice()[index].count;
     if count > 0 {
-        fail StockError::StillInStock { name: name, count: count };
+        throw StockError::StillInStock { name: name, count: count };
     }
     // `RemoveAt` hands back the item it took out, as an optional; it is not needed here.
     stock.RemoveAt(index);
 }
 
-func Apply(stock: &var Vector<StockItem>, order: Order) -> ! (StockError | CollectionError) {
+func Apply(stock: &var Vector<StockItem>, order: Order) throws (StockError | AllocError) {
     match order {
         .Sell { name, amount } => {
             PrintLine("sell {} {}", amount, name);
-            Sell(stock, name, amount)?;
+            try Sell(stock, name, amount);
         },
         .Deliver { name, amount } => {
             PrintLine("deliver {} {}", amount, name);
-            Deliver(stock, name, amount)?;
+            try Deliver(stock, name, amount);
         },
         .Retire(name) => {
             PrintLine("retire {}", name);
-            Retire(stock, name)?;
+            try Retire(stock, name);
         }
     }
 }
@@ -115,15 +115,16 @@ func PrintStock(stock: &Vector<StockItem>) {
     }
 }
 
-func Main() -> ! CollectionError {
+func Main() throws AllocError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
     var stock = Vector<StockItem>(allocator);
-    stock.Push(StockItem { name: "apples", count: 12 })?;
-    stock.Push(StockItem { name: "bread", count: 3 })?;
-    stock.Push(StockItem { name: "candles", count: 0 })?;
-    stock.Push(StockItem { name: "milk", count: 6 })?;
+    // `Push` gets its memory or ends the program, so the opening stock needs no `try`.
+    stock.Push(StockItem { name: "apples", count: 12 });
+    stock.Push(StockItem { name: "bread", count: 3 });
+    stock.Push(StockItem { name: "candles", count: 0 });
+    stock.Push(StockItem { name: "milk", count: 6 });
     PrintLine("opening stock");
     PrintStock(stock);
 
@@ -141,14 +142,17 @@ func Main() -> ! CollectionError {
     ];
     var refused = 0;
     for order in orders {
-        match Apply(stock, order) {
-            .Success(()) => PrintLine("    done"),
-            .Failure(error: StockError) => {
+        // A typed pattern tells the two kinds of error apart.
+        try {
+            Apply(stock, order);
+            PrintLine("    done");
+        } catch {
+            error: StockError => {
                 Explain(error);
                 refused += 1;
             },
             // Running out of memory is no fault of the order, so it ends the day.
-            .Failure(error: CollectionError) => fail error
+            error: AllocError => throw error
         }
     }
 

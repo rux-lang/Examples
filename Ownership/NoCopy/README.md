@@ -1,6 +1,6 @@
 # NoCopy
 
-Prohibit copying a type with a bodyless `func =`, so that it can only be moved.
+Mark a plain-data type `#NoCopy`, so that it can only be moved.
 
 **You'll need:** [Destructor](https://rux-lang.dev/docs/learn/destructor), [Move](https://rux-lang.dev/docs/learn/move)
 

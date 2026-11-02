@@ -15,21 +15,19 @@
 //
 // The file this program writes lives in its package's `Bin/` folder, and is deleted at the end.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, Vector };
+import Collections::Vector;
 import Compress::{ Compress, CompressWriter, Decompress, DecompressReader, Format, Level };
 import FileSystem::{ DeleteFile, File, OpenOptions };
 import Io::{ IoError, IoErrorKind, PrintLine };
 import Path::{ OsString, Path };
-import Text::TextError;
 
-// Text as the bytes it is made of, as in the Hash lesson. `Compress` takes bytes, and text is
-// not accepted in their place:
-//
-//     Compress(allocator, "Hello, Rux!", Format::Gzip)
-//         error: argument 2 to 'Compress' has type 'char8[..]', but parameter 'data' requires
-//                'uint8[..]'
+// Text as the bytes it is made of, as in the Hash lesson. `Compress` and `Decompress` also take
+// text directly, but what comes back is always bytes, so the log is viewed as bytes once and the
+// round trip compares bytes with bytes.
 func AsBytes(text: char8[..]) -> byte[..] {
-    return (text.data as *byte)[..text.length];
+    // Safety: `char8` and `byte` have the same size and alignment, so the `text.length` code units
+    // at `text.data` are as many bytes, borrowed from the same storage as `text`.
+    return unsafe { (text.data as *byte)[..text.length] };
 }
 
 func SameBytes(left: byte[..], right: byte[..]) -> bool {
@@ -41,8 +39,9 @@ func SameBytes(left: byte[..], right: byte[..]) -> bool {
 }
 
 // A web server's access log of `count` requests: a few paths and statuses in an order that looks
-// random but is the same on every run, and a time in milliseconds.
-func MakeLog(allocator: Allocator, count: int) -> Vector<char8> ! CollectionError {
+// random but is the same on every run, and a time in milliseconds. The order comes from a small
+// random number generator whose arithmetic wraps on purpose, so it uses `*%` and `+%`.
+func MakeLog(allocator: Allocator, count: int) -> Vector<char8> {
     let paths: char8[..][6] = ["/docs/learn/compress", "/docs/learn/url", "/images/logo.svg",
         "/v1/playground/run", "/blog", "/packages"];
     let statuses: char8[..][3] = [" 200 ", " 304 ", " 404 "];
@@ -50,48 +49,48 @@ func MakeLog(allocator: Allocator, count: int) -> Vector<char8> ! CollectionErro
     var log = Vector<char8>(allocator);
     var state: uint32 = 2026;
     for _ in 0..count {
-        state = state * 1664525 + 1013904223;
-        log.PushSlice("GET ")?;
-        log.PushSlice(paths[((state >> 8) % 6) as uint])?;
-        log.PushSlice(statuses[((state >> 16) % 3) as uint])?;
-        log.Push(digits[((state >> 20) % 10) as uint])?;
-        log.Push(digits[((state >> 24) % 10) as uint])?;
-        log.PushSlice(" ms\n")?;
+        state = state *% 1664525 +% 1013904223;
+        log.PushSlice("GET ");
+        log.PushSlice(paths[((state >> 8) % 6) as uint]);
+        log.PushSlice(statuses[((state >> 16) % 3) as uint]);
+        log.Push(digits[((state >> 20) % 10) as uint]);
+        log.Push(digits[((state >> 24) % 10) as uint]);
+        log.PushSlice(" ms\n");
     }
-    return <-log;
+    return move log;
 }
 
 // Writes `text` into a .gz file. The writer takes the file and compresses whatever is written
 // to it, here 1000 characters at a time; nothing is complete until `Finish` writes the last block
 // and the checksum. When the function returns the writer is destroyed, and the file it holds is
-// closed. A file is move-only, so handing it over takes `<-`:
+// closed. A file is move-only, so handing it over takes `move`:
 //
-//     CompressWriter::New(allocator, file, Format::Gzip)
-//         error: move-only value 'file' requires an explicit '<-' in argument
-func WriteLog(allocator: Allocator, path: Path, text: char8[..]) -> ! IoError {
-    var file = File::Open(allocator, path, OpenOptions::Writing())?;
-    var writer = CompressWriter::New(allocator, <-file, Format::Gzip)?;
+//     CompressWriter(allocator, file, Format::Gzip)
+//         error: cannot copy 'File', which owns resources
+func WriteLog(allocator: Allocator, path: Path, text: char8[..]) throws IoError {
+    var file = try File::Open(allocator, path, OpenOptions::Writing());
+    var writer = try CompressWriter(allocator, move file, Format::Gzip);
     var written: uint = 0;
     while written < text.length {
-        let end = written + 1000 < text.length ? written + 1000 : text.length;
-        written = written + writer.Write(text[written..end])?;
+        let end = if written + 1000 < text.length { written + 1000 } else { text.length };
+        written = try written + writer.Write(text[written..end]);
     }
-    writer.Finish()?;
+    try writer.Finish();
 }
 
 // Reads the .gz file back a buffer at a time, until the reader reports the end of the data. That
 // end comes only after the checksum agreed.
-func ReadLog(allocator: Allocator, path: Path) -> ! IoError {
-    var file = File::Open(allocator, path, OpenOptions::Reading())?;
-    PrintLine("file                {} bytes", file.Size()?);
-    var reader = DecompressReader::New(allocator, <-file, Format::Gzip)?;
+func ReadLog(allocator: Allocator, path: Path) throws IoError {
+    var file = try File::Open(allocator, path, OpenOptions::Reading());
+    try PrintLine("file                {} bytes", file.Size());
+    var reader = try DecompressReader(allocator, move file, Format::Gzip);
     var buffer: char8[1024];
     var total: uint = 0;
     var lines: uint = 0;
     while true {
-        let count = reader.Read(buffer[..]) catch {
+        let count = try reader.Read(buffer[..]) catch {
             error if error.IsEnd() => break,
-            error => fail error
+            error => throw error
         };
         for c in buffer[..count] {
             if c == '\n' { lines = lines + 1; }
@@ -101,19 +100,19 @@ func ReadLog(allocator: Allocator, path: Path) -> ! IoError {
     PrintLine("read back           {} bytes, {} lines", total, lines);
 }
 
-func Main() -> ! IoError | CollectionError | TextError {
+func Main() throws IoError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    let log = MakeLog(allocator, 400)?;
+    let log = MakeLog(allocator, 400);
     let data = AsBytes(log.AsSlice());
     PrintLine("log                 {} bytes", data.length);
 
     // The same data in the three containers. The compressed stream inside is the same; the
     // containers differ only by the size of their header and checksum.
-    let raw = Compress(allocator, data, Format::Raw)?;
-    let zlib = Compress(allocator, data, Format::Zlib)?;
-    let gzip = Compress(allocator, data, Format::Gzip)?;
+    let raw = try Compress(allocator, data, Format::Raw);
+    let zlib = try Compress(allocator, data, Format::Zlib);
+    let gzip = try Compress(allocator, data, Format::Gzip);
     PrintLine("raw                 {} bytes", raw.Length());
     PrintLine("zlib                {} bytes", zlib.Length());
     PrintLine("gzip                {} bytes", gzip.Length());
@@ -124,35 +123,37 @@ func Main() -> ! IoError | CollectionError | TextError {
     let levels: Level[4] = [Level::Store, Level::Fastest, Level::Default, Level::Best];
     let names: char8[..][4] = ["store", "fastest", "default", "best"];
     for i in 0..4 {
-        let packed = Compress(allocator, data, Format::Gzip, levels[i])?;
+        let packed = try Compress(allocator, data, Format::Gzip, levels[i]);
         PrintLine("gzip, {:<13} {} bytes", names[i], packed.Length());
     }
 
     // The round trip gives back every byte. Decompressing needs only the format: the level is
     // not part of the data.
-    let unpacked = Decompress(allocator, gzip.AsSlice(), Format::Gzip)?;
+    let unpacked = try Decompress(allocator, gzip.AsSlice(), Format::Gzip);
     PrintLine("round trip          {} bytes, identical: {}", unpacked.Length(),
         SameBytes(unpacked.AsSlice(), data));
 
     // Short text has nothing to repeat, and the container's header and checksum make it larger.
-    let short = Compress(allocator, AsBytes("Hello, Rux!"), Format::Gzip)?;
+    let short = try Compress(allocator, "Hello, Rux!", Format::Gzip);
     PrintLine("11 bytes as gzip    {} bytes", short.Length());
 
     // The checksum catches damage. Change one bit of the compressed data and decompressing
     // fails with `InvalidInput` instead of returning wrong data.
     var damaged = Vector<byte>(allocator);
-    damaged.PushSlice(gzip.AsSlice())?;
+    damaged.PushSlice(gzip.AsSlice());
     damaged.AsMutableSlice()[100] = damaged.AsSlice()[100] ^ 0x01;
-    match Decompress(allocator, damaged.AsSlice(), Format::Gzip) {
-        .Success(_) => PrintLine("damaged             accepted"),
-        .Failure(error) => PrintLine("damaged             refused, invalid input: {}",
+    try {
+        Decompress(allocator, damaged.AsSlice(), Format::Gzip);
+        PrintLine("damaged             accepted");
+    } catch {
+        error => PrintLine("damaged             refused, invalid input: {}",
             error.kind == IoErrorKind::InvalidInput)
     }
 
     // Streaming into a .gz file, and back out of it.
-    var holder = OsString::FromText(allocator, "Bin/access.log.gz")?;
+    var holder = OsString::FromText(allocator, "Bin/access.log.gz");
     let path = Path::FromView(holder.View());
-    WriteLog(allocator, path, log.AsSlice())?;
-    ReadLog(allocator, path)?;
-    DeleteFile(allocator, path)?;
+    try WriteLog(allocator, path, log.AsSlice());
+    try ReadLog(allocator, path);
+    try DeleteFile(allocator, path);
 }

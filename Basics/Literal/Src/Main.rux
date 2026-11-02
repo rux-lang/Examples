@@ -37,10 +37,11 @@ func Main() -> int {
 
     // With no suffix, a literal standing alone is an `int` or a `float64`. Next to a value that
     // already has a type, it takes that value's type instead. Here 100 becomes a uint8, the sum
-    // is worked out in eight bits, and 300 does not fit in eight bits: the result wraps around
-    // past 255 and lands on 44.
+    // is worked out in eight bits, and 300 does not fit in eight bits. With `+` that stops the
+    // program with an overflow panic; the wrapping `+%` asks for the result to wrap around past
+    // 255 instead, and it lands on 44.
     let level: uint8 = 200;
-    let raised = level + 100;
+    let raised = level +% 100;
     PrintLine("uint8      {}", raised);
 
     // Two literals together have no typed partner, so both are `int` and the sum is plain 300.

@@ -65,7 +65,7 @@ func Main() -> int {
         PrintLine("at ({}, {}), cost so far {}", x, y, cost);
     }
 
-    // There is no `else` arm in either match, and none is needed. Every case is named, and a
+    // There is no `_` arm in either match, and none is needed. Every case is named, and a
     // match on a variant must name them all: leave one out, and it does not compile.
     return 0;
 }

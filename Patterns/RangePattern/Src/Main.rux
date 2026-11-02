@@ -23,7 +23,7 @@ func Status(code: int32) -> char8[..] {
         300..=399 => "redirection",
         400..=499 => "client error",
         500..=599 => "server error",
-        else => "not a status code"
+        _ => "not a status code"
     };
 }
 
@@ -37,7 +37,7 @@ func Size(count: int32) -> char8[..] {
         10..100 => "dozens",
         100..1000 => "hundreds",
         -1000..0 => "a debt",
-        else => "a lot"
+        _ => "a lot"
     };
 }
 
@@ -49,7 +49,7 @@ func Fare(age: int32, student: bool) -> int32 {
         6..=17 => 5,
         18..=25 if student => 5,
         65..=120 => 6,
-        else => 10
+        _ => 10
     };
 }
 

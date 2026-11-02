@@ -5,12 +5,12 @@
 // The usual kind, version 4, is 122 random bits plus 6 bits marking the version and layout. With
 // that many random bits, two programs that never talk to each other will still, in practice,
 // never produce the same one. `Random()` makes one from the operating system's entropy, so like
-// any request for entropy it returns `Uuid ! EntropyError`.
+// any request for entropy it can throw an `EntropyError`.
 //
-// `Parse` reads the text form and returns `Uuid ! UuidParseError`. It is strict: upper case is
-// accepted, since it means the same, but braces, missing hyphens or stray characters are
-// refused, with the byte where the text went wrong. Printing with `{}` always writes the one
-// canonical form, in lower case.
+// `Parse` reads the text form and throws a `UuidParseError` when it is wrong. It is strict:
+// upper case is accepted, since it means the same, but braces, missing hyphens or stray
+// characters are refused, with the byte where the text went wrong. Printing with `{}` always
+// writes the one canonical form, in lower case.
 import Io::PrintLine;
 import Uuid::{ Parse, Random, Uuid, UuidParseError };
 
@@ -24,9 +24,11 @@ func Reason(error: UuidParseError) -> char8[..] {
 }
 
 func Show(text: char8[..]) {
-    match Parse(text) {
-        .Success(id) => PrintLine("{:<45} -> {}", text, id),
-        .Failure(error) => PrintLine("{:<45} -> {} at byte {}", text, Reason(error), error.Offset())
+    try {
+        let id = Parse(text);
+        PrintLine("{:<45} -> {}", text, id);
+    } catch {
+        error => PrintLine("{:<45} -> {} at byte {}", text, Reason(error), error.Offset())
     }
 }
 
@@ -39,15 +41,17 @@ func Main() -> int {
     Show("{123e4567-e89b-42d3-a456-426614174000}");
 
     // Two spellings, one identifier: comparison is on the 16 bytes, not on the text.
-    let lower = Parse("123e4567-e89b-42d3-a456-426614174000") catch { else => Uuid::Nil() };
-    let upper = Parse("123E4567-E89B-42D3-A456-426614174000") catch { else => Uuid::Nil() };
+    let lower = try Parse("123e4567-e89b-42d3-a456-426614174000") catch { _ => Uuid::Nil() };
+    let upper = try Parse("123E4567-E89B-42D3-A456-426614174000") catch { _ => Uuid::Nil() };
     PrintLine("same identifier: {}", lower.Equals(upper));
     PrintLine("the nil UUID:    {}", Uuid::Nil());
 
     // A fresh random one, different on every run.
-    match Random() {
-        .Success(id) => PrintLine("a new one:       {}  version {}", id, id.Version()),
-        .Failure(_) => PrintLine("no entropy for a new UUID")
+    try {
+        let id = Random();
+        PrintLine("a new one:       {}  version {}", id, id.Version());
+    } catch {
+        _ => PrintLine("no entropy for a new UUID")
     }
     return 0;
 }

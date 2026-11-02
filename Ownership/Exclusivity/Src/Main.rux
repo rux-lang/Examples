@@ -23,7 +23,7 @@ func Merge(into: &var Account, from: &var Account) {
 
 // Two read-only borrows of the same account are fine: neither can change it.
 func Richer(left: &Account, right: &Account) -> char8[..] {
-    let owner = left.balance >= right.balance ? left.owner : right.owner;
+    let owner = if left.balance >= right.balance { left.owner } else { right.owner };
     return owner;
 }
 

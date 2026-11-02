@@ -2,7 +2,7 @@
 
 Parse a TOML document, read integers, floats, dates and arrays from its tables, and see a bad document refused by line and column.
 
-**You'll need:** [Json](https://rux-lang.dev/docs/learn/json), [StringBuilder](https://rux-lang.dev/docs/learn/string-builder), [Date](https://rux-lang.dev/docs/learn/date), [FallibleMain](https://rux-lang.dev/docs/learn/fallible-main)
+**You'll need:** [Json](https://rux-lang.dev/docs/learn/json), [StringBuilder](https://rux-lang.dev/docs/learn/string-builder), [Date](https://rux-lang.dev/docs/learn/date), [Optional](https://rux-lang.dev/docs/learn/optional), [Catch](https://rux-lang.dev/docs/learn/catch)
 
 ```sh
 rux run

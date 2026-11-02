@@ -1,7 +1,6 @@
 # Const
 
-Name a value the compiler works out before the program runs, and see where `const` differs from
-`let`.
+Name a value the compiler works out before the program runs, and see where `const` differs from `let`.
 
 **You'll need:** [Variable](https://rux-lang.dev/docs/learn/variable), [Literal](https://rux-lang.dev/docs/learn/literal), [Console](https://rux-lang.dev/docs/learn/console)
 

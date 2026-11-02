@@ -1,16 +1,14 @@
 # Input
 
-Read lines from standard input with `ReadLine`, where reaching the end of the input is an
-`IoError` whose kind is `EndOfStream`.
+Read lines from standard input with `ReadLine`, where reaching the end of the input is an `IoError` whose kind is `EndOfStream`.
 
-**You'll need:** [StringBuilder](https://rux-lang.dev/docs/learn/string-builder), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Guard](https://rux-lang.dev/docs/learn/guard), [Break](https://rux-lang.dev/docs/learn/break), [Continue](https://rux-lang.dev/docs/learn/continue)
+**You'll need:** [StringBuilder](https://rux-lang.dev/docs/learn/string-builder), [Catch](https://rux-lang.dev/docs/learn/catch), [Guard](https://rux-lang.dev/docs/learn/guard), [Break](https://rux-lang.dev/docs/learn/break), [Continue](https://rux-lang.dev/docs/learn/continue)
 
 ```sh
 rux run
 ```
 
-A sample session: type `Ada`, an empty line and `Grace Hopper`, then end the input with Ctrl+Z
-and Enter on Windows (Ctrl+D elsewhere).
+A sample session: type `Ada`, an empty line and `Grace Hopper`, then end the input with Ctrl+Z and Enter on Windows (Ctrl+D elsewhere).
 
 ```text
 Type some lines, then end the input.

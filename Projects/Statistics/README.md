@@ -1,7 +1,6 @@
 # Statistics
 
-Summarise slices of numbers — count, extremes, mean, population and sample variance, and median —
-including an even count with repeated values, a single value and no values at all.
+Summarise slices of numbers — count, extremes, mean, population and sample variance, and median — including an even count with repeated values, a single value and no values at all.
 
 **You'll need:** Parts 1–18 — this project is the checkpoint for Algorithms, and leans on [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice), [Sort](https://rux-lang.dev/docs/learn/sort), [MinMax](https://rux-lang.dev/docs/learn/min-max), [Fold](https://rux-lang.dev/docs/learn/fold) and [Math](https://rux-lang.dev/docs/learn/math).
 

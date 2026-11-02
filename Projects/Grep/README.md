@@ -1,9 +1,6 @@
 # Grep
 
-Search files for lines that match a regular expression, like the Unix tool of the same name, with
-`-i`, `-n`, `-c`, `-v` and `--help` read by the CommandLine package and an exit status that says
-whether anything matched. Run with no arguments, it takes a tour of fixed command lines over its
-own source.
+Search files for lines that match a regular expression, like the Unix tool of the same name, with `-i`, `-n`, `-c`, `-v` and `--help` read by the CommandLine package and an exit status that says whether anything matched. Run with no arguments, it takes a tour of fixed command lines over its own source.
 
 **You'll need:** Parts 1–26 — this project is the checkpoint for Systems, and leans on [CommandLine](https://rux-lang.dev/docs/learn/command-line), [Regex](https://rux-lang.dev/docs/learn/regex), [File](https://rux-lang.dev/docs/learn/file) and [BufferedIo](https://rux-lang.dev/docs/learn/buffered-io).
 
@@ -14,17 +11,17 @@ rux run
 ```text
 $ grep -n ^func Src/Main.rux
 38:func SearchFile(allocator: Allocator, regex: &Regex, path: OsStringView, show: Show)
-70:func Pattern(allocator: Allocator, parsed: &Parsed) -> String ! TextError {
-77:func Run(allocator: Allocator, parsed: &Parsed, screen: &var TextWriter) -> int ! FormatError {
-128:func Split(text: OsStringView, words: var OsStringView[..]) -> uint {
-144:func Main() -> int {
+70:func Pattern(allocator: Allocator, parsed: &Parsed) -> String throws TextError {
+77:func Run(allocator: Allocator, parsed: &Parsed, screen: &var TextWriter) -> int throws FormatError {
+124:func Split(text: OsStringView, words: var OsStringView[..]) -> uint {
+140:func Main() -> int {
 (exit status 0)
 $ grep -c -i regex Src/Main.rux Rux.toml
-Src/Main.rux:9
+Src/Main.rux:8
 Rux.toml:1
 (exit status 0)
 $ grep -v -c ^\s*// Src/Main.rux
-171
+170
 (exit status 0)
 $ grep -n (unclosed Src/Main.rux
 grep: bad pattern '(unclosed' at byte 0

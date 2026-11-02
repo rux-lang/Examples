@@ -5,21 +5,20 @@
 // answers membership in about the same time however large it grows. It is built the same way as
 // a hash map — a hash function and an equality test — and, like a hash map, keeps no order.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, EqualsSlice, HashSet, HashSlice };
+import Collections::{ EqualsSlice, HashSet, HashSlice };
 import Io::PrintLine;
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
     var visited = HashSet<char8[..]>(allocator, HashSlice, EqualsSlice);
 
     // `Insert` answers a question as it works: `true` when the element was new, `false` when the
-    // set already had it. It may also need more room, so its type is `bool ! CollectionError`,
-    // and `?` unwraps the answer or hands the failure to `Main`.
+    // set already had it. It may also need more room, which the set asks its allocator for.
     let route: char8[..][6] = ["Lyon", "Paris", "Lille", "Paris", "Nice", "Lyon"];
     for city in route {
-        let isNew = visited.Insert(city)?;
+        let isNew = visited.Insert(city);
         if isNew {
             PrintLine("{:6} first visit", city);
         }
@@ -35,7 +34,7 @@ func Main() -> ! CollectionError {
 
     // `Remove` hands the element back as an optional, `none` when it was not there.
     match visited.Remove("Lille") {
-        city? => PrintLine("forgot {}", city),
+        .Some(city) => PrintLine("forgot {}", city),
         none => PrintLine("Lille was never visited")
     }
     PrintLine("visited Lille? {}", visited.Contains("Lille"));

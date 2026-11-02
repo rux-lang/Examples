@@ -1,7 +1,6 @@
 # Entropy
 
-Ask the operating system for unpredictable numbers with `NextUint64` and `Fill`, which return
-`! EntropyError`, and check every failure rather than replacing it with a fixed value.
+Ask the operating system for unpredictable numbers with `NextUint64` and `Fill`, which throw an `EntropyError`, call the `unsafe` `Fill` inside an `unsafe` block, and handle every error rather than replacing it with a fixed value.
 
 **You'll need:** [Distribution](https://rux-lang.dev/docs/learn/distribution), [Catch](https://rux-lang.dev/docs/learn/catch), [Enum](https://rux-lang.dev/docs/learn/enum), [Pointer](https://rux-lang.dev/docs/learn/pointer)
 

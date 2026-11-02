@@ -11,12 +11,14 @@
 // "Largest" means the element type's own `<`. There is no ordering function to pass, as there is
 // for a tree map: to change the order, change the type's `<`. The queue lives in another package,
 // so both the type and its `<` must be `pub` for the queue's code to see them. Without `pub`, the
-// operator is invisible there and the queue reports it as missing:
+// operator is invisible there, and the queue's code is refused where it compares two tickets:
 //
-//     error: operator '<' is not defined for 'Ticket'
-//     help: declare '<' on 'Ticket'
+//     error: operator '<' of 'Ticket' is private to package 'local:.../PriorityQueue/Rux.toml'
+//     note: code in another package, such as a generic collection, uses only the operators it
+//           can see
+//     help: add 'pub' to 'Ticket' and to the declaration of '<'
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, PriorityQueue };
+import Collections::PriorityQueue;
 import Io::PrintLine;
 
 // A support ticket. A higher priority is more urgent; among equals, the one that arrived first
@@ -28,7 +30,7 @@ pub struct Ticket {
 }
 
 extend Ticket {
-    pub func <(self: &Ticket, other: Ticket) -> bool {
+    pub func <(&self, other: Ticket) -> bool {
         if self.priority != other.priority {
             return self.priority < other.priority;
         }
@@ -44,27 +46,27 @@ pub struct Timer {
 }
 
 extend Timer {
-    pub func <(self: &Timer, other: Timer) -> bool {
+    pub func <(&self, other: Timer) -> bool {
         return self.at > other.at;
     }
 }
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    // `Push` may need more room, and so can fail; `?` hands that failure to `Main`.
+    // `Push` may need more room, which the queue asks its allocator for.
     var tickets = PriorityQueue<Ticket>(allocator);
-    tickets.Push(Ticket { priority: 1, arrival: 1, subject: "typo on the pricing page" })?;
-    tickets.Push(Ticket { priority: 3, arrival: 2, subject: "checkout is down" })?;
-    tickets.Push(Ticket { priority: 2, arrival: 3, subject: "password reset email is late" })?;
-    tickets.Push(Ticket { priority: 3, arrival: 4, subject: "site is slow" })?;
-    tickets.Push(Ticket { priority: 1, arrival: 5, subject: "dark mode request" })?;
+    tickets.Push(Ticket { priority: 1, arrival: 1, subject: "typo on the pricing page" });
+    tickets.Push(Ticket { priority: 3, arrival: 2, subject: "checkout is down" });
+    tickets.Push(Ticket { priority: 2, arrival: 3, subject: "password reset email is late" });
+    tickets.Push(Ticket { priority: 3, arrival: 4, subject: "site is slow" });
+    tickets.Push(Ticket { priority: 1, arrival: 5, subject: "dark mode request" });
 
-    // `Peek` looks at the front without taking it out. It returns a pointer, valid until the
-    // queue next changes, or `none` when the queue is empty.
+    // `Peek` looks at the front without taking it out. It returns a reference, `&Ticket?`, that
+    // keeps the queue borrowed while it is in use, or `none` when the queue is empty.
     match tickets.Peek() {
-        top? => PrintLine("next up: {} ({} waiting)", top.subject, tickets.Length()),
+        .Some(top) => PrintLine("next up: {} ({} waiting)", top.subject, tickets.Length()),
         none => PrintLine("no tickets")
     }
 
@@ -77,10 +79,10 @@ func Main() -> ! CollectionError {
 
     // The same queue over the reversed `<` hands out the earliest time first.
     var timers = PriorityQueue<Timer>(allocator);
-    timers.Push(Timer { at: 30, name: "autosave" })?;
-    timers.Push(Timer { at: 5, name: "blink the cursor" })?;
-    timers.Push(Timer { at: 60, name: "check mail" })?;
-    timers.Push(Timer { at: 12, name: "refresh the feed" })?;
+    timers.Push(Timer { at: 30, name: "autosave" });
+    timers.Push(Timer { at: 5, name: "blink the cursor" });
+    timers.Push(Timer { at: 60, name: "check mail" });
+    timers.Push(Timer { at: 12, name: "refresh the feed" });
     loop {
         let timer = timers.Pop() ?? break;
         PrintLine("at {:2}s  {}", timer.at, timer.name);

@@ -1,7 +1,6 @@
 # Character
 
-Write single characters with `'A'`, escapes and `\u{...}`, and meet `char` and the sized
-character types `char8` to `char512`.
+Write single characters with `'A'`, escapes and `\u{...}`, and meet `char` and the sized character types `char8` to `char512`.
 
 **You'll need:** [Variable](https://rux-lang.dev/docs/learn/variable), [Integer](https://rux-lang.dev/docs/learn/integer)
 

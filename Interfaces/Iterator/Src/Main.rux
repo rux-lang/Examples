@@ -1,6 +1,6 @@
 // `for` has walked ranges and arrays since the Control flow part. It can walk a type of your own
 // too, once that type has one method:
-//     func Next(self: &var T) -> Item?
+//     func Next(&var self) -> Item?
 // Each call hands out the next item, or `none` when there are no more. `for` calls `Next` again
 // and again, runs the loop body with every item it gets, and stops at the first `none`. The item
 // type is whatever the optional carries: `int32` here.
@@ -17,8 +17,8 @@ struct Countdown {
 }
 
 extend Countdown : Iterator {
-    // `&var`, because handing out an item moves the countdown along.
-    func Next(self: &var Countdown) -> int32? {
+    // `&var self`, because handing out an item moves the countdown along.
+    func Next(&var self) -> int32? {
         if self.remaining == 0 {
             return none;
         }

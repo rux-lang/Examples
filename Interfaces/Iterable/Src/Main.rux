@@ -3,7 +3,7 @@
 // books.
 //
 // So a collection does not walk itself. It provides one method,
-//     func Iterate(self: &T) -> SomeIterator
+//     func Iterate(&self) -> SomeIterator
 // which hands out a fresh iterator, starting at the beginning, every time it is called. `for`
 // calls it once at the top of each loop and then drives that iterator with `Next`. The collection
 // is only borrowed, so it is unchanged afterwards; the position lives in the iterator.
@@ -23,7 +23,7 @@ struct ShelfCursor {
 }
 
 extend ShelfCursor : Iterator {
-    func Next(self: &var ShelfCursor) -> char8[..]? {
+    func Next(&var self) -> char8[..]? {
         if self.index == self.titles.length {
             return none;
         }
@@ -34,7 +34,7 @@ extend ShelfCursor : Iterator {
 }
 
 extend Shelf : Iterable {
-    func Iterate(self: &Shelf) -> ShelfCursor {
+    func Iterate(&self) -> ShelfCursor {
         return ShelfCursor { titles: self.titles[..], index: 0 };
     }
 }

@@ -1,7 +1,7 @@
 // The same place can be spelled many ways: `Bin/reports`, `Bin//reports`, `Bin/./reports` and
 // `Bin/old/../reports`. `Path::Normalize` rewrites a path into one tidy spelling:
 //
-//     func Normalize(allocator, path: Path) -> PathBuffer ! TextError
+//     func Normalize(allocator, path: Path) -> PathBuffer
 //
 // - every run of separators becomes one preferred separator: `\` on Windows, `/` elsewhere;
 // - `.` segments go, because `.` means "right here";
@@ -22,39 +22,38 @@
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Path::{ Normalize, OsString, Path, PathBuffer };
-import Text::TextError;
 
-func Tidy(allocator: Allocator, text: char8[..]) -> PathBuffer ! TextError {
-    var holder = OsString::FromText(allocator, text)?;
+func Tidy(allocator: Allocator, text: char8[..]) -> PathBuffer {
+    var holder = OsString::FromText(allocator, text);
     return Normalize(allocator, Path::FromView(holder.View()));
 }
 
-func Show(allocator: Allocator, text: char8[..]) -> ! TextError {
-    let tidy = Tidy(allocator, text)?;
+func Show(allocator: Allocator, text: char8[..]) {
+    let tidy = Tidy(allocator, text);
     PrintLine("{:28} {}", text, tidy.AsPath());
 }
 
-func Main() -> ! TextError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
-    Show(allocator, "Bin//reports/./2026")?;
-    Show(allocator, "Bin/old/../reports")?;
-    Show(allocator, "Bin/reports/2026/../../logs")?;
-    Show(allocator, "../shared/./notes.txt")?;
-    Show(allocator, "/../etc")?;
-    Show(allocator, "Bin/reports/")?;
+    Show(allocator, "Bin//reports/./2026");
+    Show(allocator, "Bin/old/../reports");
+    Show(allocator, "Bin/reports/2026/../../logs");
+    Show(allocator, "../shared/./notes.txt");
+    Show(allocator, "/../etc");
+    Show(allocator, "Bin/reports/");
     PrintLine();
 
     // `Equals` compares units exactly, so two spellings of one place differ until both are
     // normalized.
-    var oneHolder = OsString::FromText(allocator, "Bin//reports")?;
-    var twoHolder = OsString::FromText(allocator, "Bin/old/../reports")?;
+    var oneHolder = OsString::FromText(allocator, "Bin//reports");
+    var twoHolder = OsString::FromText(allocator, "Bin/old/../reports");
     let one = Path::FromView(oneHolder.View());
     let two = Path::FromView(twoHolder.View());
     PrintLine("equal as written    {}", one.Equals(two));
 
-    let tidyOne = Normalize(allocator, one)?;
-    let tidyTwo = Normalize(allocator, two)?;
+    let tidyOne = Normalize(allocator, one);
+    let tidyTwo = Normalize(allocator, two);
     PrintLine("equal normalized    {}", tidyOne.AsPath().Equals(tidyTwo.AsPath()));
 }

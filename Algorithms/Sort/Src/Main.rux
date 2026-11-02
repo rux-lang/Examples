@@ -22,7 +22,7 @@ func Show(label: char8[..], items: int[..]) {
 }
 
 func Magnitude(value: int) -> int {
-    return value < 0 ? -value : value;
+    return if value < 0 { -value } else { value };
 }
 
 // A custom order: closest to zero first, whatever the sign.

@@ -1,7 +1,6 @@
 # NumberLimit
 
-Read a type's limits as associated constants — `Min`, `Max`, `Bits`, `Lowest`, `Epsilon` — and
-ask `Core` for them inside a generic function.
+Read a type's limits as associated constants — `Min`, `Max`, `Bits`, `Lowest`, `Epsilon` — and ask `Core` for them inside a generic function.
 
 **You'll need:** [Integer](https://rux-lang.dev/docs/learn/integer), [Float](https://rux-lang.dev/docs/learn/float), [Const](https://rux-lang.dev/docs/learn/const), [Generic](https://rux-lang.dev/docs/learn/generic)
 

@@ -25,13 +25,14 @@ func Main() -> int {
     PrintLine("100 >> 2   {}", value >> 2);
 
     // The two right shifts part ways on a negative number. `{:b}` prints a signed value with a
-    // minus sign, so each one is shown through `as uint32` to see the bits themselves.
+    // minus sign, so each one is shown through `Truncate<uint32>()` to see the bits themselves.
+    // (`as uint32` would stop the program: a cast keeps the value, and -16 is no `uint32`.)
     let negative: int32 = -16;
     let arithmetic = negative >> 2;
     let logical = negative >>> 2;
-    PrintLine("-16        {:032b}", negative as uint32);
-    PrintLine("-16 >> 2   {:032b}  {}", arithmetic as uint32, arithmetic);
-    PrintLine("-16 >>> 2  {:032b}  {}", logical as uint32, logical);
+    PrintLine("-16        {:032b}", negative.Truncate<uint32>());
+    PrintLine("-16 >> 2   {:032b}  {}", arithmetic.Truncate<uint32>(), arithmetic);
+    PrintLine("-16 >>> 2  {:032b}  {}", logical.Truncate<uint32>(), logical);
     PrintLine("");
 
     // Packing: each channel shifted into its own byte, then combined with `|`.

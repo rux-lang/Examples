@@ -18,24 +18,24 @@ import Regex::{ Match, Regex, RegexError };
 //     error: type 'Match?' has no field 'Slice'
 func Part(span: Match?, text: char8[..]) -> char8[..] {
     return match span {
-        found? => found.Slice(text),
+        .Some(found) => found.Slice(text),
         none => "-"
     };
 }
 
-func Main() -> ! RegexError {
+func Main() throws RegexError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
     let notes = "Released 2026-10-15, patched 2026-11-02, retired 2027-01-31.";
-    let date = Regex::New(allocator, "(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})")?;
+    let date = try Regex(allocator, "(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})");
     PrintLine("groups    {}", date.GroupCount());
 
     // `Capture` finds the first match, as `Find` does, and answers with its `Captures`, or `none`.
     // Group 0 is the whole match, and the others count from 1 in the order their `(` appear. A
     // named group can be asked for either way.
-    match date.Capture(notes)? {
-        groups? => {
+    match date.Capture(notes) {
+        .Some(groups) => {
             PrintLine("match     {}", Part(groups.Group(0), notes));
             PrintLine("year      {}", Part(groups.Named("year"), notes));
             PrintLine("month     {}", Part(groups.Group(2), notes));
@@ -46,36 +46,34 @@ func Main() -> ! RegexError {
 
     // Each group answers with a `Match?`, because a group may take no part in a match: here the
     // minor version is optional, so in "v4" group 2 has nothing to report.
-    let version = Regex::New(allocator, "v(\\d+)(?:\\.(\\d+))?")?;
+    let version = try Regex(allocator, "v(\\d+)(?:\\.(\\d+))?");
     for text in ["v3.1", "v4"] {
-        match version.Capture(text)? {
-            groups? => PrintLine("{:<9} major {}, minor {}", text, Part(groups.Group(1), text),
+        match version.Capture(text) {
+            .Some(groups) => PrintLine("{:<9} major {}, minor {}", text, Part(groups.Group(1), text),
                 Part(groups.Group(2), text)),
             none => PrintLine("{:<9} no version", text)
         }
     }
 
-    // `FindAll` is an iterator over every match, leftmost first, never overlapping. Making one can
-    // fail for want of memory, so the `?` comes before the loop can start; without it:
-    //
-    //     error: cannot iterate over 'MatchIterator ! RegexError'
-    for found in date.FindAll(notes)? {
+    // `FindAll` is an iterator over every match, leftmost first, never overlapping. Only compiling
+    // a pattern throws: searching cannot fail, so the loop needs no `try`.
+    for found in date.FindAll(notes) {
         PrintLine("found     {} at byte {}", found.Slice(notes), found.start);
     }
 
     // `Split` is an iterator over what lies between the matches. Because the separator is a
     // pattern, one call copes with commas or semicolons and any spaces around them.
     let list = "apples, pears;plums ,  figs";
-    let separator = Regex::New(allocator, "\\s*[,;]\\s*")?;
-    for part in separator.Split(list)? {
+    let separator = try Regex(allocator, "\\s*[,;]\\s*");
+    for part in separator.Split(list) {
         PrintLine("part      [{}]", part);
     }
 
     // `Replace` builds a new String with every match replaced. In the replacement, `${name}` is
     // what that group matched, `$1` is group 1 and `$0` the whole match. `ReplaceFirst` stops
     // after the first match.
-    let dotted = date.Replace(allocator, notes, "${day}.${month}.${year}")?;
-    PrintLine("{}", dotted);
-    let marked = date.ReplaceFirst(allocator, notes, "[$0]")?;
-    PrintLine("{}", marked);
+    let dotted = date.Replace(allocator, notes, "${day}.${month}.${year}");
+    PrintLine(dotted);
+    let marked = date.ReplaceFirst(allocator, notes, "[$0]");
+    PrintLine(marked);
 }

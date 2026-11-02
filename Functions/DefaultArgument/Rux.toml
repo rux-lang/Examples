@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "DefaultArgument"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Parameters with default values, and calls that leave them out"
+Description = "Parameters with default values, calls that leave them out, and named arguments that skip them"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

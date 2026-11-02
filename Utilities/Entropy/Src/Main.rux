@@ -3,10 +3,10 @@
 // simulation that should differ every run, they have to come from outside the program.
 //
 // The operating system collects unpredictability from hardware and timing, and the Entropy
-// package asks it for some. `NextUint64()` returns `uint64 ! EntropyError` and `Fill` fills a
-// buffer, returning `! EntropyError`. Asking can fail (a system may have no source, or the
-// request may be interrupted), and since the whole point is that the bytes are unguessable, a
-// failure must never be quietly replaced by some fixed value. So every call here is checked.
+// package asks it for some. `NextUint64()` returns a `uint64` and `Fill` fills a buffer, and
+// both declare `throws EntropyError`. Asking can fail (a system may have no source, or the
+// request may be interrupted), and since the whole point is that the bytes are unguessable, an
+// error must never be quietly replaced by some fixed value. So every call here is handled.
 //
 // The output is different on every run, which is exactly what this lesson is about.
 import Entropy::{ EntropyError, Fill, NextUint64 };
@@ -26,17 +26,20 @@ func Describe(error: EntropyError) {
 
 func Main() -> int {
     // One unpredictable 64-bit number.
-    match NextUint64() {
-        .Success(value) => PrintLine("a 64-bit value  {:#018x}", value),
-        .Failure(error) => {
+    let value = try NextUint64() catch {
+        error => {
             Describe(error);
             return 1;
         }
-    }
+    };
+    PrintLine("a 64-bit value  {:#018x}", value);
 
-    // Sixteen unpredictable bytes, written into a buffer through a pointer.
+    // Sixteen unpredictable bytes, written into a buffer through a pointer. `Fill` cannot check
+    // that the pointer addresses as many bytes as it is told to write, so it is an `unsafe func`.
     var key: byte[16] = [0; 16];
-    Fill(@key[0] as *var opaque, 16) catch {
+    // Safety: `key` is a local array of 16 bytes, so the address of its first byte is writable
+    // for all 16.
+    try (unsafe { Fill(@key[0] as *var opaque, 16) }) catch {
         error => {
             Describe(error);
             return 1;
@@ -49,8 +52,9 @@ func Main() -> int {
     PrintLine();
 
     // The common use: seed a fast generator once from entropy, then draw from it as usual.
-    // `PcgFromEntropy` returns `Pcg64Dxsm ! EntropyError`, so the seeding is checked too.
-    var generator = PcgFromEntropy() catch {
+    // `PcgFromEntropy` returns a `Pcg64Dxsm` or throws an `EntropyError`, so the seeding is
+    // handled too.
+    var generator = try PcgFromEntropy() catch {
         error => {
             Describe(error);
             return 1;

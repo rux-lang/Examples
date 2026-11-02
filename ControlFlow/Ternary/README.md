@@ -1,6 +1,6 @@
 # Ternary
 
-Choose between two values inside an expression with `condition ? a : b`.
+Choose between two values inside an expression with an `if` value, `if condition { a } else { b }` — Rux's replacement for the `condition ? a : b` operator.
 
 **You'll need:** [If](https://rux-lang.dev/docs/learn/if)
 

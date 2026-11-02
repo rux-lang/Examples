@@ -1,7 +1,6 @@
 # Mutex
 
-Guard two balances that must change together with a `Mutex<T>`: each thread locks it, changes the
-value through the `MutexGuard<T>` it gets back, and the lock is released when the guard is dropped.
+Guard two balances that must change together with a `Mutex<T>`: each thread locks it, changes the value through the `MutexGuard<T>` it gets back, and the lock is released when the guard is dropped.
 
 **You'll need:** [Destructor](https://rux-lang.dev/docs/learn/destructor), [Pointer](https://rux-lang.dev/docs/learn/pointer), [Thread](https://rux-lang.dev/docs/learn/thread), [Atomic](https://rux-lang.dev/docs/learn/atomic)
 

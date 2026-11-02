@@ -26,13 +26,13 @@ The other commands, all run from this directory:
 | `rux test`        | Builds and runs each package below `Tests/`; status 0 passes         |
 | `rux doc`         | Writes reference pages for the `pub` items to `Bin/Docs/`            |
 
-`rux test` prints one line per test; the timings vary:
+`rux test` prints one line per test package; the timings vary:
 
 ```text
 Testing Tooling v0.1.0 (Debug, Windows x86-64)
-Running 1 test
+Running 1 test package
 Passed LeapYear in 427 ms
-Passed 1 test in 427 ms (1 passed, 0 failed)
+Passed 1 test package in 427 ms (1 passed, 0 failed)
 ```
 
 Read the lesson: https://rux-lang.dev/docs/learn/tooling

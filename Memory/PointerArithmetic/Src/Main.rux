@@ -7,7 +7,9 @@
 //
 // The arithmetic itself is never checked. A pointer moved past the end of its storage is still
 // a pointer, and reaching through it reads or writes memory that belongs to something else.
-// Keep an end in view: here, a second pointer one past the last element.
+// Keep an end in view: here, a second pointer one past the last element. That is why pointer
+// arithmetic, like reaching through a pointer, sits in `unsafe { ... }` with a `// Safety:`
+// comment saying why the result stays inside its storage.
 import Io::{ Print, PrintLine };
 
 struct Pixel {
@@ -27,23 +29,34 @@ func Main() -> int {
     let b = @bytes[0];
     let c = @counts[0];
     let x = @pixels[0];
-    PrintLine("+1 on *uint8 moves {} byte", ((b + 1) as uint) - (b as uint));
-    PrintLine("+1 on *int64 moves {} bytes", ((c + 1) as uint) - (c as uint));
-    PrintLine("+1 on *Pixel moves {} bytes", ((x + 1) as uint) - (x as uint));
+    // Safety: each step lands on the second element of its array, and only its address is used.
+    let (nextB, nextC, nextX) = unsafe { (b + 1, c + 1, x + 1) };
+    PrintLine("+1 on *uint8 moves {} byte", (nextB as uint) - (b as uint));
+    PrintLine("+1 on *int64 moves {} bytes", (nextC as uint) - (c as uint));
+    PrintLine("+1 on *Pixel moves {} bytes", (nextX as uint) - (x as uint));
 
     // Offset and index are two spellings of one thing.
-    PrintLine("*(c + 2) is {}, c[2] is {}", *(c + 2), c[2]);
-    PrintLine("(x + 1).blue is {}", (x + 1).blue);
+    // Safety: `c + 2` and `c[2]` are the third of the four `counts`, and `x + 1` is the second of
+    // the two `pixels`.
+    let (offset, indexed, blue) = unsafe { (*(c + 2), c[2], (x + 1).blue) };
+    PrintLine("*(c + 2) is {}, c[2] is {}", offset, indexed);
+    PrintLine("(x + 1).blue is {}", blue);
 
     // Walking with a pointer: `end` is one past the last element and is never read through.
     // Pointers compare by address, so `cursor < end` means "not there yet".
     var cursor = c;
-    let end = c + 4;
+    // Safety: one past the last element is an address that may be computed and compared, and the
+    // loop never reads through it.
+    let end = unsafe { c + 4 };
     Print("doubled:");
     while cursor < end {
-        *cursor = *cursor * 2;
-        Print(" {}", *cursor);
-        cursor += 1;
+        // Safety: `cursor` is below `end`, so it addresses one of the four `counts`, and the step
+        // lands at most on `end`.
+        unsafe {
+            *cursor = *cursor * 2;
+            Print(" {}", *cursor);
+            cursor += 1;
+        }
     }
     PrintLine();
 

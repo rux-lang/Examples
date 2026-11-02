@@ -19,21 +19,21 @@ struct Player {
 }
 
 extend Player : Scored {
-    func Score(self: &Player) -> int32 {
+    func Score(&self) -> int32 {
         return self.points;
     }
 }
 
 // A player prints as their name.
 extend Player : Display {
-    func WriteDisplay(self: &Player, writer: &var TextWriter, spec: FormatSpec) -> ! FormatError {
-        return writer.Write(self.name);
+    func WriteDisplay(&self, writer: &var TextWriter, spec: FormatSpec) throws FormatError {
+        try writer.Write(self.name);
     }
 }
 
 // `int32` already implements `Display` in the standard packages, so it needs only `Scored`.
 extend int32 : Scored {
-    func Score(self: &int32) -> int32 {
+    func Score(&self) -> int32 {
         return self;
     }
 }

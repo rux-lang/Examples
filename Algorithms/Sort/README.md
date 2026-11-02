@@ -1,7 +1,6 @@
 # Sort
 
-Sort a slice in place with `Sort`, `SortDescending` and `SortBy`, through a
-writable view `var T[..]`.
+Sort a slice in place with `Sort`, `SortDescending` and `SortBy`, through a writable view `var T[..]`.
 
 **You'll need:** [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice), [Callback](https://rux-lang.dev/docs/learn/callback), [Comparable](https://rux-lang.dev/docs/learn/comparable)
 

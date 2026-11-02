@@ -10,8 +10,9 @@
 // after the address.
 //
 // Nothing here is checked for you. A `null` must be caught before use, the block must be freed
-// exactly once, and it must not be touched afterwards. The rest of this part is about tools that
-// make those rules harder to break.
+// exactly once, and it must not be touched afterwards. So each step that relies on those rules
+// sits in an `unsafe { ... }` block, with a `// Safety:` comment saying why it holds. The rest of
+// this part is about tools that make those rules harder to break.
 import Io::{ Print, PrintLine };
 import Memory::{ Alloc, Free, Zero };
 
@@ -21,7 +22,8 @@ func Main() -> int {
     let size = count * sizeof(uint);
     PrintLine("asking for {} elements, {} bytes", count, size);
 
-    var values = Alloc(size) as *var uint;
+    // Safety: `Alloc` returns memory aligned for any scalar, so its block may hold `uint`s.
+    var values = unsafe { Alloc(size) as *var uint };
 
     // Allocation can fail, and the only sign is `null`. Check before the first use.
     if values == null {
@@ -30,24 +32,30 @@ func Main() -> int {
     }
 
     // Registered right after the check, so every later path out of `Main` frees the block once.
-    defer Free(values);
+    // Safety: `values` came from `Alloc`, and this is the only place it is freed.
+    defer unsafe { Free(values); }
 
     // Fresh memory holds whatever was there before. `Zero` makes its contents definite.
-    Zero(values, size);
+    // Safety: `values` is not null, checked above, and holds `size` bytes.
+    unsafe { Zero(values, size); }
     Print("after Zero:");
     for i in 0..count {
-        Print(" {}", values[i]);
+        // Safety: `i` is below `count`, the number of elements the block holds.
+        Print(" {}", unsafe { values[i] });
     }
     PrintLine();
 
     for i in 0..count {
-        values[i] = i * i;
+        // Safety: as above, `i` is below `count`.
+        unsafe { values[i] = i * i; }
     }
     Print("squares:   ");
     var total: uint = 0;
     for i in 0..count {
-        Print(" {}", values[i]);
-        total += values[i];
+        // Safety: as above, `i` is below `count`.
+        let value = unsafe { values[i] };
+        Print(" {}", value);
+        total += value;
     }
     PrintLine();
     PrintLine("total:      {}", total);

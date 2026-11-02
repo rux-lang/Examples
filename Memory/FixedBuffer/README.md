@@ -2,7 +2,7 @@
 
 Allocate from storage you already own with `FixedBuffer`, which refuses with `OutOfMemory` once the storage is full.
 
-**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Arena](https://rux-lang.dev/docs/learn/arena), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Loop](https://rux-lang.dev/docs/learn/loop)
+**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Arena](https://rux-lang.dev/docs/learn/arena), [Catch](https://rux-lang.dev/docs/learn/catch), [Loop](https://rux-lang.dev/docs/learn/loop)
 
 ```sh
 rux run

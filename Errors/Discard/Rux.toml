@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "Discard"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Why a fallible result cannot be ignored, and how to discard one on purpose"
+Description = "Why a throwing call must be marked, and how to drop its error on purpose"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

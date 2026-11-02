@@ -3,23 +3,24 @@
 // of repeating it in every condition.
 //
 // Each arm is `pattern => what to do`, and arms are separated by commas. The last arm may be
-// `else`, which fits any value the arms above it did not name. The default arm is always spelled
-// `else`; the `_` other languages use is refused:
+// `_`, which fits any value the arms above it did not name. The `else` some languages use is
+// refused:
 //
-//     error: use 'else' for the default match arm
+//     error: 'else' is not a match arm
+//     help: use '_' for the default arm
 //
-// An arm holds exactly one pattern. There is no `1 | 2 =>`: two values that share an outcome are
-// written as two arms.
+// Two values that share an outcome share an arm: `3 | 4 =>` fits either one.
 import Io::PrintLine;
 
 func Main() -> int {
-    // Literal patterns, and `else` for everything else.
+    // Literal patterns, alternatives joined by `|`, and `_` for everything else.
     let count: int32 = 2;
     match count {
         0 => PrintLine("none"),
         1 => PrintLine("one"),
         2 => PrintLine("a pair"),
-        else => PrintLine("several")
+        3 | 4 => PrintLine("a few"),
+        _ => PrintLine("several")
     }
 
     // An arm that needs more than one statement takes a block.
@@ -30,24 +31,29 @@ func Main() -> int {
             PrintLine("not found");
             PrintLine("check the address");
         },
-        else => PrintLine("status {}", status)
+        _ => PrintLine("status {}", status)
     }
 
-    // A `bool` has only two values, so naming both covers everything and no `else` is needed.
+    // A `bool` has only two values, so naming both covers everything and no `_` is needed.
     let ready = false;
     match ready {
         true => PrintLine("ready"),
         false => PrintLine("not ready yet")
     }
 
-    // The caveat: an integer that fits no arm is not an error. Nothing runs, and the program
-    // carries on after the match. Write an `else` arm whenever every value ought to be handled.
-    // (A match that produces a value is held to more than this, as the next lesson shows.)
+    // Every match must cover every value. An `int32` has far more values than two arms name, so
+    // leaving out the `_` arm is refused:
+    //
+    //     error: match on 'int32' is not exhaustive; its arms do not cover every value
+    //     help: add a '_' arm
+    //
+    // When the other values should do nothing, say so with an empty `_ => {}` arm.
     let missed: int32 = 99;
     match missed {
         1 => PrintLine("one"),
-        2 => PrintLine("two")
+        2 => PrintLine("two"),
+        _ => {}
     }
-    PrintLine("99 fit no arm, so that match did nothing");
+    PrintLine("99 fit no named arm, so that match did nothing");
     return 0;
 }

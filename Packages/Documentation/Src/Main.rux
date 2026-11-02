@@ -32,14 +32,14 @@ extend Rectangle {
         The space the rectangle covers.
         @returns `width` times `height`
     */
-    pub func Area(self: &Rectangle) -> int {
+    pub func Area(&self) -> int {
         return self.width * self.height;
     }
 
     /// Makes a copy with both sides multiplied. The original is left as it was.
     /// @param factor what each side is multiplied by
     /// @returns the scaled copy
-    pub func Scaled(self: &Rectangle, factor: int) -> Rectangle {
+    pub func Scaled(&self, factor: int) -> Rectangle {
         return Rectangle { width: self.width * factor, height: self.height * factor };
     }
 
@@ -47,7 +47,7 @@ extend Rectangle {
     /// @returns the same value as `Area`
     /// @deprecated call `Area`, whose name says what it measures
     /// @see `Rectangle::Area`
-    pub func Size(self: &Rectangle) -> int {
+    pub func Size(&self) -> int {
         return self.Area();
     }
 }

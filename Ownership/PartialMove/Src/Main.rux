@@ -1,19 +1,21 @@
 // A parcel is wrapping paper around a gift. It is tempting to move just the gift out and leave the
 // rest where it is, but Rux refuses: a field cannot be moved out of a value on its own.
 //
-//     return <-parcel.gift;
+//     return move parcel.gift;
 //
-// error: cannot move field 'gift' out of droppable value 'parcel'
-//   note: partial moves would leave the aggregate with only some fields initialized
+// error: cannot move field 'gift' out of 'parcel', which is destroyed as a whole
+//   note: partial moves would leave the aggregate with only some fields initialized when it is
+//         destroyed
 //   help: move the complete aggregate or borrow or clone the component explicitly
 //
 // Half a parcel would be a value that is partly alive, and the compiler could no longer say what
 // to destroy when its scope ends.
 //
-// What works is taking the whole value apart. A struct pattern with `<-` moves the parcel into
-// the pattern, and every field gets exactly one owner again: a field bound to a name belongs to
-// that binding, and a field bound to `_`, or left out of the pattern, belongs to nobody and is
-// destroyed on the spot. So the gift moves on and the wrapping is gone before the next line runs.
+// What works is taking the whole value apart. A struct pattern given `move parcel` moves the
+// parcel into the pattern, and every field gets exactly one owner again: a field bound to a name
+// belongs to that binding, and a field bound to `_`, or left out of the pattern, belongs to nobody
+// and is destroyed on the spot. So the gift moves on and the wrapping is gone before the next line
+// runs.
 //
 // Only a struct that is nothing more than its fields can be taken apart. Give `Parcel` its own
 // destructor and that destructor needs the whole parcel, so the same pattern is refused:
@@ -28,9 +30,7 @@ struct Item {
 }
 
 extend Item {
-    func =(self: &var Item, other: &Item);
-
-    func ~Item(self: &var Item) {
+    func ~Item(&var self) {
         PrintLine("    {} destroyed", self.name);
     }
 }
@@ -43,9 +43,9 @@ struct Parcel {
 
 // The gift moves out to the caller. The wrapping is bound to `_`, so it is destroyed at the `let`.
 func Unwrap(parcel: Parcel) -> Item {
-    let Parcel { wrapping: _, gift: gift } <- parcel;
+    let Parcel { wrapping: _, gift: gift } = move parcel;
     PrintLine("    unwrapped the {}", gift.name);
-    return <-gift;
+    return move gift;
 }
 
 func Main() -> int {

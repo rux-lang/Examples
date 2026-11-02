@@ -1,7 +1,6 @@
 # NanoId
 
-Make short, URL-safe random identifiers with `NanoId::Generate`, read them back strictly with
-`NanoId::Parse`, and fill a buffer of your own length from a custom alphabet with `GenerateNanoId`.
+Make short, URL-safe random identifiers with `NanoId::Generate`, read them back strictly with `NanoId::Parse`, and fill a buffer of your own length from a custom alphabet with `GenerateNanoId`.
 
 **You'll need:** [Uuid](https://rux-lang.dev/docs/learn/uuid), [WritableSlice](https://rux-lang.dev/docs/learn/writable-slice)
 
@@ -25,7 +24,6 @@ abcabc           -> a duplicate at byte 3
 abé              -> not ASCII at byte 2
 ```
 
-The `a new one` and `a code` lines are samples: each run draws a new identifier and a new code.
-Every other line is the same on each run.
+The `a new one` and `a code` lines are samples: each run draws a new identifier and a new code. Every other line is the same on each run.
 
 Read the lesson: https://rux-lang.dev/docs/learn/nano-id

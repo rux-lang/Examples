@@ -10,7 +10,8 @@
 // Unlike x86-64, AArch64 has a single calling convention, AAPCS64, on every operating system,
 // so there is no `#Abi` to choose. Integer arguments arrive in x0, x1, x2 and so on, and the
 // result goes back in x0. The instructions are different too: most take a destination and two
-// sources, so `add x0, x0, x1` means x0 = x0 + x1.
+// sources, so `add x0, x0, x1` means x0 = x0 + x1. As in the Asm lesson, each call sits in an
+// `unsafe` block, because the compiler cannot check what the body does.
 import Core::{ #target };
 import Io::PrintLine;
 
@@ -42,14 +43,17 @@ when #target.arch {
             ret
         }
     },
-    else => {}
+    _ => {}
 }
 
 func Main() -> int {
     when #target.arch == .AArch64 {
-        PrintLine("Add(20, 22)  {}", Add(20, 22));
-        PrintLine("SumTo(100)   {}", SumTo(100));
-        PrintLine("Max(4, 9)    {}", Max(4, 9));
+        // Safety: each body reads only x0 and x1, touches no memory, and leaves its result in x0,
+        // as AAPCS64 requires.
+        let (sum, total, larger) = unsafe { (Add(20, 22), SumTo(100), Max(4, 9)) };
+        PrintLine("Add(20, 22)  {}", sum);
+        PrintLine("SumTo(100)   {}", total);
+        PrintLine("Max(4, 9)    {}", larger);
     } else {
         PrintLine("This lesson's assembly is for AArch64, and this machine is not one.");
         PrintLine("The AArch64 functions were left out of this build, so none of them ran.");

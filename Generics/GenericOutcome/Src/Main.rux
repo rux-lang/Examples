@@ -1,43 +1,59 @@
-// Optionals, fallibles and sums are built into the language rather than declared by a package,
-// so there is no package to own methods on them. `extend int32 ! DivisionByZero { ... }` is
-// rejected: "cannot extend native type 'int32 ! DivisionByZero'". A question you keep asking of
-// an outcome is written instead as a generic function whose parameter spells the form out:
-// `T ! E`, or `T?`.
+// Optionals and error sums are built into the language rather than declared by a package, so
+// there is no package to own methods on them. `extend int32? { ... }` is rejected: "cannot extend
+// native type 'int32?'". A question you keep asking of an optional is written instead as a
+// generic function whose parameter spells the form out: `T?`.
 //
-// Such a helper works for every success type and every error type at once, and nothing needs
-// to be written at the call: `T` and `E` are read straight out of the argument's type.
-//
-// `Core` ships the two everybody needs, written exactly this way: `Succeeded(outcome)` and
-// `Failed(outcome)` answer which channel an outcome holds without unwrapping it.
-import Core::{ Failed, Succeeded };
+// The same style serves an outcome kept as a value. A call that throws is handled where it is
+// made, and when its outcome has to be kept, it goes into Core's `Result<T, E>`, an ordinary
+// variant built with `try .Success(F()) catch { e => .Failure(e) }`. A helper over `Result<T, E>`
+// works for every success type and every error type at once, and nothing needs to be written at
+// the call: `T` and `E` are read straight out of the argument's type.
+import Core::Result;
 import Io::PrintLine;
 
 struct DivisionByZero {
     numerator: int32;
 }
 
-func Divide(numerator: int32, denominator: int32) -> int32 ! DivisionByZero {
+func Divide(numerator: int32, denominator: int32) -> int32 throws DivisionByZero {
     if denominator == 0 {
-        fail DivisionByZero { numerator: numerator };
+        throw DivisionByZero { numerator: numerator };
     }
     return numerator / denominator;
 }
 
+// Keeps the outcome of one division instead of handling it here.
+func KeepDivide(numerator: int32, denominator: int32) -> Result<int32, DivisionByZero> {
+    return try .Success(Divide(numerator, denominator)) catch { e => .Failure(e) };
+}
+
+// Which case an outcome holds, without unwrapping it. `is` only asks, so nothing is taken apart.
+func Succeeded<T, E>(outcome: Result<T, E>) -> bool {
+    return outcome is .Success(_);
+}
+
+func Failed<T, E>(outcome: Result<T, E>) -> bool {
+    return outcome is .Failure(_);
+}
+
 // The success, or `fallback` when there is none.
-func ValueOr<T, E>(outcome: T ! E, fallback: T) -> T {
-    return outcome catch { else => fallback };
+func ValueOr<T, E>(outcome: Result<T, E>, fallback: T) -> T {
+    return match outcome {
+        .Success(value) => value,
+        .Failure(_) => fallback
+    };
 }
 
 // Keeps the success and forgets why there might not be one.
-func SuccessOf<T, E>(outcome: T ! E) -> T? {
+func SuccessOf<T, E>(outcome: Result<T, E>) -> T? {
     return match outcome {
         .Success(value) => .Some(value),
         .Failure(_) => none
     };
 }
 
-// The other channel: the error, if there is one.
-func ErrorOf<T, E>(outcome: T ! E) -> E? {
+// The other case: the error, if there is one.
+func ErrorOf<T, E>(outcome: Result<T, E>) -> E? {
     return match outcome {
         .Success(_) => none,
         .Failure(error) => .Some(error)
@@ -61,15 +77,15 @@ func CountPresent<T>(values: T?[..]) -> uint {
 }
 
 func Main() -> int {
-    let even = Divide(12, 4);
-    let broken = Divide(7, 0);
+    let even = KeepDivide(12, 4);
+    let broken = KeepDivide(7, 0);
     PrintLine("ValueOr      {} {}", ValueOr(even, -1), ValueOr(broken, -1));
     PrintLine("Succeeded    {} {}", Succeeded(even), Succeeded(broken));
     PrintLine("Failed       {} {}", Failed(even), Failed(broken));
     PrintLine("SuccessOf    {}", SuccessOf(even) ?? 0);
 
     match ErrorOf(broken) {
-        error? => PrintLine("ErrorOf      cannot divide {} by zero", error.numerator),
+        .Some(error) => PrintLine("ErrorOf      cannot divide {} by zero", error.numerator),
         none => PrintLine("ErrorOf      nothing went wrong")
     }
 
@@ -77,7 +93,7 @@ func Main() -> int {
     let height: int32? = 24;
     let missing: char8[..]? = none;
     match Both(width, height) {
-        size? => PrintLine("Both         {} x {}", size.0, size.1),
+        .Some(size) => PrintLine("Both         {} x {}", size.0, size.1),
         none => PrintLine("Both         incomplete")
     }
     PrintLine("Both         complete: {}", Both(width, missing) is (int32, char8[..]));

@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "UnitTest"
 Version = "0.1.0"
 Type = "SourceLibrary"
-Description = "Write `#Test()` functions with `Expect` checks and run them with `rux test`"
+Description = "Write `#Test` functions with `Expect` checks and run them with `rux test`"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

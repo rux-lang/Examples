@@ -6,10 +6,10 @@
 // it holds. Its capacity is how many would fit before it needs a larger block. Pushing raises the
 // length by one every time; the capacity only jumps now and then.
 import Allocator::{ Allocator, SystemAllocator };
-import Collections::{ CollectionError, Vector };
+import Collections::Vector;
 import Io::{ Print, PrintLine };
 
-func Main() -> ! CollectionError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -18,11 +18,12 @@ func Main() -> ! CollectionError {
     var numbers = Vector<int>(allocator);
     PrintLine("empty       length {}  capacity {}", numbers.Length(), numbers.Capacity());
 
-    // A push may need a larger block, and the allocator may have none to give, so `Push`
-    // returns `! CollectionError`. The `?` hands that failure to `Main`.
+    // A push may need a larger block, and the allocator may have none to give. `Push` then stops
+    // the program, as every allocation in a collection does; `TryPush` throws the `AllocError`
+    // instead, for code that has a better answer to running out of memory.
     for i in 1..=9 {
         let before = numbers.Capacity();
-        numbers.Push(i * 10)?;
+        numbers.Push(i * 10);
         if numbers.Capacity() != before {
             PrintLine("push {}      length {}  capacity {}  (grew)", i, numbers.Length(),
                 numbers.Capacity());
@@ -35,7 +36,7 @@ func Main() -> ! CollectionError {
 
     // When the final size is known up front, `Reserve` makes the room in one step: at least 100
     // more values will now fit, so the pushes that follow never need to grow.
-    numbers.Reserve(100)?;
+    numbers.Reserve(100);
     PrintLine("reserved    length {}  capacity {}", numbers.Length(), numbers.Capacity());
 
     // A vector is a container a `for` loop can walk, in the order the values went in.

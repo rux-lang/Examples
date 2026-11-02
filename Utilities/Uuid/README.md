@@ -1,9 +1,8 @@
 # Uuid
 
-Make a random identifier with `Random`, which returns `Uuid ! EntropyError`, and read and write
-its strict text form with `Parse` and `{}`.
+Make a random identifier with `Random`, which throws an `EntropyError` when the system has no entropy, and read and write its strict text form with `Parse` and `{}`.
 
-**You'll need:** [Entropy](https://rux-lang.dev/docs/learn/entropy), [Outcome](https://rux-lang.dev/docs/learn/outcome), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
+**You'll need:** [Entropy](https://rux-lang.dev/docs/learn/entropy), [Catch](https://rux-lang.dev/docs/learn/catch), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
 
 ```sh
 rux run
@@ -21,7 +20,6 @@ the nil UUID:    00000000-0000-0000-0000-000000000000
 a new one:       12c16353-3376-4e49-a1ec-403586becf8d  version 4
 ```
 
-Every line is the same on each run except the last, which is a sample: a new random UUID each
-time.
+Every line is the same on each run except the last, which is a sample: a new random UUID each time.
 
 Read the lesson: https://rux-lang.dev/docs/learn/uuid

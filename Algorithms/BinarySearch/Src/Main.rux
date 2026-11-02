@@ -15,7 +15,7 @@ import Io::PrintLine;
 
 func Report(sorted: int[..], value: int) {
     match BinarySearch(sorted, value) {
-        at? => PrintLine("{} found at {}", value, at),
+        .Some(at) => PrintLine("{} found at {}", value, at),
         none => PrintLine("{} not found, would go at {}", value, LowerBound(sorted, value))
     }
 }

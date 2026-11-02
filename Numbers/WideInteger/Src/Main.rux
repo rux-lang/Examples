@@ -5,9 +5,9 @@
 // arithmetic inside cryptography.
 //
 // Everything you know about integers still applies: the same operators, the same `Min` and `Max`,
-// the same wrap-around at the edges, and the same widening. An `int64` becomes an `int128` as
+// the same overflow checks at the edges, and the same widening. An `int64` becomes an `int128` as
 // silently as an `int32` becomes an `int64`, and an unsuffixed literal takes the type of the other
-// operand, however wide. Only the way back, from wide to narrow, has to be written with `as`.
+// operand, however wide. Only the way back, from wide to narrow, has to be written out.
 import Core::{ int128, int256, int64, uint128, uint256, uint512, uint64 };
 import Io::PrintLine;
 
@@ -42,7 +42,8 @@ func Main() -> int {
     PrintLine("57!          {}", big);
 
     // The left side of a shift decides its type, so it carries the suffix. A plain `1 << 200`
-    // would be an `int`, which has no bit 200: it prints 256.
+    // would be an `int`, which has no bit 200, and is refused: "shift count 200 is out of range
+    // for 'int', which takes counts from 0 to 63".
     let power = 1u256 << 200;
     PrintLine("2^200        {}", power);
 
@@ -53,12 +54,14 @@ func Main() -> int {
     PrintLine("widened      {}", large);
 
     // Narrowing can lose bits, so it is never silent: `let back: int64 = large;` is refused with
-    // "cannot assign 'int128' to 'int64'". `as` keeps the low 64 bits, whatever they mean.
-    PrintLine("narrowed     {}", large as int64);
+    // "cannot assign 'int128' to 'int64'". `large as int64` keeps the value or stops the program,
+    // and this value does not fit; `Truncate<int64>()` keeps the low 64 bits, whatever they mean.
+    PrintLine("narrowed     {}", large.Truncate<int64>());
 
-    // The edges behave like every other integer's: one past the maximum wraps to the minimum.
+    // The edges behave like every other integer's: `int128::Max + 1` stops the program with an
+    // overflow, while the wrapping `+%` goes from the maximum round to the minimum.
     PrintLine("int128 max   {}", int128::Max);
-    PrintLine("max + 1      {}", int128::Max + 1);
+    PrintLine("max +% 1     {}", int128::Max +% 1);
     PrintLine("uint512 max  {}", uint512::Max);
     return 0;
 }

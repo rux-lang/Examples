@@ -1,8 +1,6 @@
 # Rc
 
-Share one value between several owners with `Rc<T>`, whose copies count themselves: the value is
-read through `Get`, written through `GetMutable` only while one handle holds it, and destroyed when
-the last handle goes.
+Share one value between several owners with `Rc<T>`, whose handles are made with `Clone` and count themselves: the value is read through `Get`, written through `GetMutable` only while one handle holds it, and destroyed when the last handle goes.
 
 **You'll need:** [Box](https://rux-lang.dev/docs/learn/box), [CustomCopy](https://rux-lang.dev/docs/learn/custom-copy), [OptionalPointer](https://rux-lang.dev/docs/learn/optional-pointer)
 

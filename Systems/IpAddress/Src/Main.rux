@@ -19,7 +19,7 @@ import Text::TextError;
 func Kind(address: IpAddress) -> char8[..] {
     if address.IsLoopback() { return "loopback, this machine"; }
     match address.AsIpv4() {
-        v4? => {
+        .Some(v4) => {
             let o = v4.octets;
             if v4.Equals(Ipv4Address::Unspecified()) { return "unspecified, any address"; }
             let ten = o[0] == 10;
@@ -39,11 +39,11 @@ func Kind(address: IpAddress) -> char8[..] {
 
 func Show(text: char8[..]) {
     match IpAddress::Parse(text) {
-        address? => {
+        .Some(address) => {
             // An IPv6 address takes at most 39 characters, so the buffer always has room.
             var buffer: char8[39];
             let length = address.WriteText(buffer[..]);
-            let version = address.IsIpv6() ? "IPv6" : "IPv4";
+            let version = if address.IsIpv6() { "IPv6" } else { "IPv4" };
             PrintLine("{:<26} {} {:<16} {}", text, version, buffer[..length], Kind(address));
         },
         none => PrintLine("{:<26} not an IP address", text)
@@ -52,7 +52,7 @@ func Show(text: char8[..]) {
 
 func ShowSocket(text: char8[..]) {
     match SocketAddress::Parse(text) {
-        socket? => {
+        .Some(socket) => {
             var buffer: char8[47];
             let length = socket.WriteText(buffer[..]);
             PrintLine("{:<26} port {:<5} {}", text, socket.port, buffer[..length]);
@@ -61,7 +61,7 @@ func ShowSocket(text: char8[..]) {
     }
 }
 
-func Main() -> ! TextError {
+func Main() throws TextError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -86,11 +86,11 @@ func Main() -> ! TextError {
     ShowSocket("localhost:80");
 
     // Built from parts. `ToString` allocates the text, so it can fail.
-    let local = SocketAddress::New(IpAddress::FromIpv4(Ipv4Address::Localhost()), 3000);
-    let text = local.ToString(allocator)?;
-    PrintLine("built from parts           {}", text);
+    let local = SocketAddress(IpAddress::FromIpv4(Ipv4Address::Localhost()), 3000);
+    let text = try local.ToString(allocator);
+    PrintLine("built from parts           {}", text.View());
     match SocketAddress::Parse("127.0.0.1:3000") {
-        parsed? => PrintLine("same as 127.0.0.1:3000?    {}", local.Equals(parsed)),
+        .Some(parsed) => PrintLine("same as 127.0.0.1:3000?    {}", local.Equals(parsed)),
         none => PrintLine("127.0.0.1:3000 did not parse")
     }
 
@@ -99,11 +99,9 @@ func Main() -> ! TextError {
     let six = IpAddress::FromIpv6(Ipv6Address::Localhost());
     PrintLine("127.0.0.1 equals ::1?      {}", four.Equals(six));
 
-    // An address is not text, and has no `{}` form of its own; `WriteText` is how it is shown.
-    // And `Parse` may find no address, so its result is an optional:
-    //
-    //     PrintLine("{}", four);
-    //         error: no matching overload for 'PrintLine' with argument types (char8[..], IpAddress)
+    // An address also prints with `{}`, in the same canonical form `WriteText` writes, so
+    // `PrintLine("{}", six)` shows `::1`; `WriteText` is for a buffer of your own. And `Parse`
+    // may find no address, so its result is an optional:
     //
     //     let other: IpAddress = IpAddress::Parse("::1");
     //         error: cannot assign 'IpAddress?' to 'IpAddress'

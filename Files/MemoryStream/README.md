@@ -1,8 +1,6 @@
 # MemoryStream
 
-Write binary records into memory with a `ByteWriter` and read them back with a `ByteReader`, using
-the same `Writer` and `Reader` code that also writes and reads a file, then test a cut-short input
-without damaging a file.
+Write binary records into memory with a `ByteWriter` and read them back with a `ByteReader`, using the same `Writer` and `Reader` code that also writes and reads a file, then test a cut-short input without damaging a file.
 
 **You'll need:** [Binary](https://rux-lang.dev/docs/learn/binary), [BufferedIo](https://rux-lang.dev/docs/learn/buffered-io), [InterfaceParameter](https://rux-lang.dev/docs/learn/interface-parameter)
 

@@ -3,65 +3,78 @@
 // values have real types: an integer is not a float even when the float is whole, and a date is
 // a date rather than a string that looks like one.
 //
-//     TomlParse(allocator, text) -> TomlValue ! TomlParseFailure
+//     TomlParse(allocator, text) -> TomlValue throws TomlParseFailure
 //
-// The result is a `TomlValue` tree, read the same way as a JSON one: `Find` answers a pointer
-// that is null when the key is missing, and `AsInteger`, `AsFloat`, `AsDate` and the rest
-// answer `false` when the value is some other kind. A refused document gives no tree at all,
-// only the reason and where it was found, by line and column.
+// The result is a `TomlValue` tree, read the same way as a JSON one: `Find` answers `none` when
+// the key is missing, and `AsInteger`, `AsFloat`, `AsDate` and the rest answer `none` when the
+// value is some other kind. A refused document gives no tree at all: `TomlParse` throws the
+// reason and where it was found, by line and column.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
-import Text::{ String, StringBuilder, StringView, TextError };
-import Time::Date;
+import Text::{ String, StringBuilder, StringView };
 import Toml::{ TomlParse, TomlValue };
 
 // A TOML document is lines, so it is written here one literal per line and joined.
-func Lines(allocator: Allocator, lines: char8[..][..]) -> String ! TextError {
+func Lines(allocator: Allocator, lines: char8[..][..]) -> String {
     var builder = StringBuilder(allocator);
     for i in 0..lines.length {
-        builder.Append(lines[i])?;
-        builder.Append("\n")?;
+        builder.Append(lines[i]);
+        builder.Append("\n");
     }
-    return builder.IntoString();
+    return builder.TakeString();
 }
 
-func Key(table: &TomlValue, key: char8[..]) -> *TomlValue {
-    return table.Find(StringView::FromValidated(key));
+// Keys are compared as text, so `Find` takes a `StringView`. The answer borrows from the table it
+// was found in, so it is an optional reference, and the helper is a method: a reference result
+// borrows from the receiver.
+extend TomlValue {
+    func Key(&self, key: char8[..]) -> &TomlValue? {
+        return self.Find(StringView::FromValidated(key));
+    }
 }
 
 func Inspect(root: &TomlValue) {
-    PrintLine("name      {}", (*Key(root, "name")).AsText());
+    if root.Key("name") is .Some(name) && name.AsText() is .Some(text) {
+        PrintLine("name      {}", text);
+    }
+
+    // A document without a `[server]` table has nothing more to show.
+    let server = root.Key("server") ?? return;
 
     // The same question asked of an integer and a float. Each answers only its own kind.
-    let server = Key(root, "server");
-    var port: int64 = 0;
-    var ratio = 0.0;
-    let portIsInteger = (*Key(*server, "port")).AsInteger(@port);
-    let portIsFloat = (*Key(*server, "port")).AsFloat(@ratio);
-    PrintLine("port      {} (integer: {}, float: {})", port, portIsInteger, portIsFloat);
-    (*Key(*server, "ratio")).AsFloat(@ratio);
-    PrintLine("ratio     {}", ratio);
-
-    var released = Date { year: 1970, month: 1, day: 1 };
-    (*Key(root, "released")).AsDate(@released);
-    PrintLine("released  {}", released);
-
-    let tags = Key(*server, "tags");
-    for i in 0..(*tags).Length() {
-        PrintLine("tags[{}]   {}", i, (*(*tags).At(i)).AsText());
+    if server.Key("port") is .Some(port) {
+        let number = port.AsInteger();
+        PrintLine("port      {} (integer: {}, float: {})", number ?? 0, number is .Some(_),
+            port.AsFloat() is .Some(_));
     }
-    PrintLine("debug     present: {}", Key(*server, "debug") != null);
+    if server.Key("ratio") is .Some(ratio) && ratio.AsFloat() is .Some(value) {
+        PrintLine("ratio     {}", value);
+    }
+
+    if root.Key("released") is .Some(released) && released.AsDate() is .Some(date) {
+        PrintLine("released  {}", date);
+    }
+
+    if server.Key("tags") is .Some(tags) {
+        for i in 0..(tags.Length() ?? 0) {
+            if tags.At(i) is .Some(tag) && tag.AsText() is .Some(text) {
+                PrintLine("tags[{}]   {}", i, text);
+            }
+        }
+    }
+    PrintLine("debug     present: {}", server.Key("debug") is .Some(_));
 }
 
 func Load(allocator: Allocator, text: char8[..]) {
-    match TomlParse(allocator, text) {
-        .Success(root) => Inspect(root),
-        .Failure(failure) =>
-            PrintLine("refused at line {}, column {}: {}", failure.line, failure.column, failure)
+    try {
+        let root = TomlParse(allocator, text);
+        Inspect(root);
+    } catch {
+        failure => PrintLine("refused at line {}, column {}: {}", failure.line, failure.column, failure)
     }
 }
 
-func Main() -> ! TextError {
+func Main() {
     var system = SystemAllocator();
     let allocator: Allocator = system;
 
@@ -75,14 +88,14 @@ func Main() -> ! TextError {
         "tags = [\"web\", \"api\"]",
         "# A comment, which the parser skips."
     ];
-    let document = Lines(allocator, good)?;
+    let document = Lines(allocator, good);
     Load(allocator, document.View().Bytes());
 
     // Two refusals. A key given twice in one table is an error in TOML, not a quiet overwrite,
     // and a value must be spelled the way its type is: there is no thirteenth month.
     PrintLine("");
     let twice: char8[..][3] = ["[server]", "port = 8080", "port = 9090"];
-    let repeated = Lines(allocator, twice)?;
+    let repeated = Lines(allocator, twice);
     Load(allocator, repeated.View().Bytes());
     Load(allocator, "released = 2026-13-04");
 }

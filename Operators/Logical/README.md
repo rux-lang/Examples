@@ -1,7 +1,6 @@
 # Logical
 
-Combine bools with `&& || !`, and watch short-circuiting skip the right side
-once the left has decided.
+Combine bools with `&& || !`, and watch short-circuiting skip the right side once the left has decided.
 
 **You'll need:** [Comparison](https://rux-lang.dev/docs/learn/comparison), [Boolean](https://rux-lang.dev/docs/learn/boolean)
 

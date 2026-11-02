@@ -4,7 +4,9 @@
 // keys by it, and a checksum stored next to data shows whether the data changed.
 //
 // The Hash package has several well-known algorithms. Each `...Of` function takes a pointer to
-// the bytes and their count, and returns the hash:
+// the bytes and their count, and returns the hash. Nothing can check that the pointer really
+// addresses that many bytes, so each is an `unsafe func`, called inside an `unsafe` block whose
+// `// Safety:` comment says why the promise holds:
 //
 //     Fnv1a64Of   FNV-1a, 64 bits: tiny and fast, good for hash tables
 //     XxHash64Of  xxHash, 64 bits: very fast on long inputs
@@ -15,11 +17,19 @@
 import Hash::{ Crc32Of, Fnv1a64, Fnv1a64Of, XxHash64Of };
 import Io::PrintLine;
 
+// The bytes of `text`, as the pointer the hash functions take.
+func AsBytes(text: char8[..]) -> *byte {
+    // Safety: a `char8` is one byte wide, so the cast addresses the same bytes under another type.
+    return unsafe { text.data as *byte };
+}
+
 func Show(text: char8[..]) {
-    let bytes = text.data as *byte;
-    PrintLine("{:<12} fnv1a64 {:016x}  xxhash64 {:016x}  crc32 {:08x}", text,
-        Fnv1a64Of(bytes, text.length), XxHash64Of(bytes, text.length),
-        Crc32Of(bytes, text.length));
+    let bytes = AsBytes(text);
+    // Safety: `bytes` addresses `text`, which stays readable for `text.length` bytes throughout.
+    let (fnv, xx, crc) = unsafe {
+        (Fnv1a64Of(bytes, text.length), XxHash64Of(bytes, text.length), Crc32Of(bytes, text.length))
+    };
+    PrintLine("{:<12} fnv1a64 {:016x}  xxhash64 {:016x}  crc32 {:08x}", text, fnv, xx, crc);
 }
 
 func Main() -> int {
@@ -40,8 +50,8 @@ func Main() -> int {
     let first = "hello ";
     let second = "world";
     var hasher = Fnv1a64();
-    hasher.Write(first.data as *byte, first.length);
-    hasher.Write(second.data as *byte, second.length);
+    hasher.Write(AsBytes(first), first.length);
+    hasher.Write(AsBytes(second), second.length);
     PrintLine("in two pieces fnv1a64 {:016x}", hasher.Finish());
     return 0;
 }

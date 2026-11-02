@@ -4,8 +4,8 @@
 //
 // `OffsetDateTime` is a `DateTime` plus a `UtcOffset`, and that is enough to name one moment. Its
 // text form is RFC 3339, the format of logs, JSON and HTTP: the date, a `T`, the time, then `Z`
-// for UTC or a signed `+HH:MM`. `ParseRfc3339` reads it and returns
-// `OffsetDateTime ! TimeParseError`, and printing an `OffsetDateTime` with `{}` writes it back.
+// for UTC or a signed `+HH:MM`. `ParseRfc3339` reads it, returning an `OffsetDateTime` or
+// throwing a `TimeParseError`, and printing an `OffsetDateTime` with `{}` writes it back.
 //
 // Two texts can name the same moment in different offsets. To compare moments, turn each into a
 // `Timestamp`, a count of seconds since 1970-01-01 in UTC, which has one spelling per moment.
@@ -14,8 +14,8 @@ import Time::{ DateTime, OffsetDateTime, ParseDateTime, ParseRfc3339, UtcOffset 
 
 func Main() -> int {
     // A local date and time. There is no offset in it, and none in its text either.
-    let meeting = ParseDateTime("2026-10-04T09:30:00") catch {
-        else => {
+    let meeting = try ParseDateTime("2026-10-04T09:30:00") catch {
+        _ => {
             PrintLine("not a date and time");
             return 1;
         }
@@ -34,24 +34,26 @@ func Main() -> int {
     PrintLine("apart by    {} s", apart);
 
     // RFC 3339 from text. This one is the Kyiv meeting written in UTC: other text, same moment.
-    match ParseRfc3339("2026-10-04T06:30:00Z") {
-        .Success(utc) => {
-            PrintLine("parsed      {}", utc);
-            let same = utc.ToTimestamp().UnixSeconds() == kyiv.ToTimestamp().UnixSeconds();
-            PrintLine("same moment as the Kyiv meeting: {}", same);
+    try {
+        let utc = ParseRfc3339("2026-10-04T06:30:00Z");
+        PrintLine("parsed      {}", utc);
+        let same = utc.ToTimestamp().UnixSeconds() == kyiv.ToTimestamp().UnixSeconds();
+        PrintLine("same moment as the Kyiv meeting: {}", same);
 
-            // Converting the moment to another offset gives the local reading there.
-            let tokyo = UtcOffset::Of(9, 0) ?? UtcOffset::Utc();
-            let there = DateTime::FromTimestamp(utc.ToTimestamp(), tokyo);
-            PrintLine("in Tokyo    {}", OffsetDateTime(there, tokyo));
-        },
-        .Failure(error) => PrintLine("rejected at byte {}", error.Offset())
+        // Converting the moment to another offset gives the local reading there.
+        let tokyo = UtcOffset::Of(9, 0) ?? UtcOffset::Utc();
+        let there = DateTime::FromTimestamp(utc.ToTimestamp(), tokyo);
+        PrintLine("in Tokyo    {}", OffsetDateTime(there, tokyo));
+    } catch {
+        error => PrintLine("rejected at byte {}", error.Offset())
     }
 
     // RFC 3339 requires the offset. Without it, the text stops being a moment.
-    match ParseRfc3339("2026-10-04T09:30:00") {
-        .Success(moment) => PrintLine("parsed      {}", moment),
-        .Failure(error) => PrintLine("no offset   rejected at byte {}", error.Offset())
+    try {
+        let moment = ParseRfc3339("2026-10-04T09:30:00");
+        PrintLine("parsed      {}", moment);
+    } catch {
+        error => PrintLine("no offset   rejected at byte {}", error.Offset())
     }
     return 0;
 }

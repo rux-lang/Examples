@@ -1,6 +1,6 @@
 # SystemInfo
 
-Open a window that shows the Windows edition, version and build, the processor, and the memory. The values come from the Win32 calls in the Windows package, and the program draws them with GDI in a classic window with a message loop.
+Open a window that shows the Windows edition, version and build, the processor, and the memory. The values come from the Win32 calls in the Windows package, and the program draws them with GDI in a classic window with a message loop. Every Win32 call is `extern`, so each sits in an `unsafe` block under a `// Safety:` comment that says why it is sound there.
 
 **You'll need:** Parts 1–24 — this project is a checkpoint for Platform, and leans on [Extern](https://rux-lang.dev/docs/learn/extern), [CInterop](https://rux-lang.dev/docs/learn/c-interop), [Target](https://rux-lang.dev/docs/learn/target) and [CompileError](https://rux-lang.dev/docs/learn/compile-error).
 

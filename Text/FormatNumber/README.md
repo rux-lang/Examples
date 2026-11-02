@@ -1,7 +1,6 @@
 # FormatNumber
 
-Spell numbers with a placeholder spec: digits after the point, rounding, scientific notation,
-number bases, zero padding and an explicit sign.
+Spell numbers with a placeholder spec: digits after the point, rounding, scientific notation, number bases, zero padding and an explicit sign.
 
 **You'll need:** [Format](https://rux-lang.dev/docs/learn/format), [Float](https://rux-lang.dev/docs/learn/float), [Literal](https://rux-lang.dev/docs/learn/literal)
 

@@ -1,7 +1,6 @@
 # Melody
 
-Play the opening of Ode to Joy through the console speaker by calling the Windows `Beep`
-function directly.
+Play the opening of Ode to Joy through the console speaker by calling the Windows `Beep` function directly. Each call sits in an `unsafe` block with a `// Safety:` comment, because the compiler cannot check what a foreign function does.
 
 **You'll need:** Parts 1–24 — this project is the checkpoint for Platform, and leans on [Extern](https://rux-lang.dev/docs/learn/extern), [Target](https://rux-lang.dev/docs/learn/target) and [CompileError](https://rux-lang.dev/docs/learn/compile-error).
 

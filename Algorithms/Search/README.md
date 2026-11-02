@@ -1,7 +1,6 @@
 # Search
 
-Find a value with a linear search: `IndexOf` returns a `uint?` that is `none` when the value is
-absent, and `Contains` returns a `bool`.
+Find a value with a linear search: `IndexOf` returns a `uint?` that is `none` when the value is absent, and `Contains` returns a `bool`.
 
 **You'll need:** [Slice](https://rux-lang.dev/docs/learn/slice), [Presence](https://rux-lang.dev/docs/learn/presence), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
 

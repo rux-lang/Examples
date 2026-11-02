@@ -1,7 +1,6 @@
 # MinMax
 
-Pick the smaller or larger of two values with `Min` and `Max`, and find the extremes of a slice with
-`MinIndex` and `MaxIndex`, which return `none` for an empty one.
+Pick the smaller or larger of two values with `Min` and `Max`, and find the extremes of a slice with `MinIndex` and `MaxIndex`, which return `none` for an empty one.
 
 **You'll need:** [Search](https://rux-lang.dev/docs/learn/search), [Presence](https://rux-lang.dev/docs/learn/presence)
 

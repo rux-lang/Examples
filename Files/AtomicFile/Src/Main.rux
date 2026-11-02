@@ -4,7 +4,7 @@
 //
 // `FileSystem::WriteAtomically` avoids that moment:
 //
-//     func WriteAtomically(allocator, target: Path, contents: char8[..]) -> ! IoError
+//     func WriteAtomically(allocator, target: Path, contents: char8[..]) throws IoError
 //
 // It writes the contents to a new temporary file in the same directory as the target, forces
 // them to the disk, and then renames the temporary file onto the target's name in one step. The
@@ -23,36 +23,35 @@ import Allocator::{ Allocator, SystemAllocator };
 import FileSystem::{ AtomicWrite, DeleteFile, File, OpenOptions, WriteAtomically };
 import Io::{ IoError, PrintLine, ReadExact, WriteAll };
 import Path::{ OsString, Path };
-import Text::TextError;
 
 // Prints what the file holds right now. The files here are short, so one buffer is enough.
-func Show(allocator: Allocator, label: char8[..], path: Path) -> ! IoError {
-    var file = File::Open(allocator, path, OpenOptions::Reading())?;
-    let size = file.Size()? as uint;
+func Show(allocator: Allocator, label: char8[..], path: Path) throws IoError {
+    var file = try File::Open(allocator, path, OpenOptions::Reading());
+    let size = try file.Size() as uint;
     var buffer: char8[64];
-    ReadExact(file, buffer[..size])?;
-    file.Close()?;
+    try ReadExact(file, buffer[..size]);
+    try file.Close();
     PrintLine("{:16} {}", label, buffer[..size]);
 }
 
-func Main() -> ! IoError | TextError {
+func Main() throws IoError {
     var system = SystemAllocator();
     let allocator: Allocator = system;
-    var holder = OsString::FromText(allocator, "Bin/settings.txt")?;
+    var holder = OsString::FromText(allocator, "Bin/settings.txt");
     let path = Path::FromView(holder.View());
 
-    WriteAtomically(allocator, path, "volume = 3")?;
-    Show(allocator, "first write", path)?;
+    try WriteAtomically(allocator, path, "volume = 3");
+    try Show(allocator, "first write", path);
 
     // The same steps by hand. While the new contents are being written they live in the
     // temporary file, and the target still holds the old ones.
-    var replacement = AtomicWrite::Begin(allocator, path)?;
-    WriteAll(replacement, "volume = 11")?;
-    Show(allocator, "while writing", path)?;
+    var replacement = try AtomicWrite::Begin(allocator, path);
+    try WriteAll(replacement, "volume = 11");
+    try Show(allocator, "while writing", path);
 
     // `Commit` syncs the temporary file and renames it onto the target.
-    replacement.Commit(allocator)?;
-    Show(allocator, "after commit", path)?;
+    try replacement.Commit(allocator);
+    try Show(allocator, "after commit", path);
 
-    DeleteFile(allocator, path)?;
+    try DeleteFile(allocator, path);
 }

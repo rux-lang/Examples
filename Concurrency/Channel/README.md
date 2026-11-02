@@ -1,7 +1,6 @@
 # Channel
 
-Pass values between threads through a bounded `Channel<T>`: one thread sends, another transforms,
-`Main` receives, and closing a channel ends the stream once what was sent has drained.
+Pass values between threads through a bounded `Channel<T>`: one thread sends, another transforms, `Main` receives, and closing a channel ends the stream once what was sent has drained.
 
 **You'll need:** [Presence](https://rux-lang.dev/docs/learn/presence), [Thread](https://rux-lang.dev/docs/learn/thread), [Mutex](https://rux-lang.dev/docs/learn/mutex)
 

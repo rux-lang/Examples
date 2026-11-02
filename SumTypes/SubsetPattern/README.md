@@ -1,7 +1,6 @@
 # SubsetPattern
 
-Match several members of a sum in one arm — `box: Square | Rectangle =>` — and get a smaller sum
-to pass on.
+Match several members of a sum in one arm — `box: Square | Rectangle =>` — and get a smaller sum to pass on.
 
 **You'll need:** [TypedPattern](https://rux-lang.dev/docs/learn/typed-pattern), [Struct](https://rux-lang.dev/docs/learn/struct)
 

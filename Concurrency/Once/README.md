@@ -1,7 +1,6 @@
 # Once
 
-Build a shared lookup table exactly once, by whichever thread needs it first, with a `Once` module
-variable, and count each thread's own lookups in a `thread var`.
+Build a shared lookup table exactly once, by whichever thread needs it first, with a `Once` module variable, and count each thread's own lookups in a `thread var`.
 
 **You'll need:** [Callback](https://rux-lang.dev/docs/learn/callback), [Thread](https://rux-lang.dev/docs/learn/thread)
 

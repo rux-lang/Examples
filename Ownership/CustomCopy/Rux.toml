@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "CustomCopy"
 Version = "0.1.0"
 Type = "Executable"
-Description = "A copy operator that does real work"
+Description = "Copying a move-only value on purpose with a Clone method"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

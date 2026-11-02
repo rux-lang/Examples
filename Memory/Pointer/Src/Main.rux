@@ -10,6 +10,10 @@
 // that it stays valid. A pointer is not checked: it can be stored, compared, and set to `null`,
 // which means "no address at all". The rest of this part is built on that freedom, and on the
 // care it asks for.
+//
+// Taking, copying and comparing addresses is safe. Reaching through one is not something the
+// compiler can check, so every read or write through a pointer sits in an `unsafe { ... }`
+// block, with a `// Safety:` comment above it saying why the address is good.
 import Io::PrintLine;
 
 struct Point {
@@ -24,29 +28,35 @@ func Main() -> int {
     let reader: *int = @score;
     let writer: *var int = @score;
 
-    *writer = 25;
+    // Safety: `writer` holds the address of `score`, which is alive for all of `Main`.
+    unsafe { *writer = 25; }
     PrintLine("score is now     {}", score);
-    PrintLine("read via pointer {}", *reader);
+    // Safety: `reader` holds the address of `score` too.
+    PrintLine("read via pointer {}", unsafe { *reader });
 
     // The address of a `let` binding is read-only. Asking for `*var int` here is an error:
     // "'@limit' yields a read-only '*T'; declare 'limit' with 'var' for a '*var T'".
     let limit: int = 100;
     let limitPointer: *int = @limit;
-    PrintLine("limit is         {}", *limitPointer);
+    // Safety: `limitPointer` holds the address of `limit`, which is alive.
+    PrintLine("limit is         {}", unsafe { *limitPointer });
 
     // A field is reached through a pointer with a plain `.`, without writing `*` first.
     var point = Point { x: 1, y: 2 };
     let cursor: *var Point = @point;
-    cursor.x = 7;
+    // Safety: `cursor` holds the address of `point`, which is alive.
+    unsafe { cursor.x = 7; }
     PrintLine("point is         ({}, {})", point.x, point.y);
 
     // `null` is the pointer that points nowhere. Comparing with `==` is safe; reaching through
-    // it with `*` is not, and the compiler will not stop you. Check before you reach.
+    // it with `*` is not, and inside `unsafe` the compiler will not stop you. Check before you
+    // reach.
     var target: *int = null;
     PrintLine("target is null   {}", target == null);
     target = @score;
     if target != null {
-        PrintLine("target now reads {}", *target);
+        // Safety: `target` is not null, checked above, and holds the address of `score`.
+        PrintLine("target now reads {}", unsafe { *target });
     }
 
     // Two pointers are equal when they hold the same address.

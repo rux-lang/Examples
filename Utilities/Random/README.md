@@ -1,7 +1,6 @@
 # Random
 
-Build a `Pcg64Dxsm` generator from a fixed seed and see that the same seed always replays the
-same numbers.
+Build a `Pcg64Dxsm` generator from a fixed seed and see that the same seed always replays the same numbers.
 
 **You'll need:** [MutableReference](https://rux-lang.dev/docs/learn/mutable-reference), [Copy](https://rux-lang.dev/docs/learn/copy), [Generic](https://rux-lang.dev/docs/learn/generic), [Format](https://rux-lang.dev/docs/learn/format)
 

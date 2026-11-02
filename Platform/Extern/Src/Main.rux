@@ -5,7 +5,9 @@
 //
 // The compiler cannot look inside the library to check the declaration. It takes what you wrote
 // on trust, so a wrong parameter type is not a compile error: the call goes ahead and passes the
-// wrong bytes. Copy a declaration carefully from the library's documentation.
+// wrong bytes. Copy a declaration carefully from the library's documentation. That trust is why
+// a call to an `extern` function needs an `unsafe { ... }` block, with a `// Safety:` comment
+// above it saying why the call is sound.
 //
 // The functions below live in Kernel32.dll, which only Windows has. `when #target.os` keeps
 // them out of every other build, and `#Error` explains why such a build stops.
@@ -24,19 +26,21 @@ when #target.os {
             func lstrlenA(text: *char8) -> int32;
         }
     },
-    else => #Error("This lesson calls Kernel32.dll, so it builds for Windows only")
+    _ => #Error("This lesson calls Kernel32.dll, so it builds for Windows only")
 }
 
 func Main() -> int {
-    // Called like any other function. Neither of these can fail, which is why they were
-    // chosen: most system functions can, and the next lesson checks for that.
-    PrintLine("process id   {}", GetCurrentProcessId());
+    // Called like any other function, inside `unsafe`. Neither of these can fail, which is why
+    // they were chosen: most system functions can, and the next lesson checks for that.
+    // Safety: `GetCurrentProcessId` takes nothing and only reads the process's own state.
+    PrintLine("process id   {}", unsafe { GetCurrentProcessId() });
 
     // C functions find the end of a string by looking for a zero byte. A Rux string literal
     // keeps one after its last character, though `.length` does not count it, so `.data`, the
     // address of the first byte, is exactly what a C function expects.
     let word = "extern";
     PrintLine("Rux length   {}", word.length);
-    PrintLine("lstrlenA     {}", lstrlenA(word.data));
+    // Safety: `word.data` addresses the literal's bytes, which end in a zero byte.
+    PrintLine("lstrlenA     {}", unsafe { lstrlenA(word.data) });
     return 0;
 }

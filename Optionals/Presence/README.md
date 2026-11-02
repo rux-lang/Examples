@@ -1,6 +1,6 @@
 # Presence
 
-Open an optional with `match`: `value?` for a present value and `none` for absence.
+Open an optional with `match` or `if ... is`: `.Some(value)` for a present value and `none` for absence.
 
 **You'll need:** [Optional](https://rux-lang.dev/docs/learn/optional), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match), [Guard](https://rux-lang.dev/docs/learn/guard)
 

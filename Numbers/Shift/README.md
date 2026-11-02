@@ -1,7 +1,6 @@
 # Shift
 
-Slide bits with `<<`, `>>` and `>>>`, see how the two right shifts differ on a negative number, and
-pack three fields into one integer.
+Slide bits with `<<`, `>>` and `>>>`, see how the two right shifts differ on a negative number, and pack three fields into one integer.
 
 **You'll need:** [Bitwise](https://rux-lang.dev/docs/learn/bitwise), [Convert](https://rux-lang.dev/docs/learn/convert)
 

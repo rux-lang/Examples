@@ -5,11 +5,11 @@
 //
 // There are two arms to write:
 //
-//     score? => ...    present: `score` is the `int` inside
-//     none => ...      absent: there is nothing to bind
+//     .Some(score) => ...    present: `score` is the `int` inside
+//     none => ...            absent: there is nothing to bind
 //
-// `score?` is a pattern, not a question. Read the `?` as "a present ...". The
-// name before it becomes an ordinary `int`, but only inside its arm.
+// `.Some(score)` is a pattern, not a call. Read it as "a present ...". The
+// name inside it becomes an ordinary `int`, but only inside its arm.
 import Io::PrintLine;
 
 struct Player {
@@ -29,29 +29,30 @@ func ScoreOf(players: Player[..], number: int) -> int? {
 
 func Report(players: Player[..], number: int) {
     match ScoreOf(players, number) {
-        score? => PrintLine("#{} scored {}", number, score),
-        none => PrintLine("#{} is not on the team", number)
-    }
-}
-
-// The same match with the long spelling. `.Some(score)` and `score?` mean the
-// same thing, much as a variant case is matched by name. The short form is the
-// usual one.
-func ReportLong(players: Player[..], number: int) {
-    match ScoreOf(players, number) {
         .Some(score) => PrintLine("#{} scored {}", number, score),
         none => PrintLine("#{} is not on the team", number)
     }
 }
 
-// The `?` wraps any pattern, so a literal and a guard work as usual. The arms
-// are tried from the top, so the general `score?` arm comes after the
-// specific ones.
+// The same question with `if ... is`. The pattern is the same `.Some(score)`,
+// and `score` exists only inside the braces that follow it; `else` is the
+// `none` arm. It reads well when only one of the two cases needs much code.
+func ReportIf(players: Player[..], number: int) {
+    if ScoreOf(players, number) is .Some(score) {
+        PrintLine("#{} scored {}", number, score);
+    } else {
+        PrintLine("#{} is not on the team", number);
+    }
+}
+
+// `.Some(...)` wraps any pattern, so a literal and a guard work as usual. The
+// arms are tried from the top, so the general `.Some(score)` arm comes after
+// the specific ones.
 func Rating(players: Player[..], number: int) -> char8[..] {
     return match ScoreOf(players, number) {
-        0? => "has not scored yet",
-        score? if score >= 20 => "is the top scorer",
-        score? => "is a regular",
+        .Some(0) => "has not scored yet",
+        .Some(score) if score >= 20 => "is the top scorer",
+        .Some(_) => "is a regular",
         none => "is not on the team"
     };
 }
@@ -65,7 +66,7 @@ func Main() -> int {
 
     Report(players, 7);
     Report(players, 9);
-    ReportLong(players, 10);
+    ReportIf(players, 10);
 
     for number in [ 4, 7, 10, 9 ] {
         let rating = Rating(players, number);
