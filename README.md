@@ -167,7 +167,7 @@ Who owns a value, and when it is cleaned up.
 Describing behaviour that many types share.
 
 - 12.1 **[Interface](Interfaces/Interface/)** — declare an interface and implement it for your own types
-- 12.2 **[InterfaceValue](Interfaces/InterfaceValue/)** — borrow any implementing type as a view, and keep handles to it
+- 12.2 **[InterfaceValue](Interfaces/InterfaceValue/)** — borrow values of different types as one interface
 - 12.3 **[InterfaceParameter](Interfaces/InterfaceParameter/)** — write a function that accepts any type implementing an interface
 - 12.4 **[Display](Interfaces/Display/)** — make your own type printable with `{}`
 - 12.5 **[Equatable](Interfaces/Equatable/)** — define what it means for two of your values to be equal

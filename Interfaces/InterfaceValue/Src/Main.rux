@@ -5,13 +5,11 @@
 // same way and the very same call runs Rectangle's `Area` instead. Which function runs is decided
 // while the program runs, by the value behind the view, not by anything written at the call.
 // That is called dynamic dispatch, and it is what lets values of different types share one
-// function, one array, or one loop.
+// function, one parameter list, or one loop.
 //
-// A view is a borrow, so it lasts as long as the code using it. To keep a Shape in an array or a
-// field, a program stores an interface value, `Shape` without the `&`. That is a handle: the
-// address of the shape and its note, copying nothing. A handle points at a value that lives
-// elsewhere, so it is made from the value's address inside `unsafe`, where the program promises
-// the value outlives the handle.
+// A view is a borrow, so it lasts as long as the code using it and copies nothing. To keep a
+// Shape in a field or an array, a program stores a handle instead, `Shape` without the `&`, which
+// the Pointer lesson in Part 15 shows how to make.
 import Io::PrintLine;
 
 interface Shape {
@@ -52,6 +50,15 @@ func Describe(shape: &Shape) {
     PrintLine("holding a {} with area {}", shape.Name(), shape.Area());
 }
 
+// A variadic parameter of views takes any mix of shapes, each borrowed for the call.
+func TotalArea(shapes: &Shape...) -> float64 {
+    var total = 0.0;
+    for each in shapes {
+        total += each.Area();
+    }
+    return total;
+}
+
 func Main() -> int {
     let wheel = Circle { radius: 2.0 };
     let door = Rectangle { width: 1.0, height: 2.0 };
@@ -61,28 +68,19 @@ func Main() -> int {
     let shape: &Shape = wheel;
     PrintLine("holding a {} with area {}", shape.Name(), shape.Area());
 
-    // One function, two types: each call runs the code of the type it was given.
-    Describe(wheel);
+    // One function, another type: the same calls now run Rectangle's code.
     Describe(door);
 
     // A circle and a rectangle cannot share an array: `let shapes = [wheel, door];` is refused
     // with "array element 2 has type 'Rectangle', but element 1 established element type
-    // 'Circle'". Two Shape handles can. Writing `[wheel, door]` for them is refused too, with
-    // "cannot make interface value 'Shape' from 'Circle'": a handle has to point somewhere.
-    // Safety: `wheel` and `door` are locals of `Main` that outlive `shapes` and never move.
-    let shapes: Shape[2] = unsafe { [@wheel as Shape, @door as Shape] };
-    var total = 0.0;
-    for each in shapes {
-        total += each.Area();
-    }
-    PrintLine("total area {}", total);
+    // 'Circle'". As Shapes they can share one call, each argument borrowed as a view.
+    PrintLine("total area {}", TotalArea(wheel, door));
 
-    // A handle copies nothing, so it sees the value as it is now, not as it was.
+    // A view reaches the value itself, so it sees the value as it is when it is used.
     var balloon = Circle { radius: 1.0 };
-    // Safety: `balloon` is a local of `Main` that outlives `tracked` and never moves.
-    let tracked = unsafe { @balloon as Shape };
     balloon.radius = 2.0;
-    PrintLine("the balloon's area is {}, and the handle sees {}", balloon.Area(), tracked.Area());
+    let seen: &Shape = balloon;
+    PrintLine("the balloon's area is {}, and the view sees {}", balloon.Area(), seen.Area());
 
     // Only what Shape promises can be reached through it. `shape.width` is rejected even when a
     // rectangle is behind it: "interface type 'Shape' has no member 'width'".
