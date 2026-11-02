@@ -55,9 +55,9 @@ func Try(allocator: Allocator, count: uint) {
 }
 
 func Main() -> int {
-    // Build the concrete allocator, then name it at the interface type to get an `Allocator`.
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
+    // `SystemAllocator` holds no state, so it converts to an `Allocator` handle wherever one is
+    // wanted, and the handle stays valid for the whole program.
+    let allocator = SystemAllocator();
 
     Try(allocator, 10);
     Try(allocator, 1000);

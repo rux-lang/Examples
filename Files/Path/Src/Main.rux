@@ -16,7 +16,7 @@
 // system may not be text at all, while valid text always makes a name. `{}` shows a path
 // anyway, swapping any unit that is not text for U+FFFD, which is fine for a message and useless
 // for reopening the file.
-import Allocator::{ Allocator, SystemAllocator };
+import Allocator::SystemAllocator;
 import Io::{ Print, PrintLine };
 import Path::{ OsString, OsStringView, Path };
 import Text::TextError;
@@ -30,8 +30,7 @@ func ShowPart(label: char8[..], part: OsStringView?) {
 }
 
 func Main() throws TextError {
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
+    let allocator = SystemAllocator();
 
     var holder = OsString::FromText(allocator, "Bin//reports/summary.txt");
     let path = Path::FromView(holder.View());

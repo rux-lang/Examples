@@ -12,7 +12,7 @@
 // The number comes from a generator seeded from the system's entropy, so every game is
 // different. Asking for entropy can fail, and then there is no fair number to pick, so the
 // program says so and stops.
-import Allocator::{ Allocator, SystemAllocator };
+import Allocator::SystemAllocator;
 import Format::ParseInt32;
 import Io::{ IoErrorKind, Print, PrintLine, ReadLine };
 import Random::{ Pcg64Dxsm, PcgFromEntropy, UniformInRange };
@@ -31,8 +31,7 @@ func Main() -> int {
 
     PrintLine("I am thinking of a number from 1 to 100. You have {} guesses.", Guesses);
 
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
+    let allocator = SystemAllocator();
     var builder = StringBuilder(allocator);
 
     var used = 0;

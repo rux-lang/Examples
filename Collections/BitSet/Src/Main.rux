@@ -14,7 +14,7 @@
 //
 // Moving it with `move ann` would use `ann` up. To combine sets and keep the originals, build the
 // combination in a new set.
-import Allocator::{ Allocator, SystemAllocator };
+import Allocator::SystemAllocator;
 import Collections::BitSet;
 import Io::{ Print, PrintLine };
 
@@ -32,8 +32,7 @@ func Show(label: char8[..], days: &BitSet) {
 }
 
 func Main() {
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
+    let allocator = SystemAllocator();
 
     // The days of June each person is free. `Set` grows the set by another word when it must.
     var ann = BitSet(allocator);

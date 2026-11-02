@@ -5,13 +5,12 @@
 // Two numbers describe a vector, and they are worth keeping apart. Its length is how many values
 // it holds. Its capacity is how many would fit before it needs a larger block. Pushing raises the
 // length by one every time; the capacity only jumps now and then.
-import Allocator::{ Allocator, SystemAllocator };
+import Allocator::SystemAllocator;
 import Collections::Vector;
 import Io::{ Print, PrintLine };
 
 func Main() {
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
+    let allocator = SystemAllocator();
 
     // A vector keeps its storage somewhere, so it is given an allocator. Making one asks for
     // nothing yet: an empty vector has a capacity of zero.
