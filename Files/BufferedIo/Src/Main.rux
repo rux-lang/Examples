@@ -13,23 +13,24 @@
 //   writer's destructor flushes too, as a safety net, but no error may leave a destructor, so
 //   there a failure is dropped unreported.
 //
-// A buffered writer keeps its destination for as long as it lives, so it needs a stored stream
-// rather than a borrow: `file.Stream()` gives one. The file must outlive the writer.
-import Allocator::{ Allocator, SystemAllocator };
+// A buffered writer keeps its destination for as long as it lives, so it needs a stored `Writer`
+// handle rather than a borrow: `unsafe { @file as Writer }` makes one from the file's address,
+// and the `unsafe` block is where the program promises the file outlives the writer.
+import Allocator::SystemAllocator;
 import FileSystem::{ DeleteFile, File, OpenOptions };
 import Io::{ BufferedWriter, IoError, PrintLine, Writer };
 import Path::{ OsString, Path };
 
 func Main() throws IoError {
-    var system = SystemAllocator();
-    let allocator: Allocator = system;
+    let allocator = SystemAllocator();
     var holder = OsString::FromText(allocator, "Bin/log.txt");
     let path = Path::FromView(holder.View());
 
     var file = try File::Open(allocator, path, OpenOptions::Writing());
-    let sink: Writer = file.Stream();
-    // A tiny 32-byte buffer, so it fills quickly. The usual choice is 0, meaning 8 KiB.
-    var buffered = try BufferedWriter(allocator, sink, 32);
+    // A tiny 32-byte buffer, so it fills quickly. The usual choice is 0, meaning 8 KiB. The
+    // buffered writer keeps a handle to the file, so the file has to outlive it.
+    // Safety: `file` is declared before `buffered`, so it outlives it, and is never moved.
+    var buffered = try BufferedWriter(allocator, unsafe { @file as Writer }, 32);
 
     PrintLine("write  pending  in file");
     for i in 1..=6 {
