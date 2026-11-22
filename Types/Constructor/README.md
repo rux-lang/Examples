@@ -1,6 +1,6 @@
 # Constructor
 
-Build values through a function named after the type, which can check or compute the fields.
+Build values through a constructor — an ordinary function such as `Time::New` or `Time::FromMinutes` — which can check or compute the fields.
 
 **You'll need:** [Method](https://rux-lang.dev/docs/learn/method), [Overload](https://rux-lang.dev/docs/learn/overload)
 

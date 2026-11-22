@@ -1,6 +1,6 @@
 # MutableReference
 
-Lend a value with `&var T`, so a function can change the caller's value in place.
+Lend a value with `&var T`, so a function can change the caller's value in place, and write the loan as `&var x` at the call.
 
 **You'll need:** [Reference](https://rux-lang.dev/docs/learn/reference)
 

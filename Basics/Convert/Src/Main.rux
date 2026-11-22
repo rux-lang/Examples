@@ -2,7 +2,6 @@
 // one signedness, such as `int8` to `int32` or `float32` to `float64`. Every other conversion is
 // asked for with `as`, because every other conversion can change the value. Writing `as` is how
 // you tell the compiler, and the next reader, that the change is intended.
-import Core::int32;
 import Io::PrintLine;
 
 func Main() -> int {
