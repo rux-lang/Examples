@@ -1,8 +1,8 @@
 # Regex
 
-Compile a regular expression with `Regex`, which throws a `RegexError` for a malformed pattern, test text with `IsMatch`, find where a match is with `Find` and `FindAt`, and turn plain text into a pattern with `Escape`.
+Compile a regular expression with `Regex::New`, which fails with a `RegexError` for a malformed pattern, test text with `IsMatch`, find where a match is with `Find` and `FindAt`, and turn plain text into a pattern with `Escape`.
 
-**You'll need:** [String](https://rux-lang.dev/docs/learn/string), [Catch](https://rux-lang.dev/docs/learn/catch), [Presence](https://rux-lang.dev/docs/learn/presence), [CoalesceExit](https://rux-lang.dev/docs/learn/coalesce-exit)
+**You'll need:** [String](https://rux-lang.dev/docs/learn/string), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Propagate](https://rux-lang.dev/docs/learn/propagate), [Presence](https://rux-lang.dev/docs/learn/presence), [CoalesceExit](https://rux-lang.dev/docs/learn/coalesce-exit)
 
 ```sh
 rux run

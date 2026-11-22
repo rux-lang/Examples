@@ -2,7 +2,7 @@
 
 Wait for a group of detached workers with a `WaitGroup` — `Add` before they start, `Done` as each one's last step, `Wait` in `Main` — and collect their answers in numbered slots so the output keeps its order.
 
-**You'll need:** [Move](https://rux-lang.dev/docs/learn/move), [Thread](https://rux-lang.dev/docs/learn/thread), [Mutex](https://rux-lang.dev/docs/learn/mutex)
+**You'll need:** [GiveAway](https://rux-lang.dev/docs/learn/give-away), [Thread](https://rux-lang.dev/docs/learn/thread), [Mutex](https://rux-lang.dev/docs/learn/mutex)
 
 ```sh
 rux run

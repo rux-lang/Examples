@@ -14,7 +14,7 @@ rux build
 Compiling StaticLibrary v0.1.0 (Debug, Windows x86-64)
 Built StaticLibrary (Debug, Windows x86-64) in 1 ms
   Output: Bin\Debug\Windows\x86-64\StaticLibrary.lib
-  1 file | 28 LOC | 61 tokens | 18.6K LOC/s | StaticLibrary.lib 1 KB
+  1 file | 31 LOC | 63 tokens | 18.6K LOC/s | StaticLibrary.lib 5 KB
 ```
 
 Any symbol lister shows what the archive holds; with LLVM installed, `llvm-nm Bin/Debug/Windows/x86-64/StaticLibrary.lib` prints `T` for the global `Area` and `Perimeter` and `t` for the local `Double`.

@@ -2,7 +2,7 @@
 
 Make a `Collections::Array<T>` whose length is chosen at run time, and compare it with an inline `int32[4]`.
 
-**You'll need:** [Array](https://rux-lang.dev/docs/learn/array), [Slice](https://rux-lang.dev/docs/learn/slice), [Move](https://rux-lang.dev/docs/learn/move), [Catch](https://rux-lang.dev/docs/learn/catch), [Allocator](https://rux-lang.dev/docs/learn/allocator), [Vector](https://rux-lang.dev/docs/learn/vector)
+**You'll need:** [Array](https://rux-lang.dev/docs/learn/array), [Slice](https://rux-lang.dev/docs/learn/slice), [GiveAway](https://rux-lang.dev/docs/learn/give-away), [Catch](https://rux-lang.dev/docs/learn/catch), [Allocator](https://rux-lang.dev/docs/learn/allocator), [Vector](https://rux-lang.dev/docs/learn/vector)
 
 ```sh
 rux run

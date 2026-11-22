@@ -2,7 +2,7 @@
 
 Join paths with `Join` and `Push`, which place separators correctly, instead of gluing strings.
 
-**You'll need:** [Path](https://rux-lang.dev/docs/learn/path), [Move](https://rux-lang.dev/docs/learn/move)
+**You'll need:** [Path](https://rux-lang.dev/docs/learn/path), [GiveAway](https://rux-lang.dev/docs/learn/give-away)
 
 ```sh
 rux run

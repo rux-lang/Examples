@@ -2,7 +2,7 @@
 
 Keep two people's free days of a month in `BitSet`s, one bit per day, then find the days both, either or only one of them is free with word-at-a-time union, intersection and difference.
 
-**You'll need:** [Bitwise](https://rux-lang.dev/docs/learn/bitwise), [Move](https://rux-lang.dev/docs/learn/move), [HashSet](https://rux-lang.dev/docs/learn/hash-set)
+**You'll need:** [Bitwise](https://rux-lang.dev/docs/learn/bitwise), [GiveAway](https://rux-lang.dev/docs/learn/give-away), [HashSet](https://rux-lang.dev/docs/learn/hash-set)
 
 ```sh
 rux run

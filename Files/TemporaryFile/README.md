@@ -2,7 +2,7 @@
 
 Create a scratch file with an unguessable name that is deleted when you are done with it.
 
-**You'll need:** [Metadata](https://rux-lang.dev/docs/learn/metadata), [Destructor](https://rux-lang.dev/docs/learn/destructor), [Move](https://rux-lang.dev/docs/learn/move)
+**You'll need:** [Metadata](https://rux-lang.dev/docs/learn/metadata), [Destructor](https://rux-lang.dev/docs/learn/destructor), [GiveAway](https://rux-lang.dev/docs/learn/give-away)
 
 ```sh
 rux run

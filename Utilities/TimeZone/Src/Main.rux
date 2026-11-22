@@ -38,7 +38,7 @@ func ShowMoment(zone: &TimeZone, moment: Timestamp) {
 
 // Which moments the local date and time `text` stands for in `zone`.
 func ShowLocal(zone: &TimeZone, text: char8[..]) {
-    let local = try ParseDateTime(text) catch {
+    let local = ParseDateTime(text) catch {
         _ => {
             PrintLine("{} is not a date and time", text);
             return;
@@ -56,36 +56,35 @@ func ShowLocal(zone: &TimeZone, text: char8[..]) {
 }
 
 func Main() -> int {
-    let allocator = SystemAllocator();
+    let allocator = SystemAllocator::New();
 
-    // A rule can be malformed, so `FromRule` throws a `TimeZoneError`; the UTC zone has no rule
-    // to get wrong, so `Utc` cannot fail. A zone owns the memory it was built in, so it is never
-    // copied by accident:
+    // A rule can be malformed, so `FromRule` can fail with a `TimeZoneError`; the UTC zone has no
+    // rule to get wrong, so `Utc` cannot fail. A zone owns the memory it was built in, so passing
+    // it by value would give it away. The functions below borrow it instead, as `&TimeZone`, and
+    // the loan is written at each call:
     //
-    //     let copy = kyiv;
-    //         error: cannot copy 'TimeZone', which owns resources
-    //
-    // The functions below borrow it instead, as `&TimeZone`.
+    //     ShowMoment(kyiv, winter.ToTimestamp());
+    //         error: 'ShowMoment' borrows its argument, and 'TimeZone' owns resources, so the loan must be written
     let utc = TimeZone::Utc(allocator);
-    let kyiv = try TimeZone::FromRule(allocator, "Kyiv", "EET-2EEST,M3.5.0/3,M10.5.0/4") catch {
+    let kyiv = TimeZone::FromRule(allocator, "Kyiv", "EET-2EEST,M3.5.0/3,M10.5.0/4") catch {
         _ => return 1
     };
-    let newYork = try TimeZone::FromRule(allocator, "New York", "EST5EDT,M3.2.0,M11.1.0") catch {
+    let newYork = TimeZone::FromRule(allocator, "New York", "EST5EDT,M3.2.0,M11.1.0") catch {
         _ => return 1
     };
 
     // One moment in winter and one in summer, each read on three clocks. The offsets change with
     // the season, and by a different amount on different dates in each place.
-    let winter = try ParseRfc3339("2026-01-15T12:00:00Z") catch { _ => return 1 };
-    let summer = try ParseRfc3339("2026-07-01T12:00:00Z") catch { _ => return 1 };
+    let winter = ParseRfc3339("2026-01-15T12:00:00Z") !! return 1;
+    let summer = ParseRfc3339("2026-07-01T12:00:00Z") !! return 1;
     PrintLine("{}", winter);
-    ShowMoment(utc, winter.ToTimestamp());
-    ShowMoment(kyiv, winter.ToTimestamp());
-    ShowMoment(newYork, winter.ToTimestamp());
+    ShowMoment(&utc, winter.ToTimestamp());
+    ShowMoment(&kyiv, winter.ToTimestamp());
+    ShowMoment(&newYork, winter.ToTimestamp());
     PrintLine("{}", summer);
-    ShowMoment(utc, summer.ToTimestamp());
-    ShowMoment(kyiv, summer.ToTimestamp());
-    ShowMoment(newYork, summer.ToTimestamp());
+    ShowMoment(&utc, summer.ToTimestamp());
+    ShowMoment(&kyiv, summer.ToTimestamp());
+    ShowMoment(&newYork, summer.ToTimestamp());
 
     // From local time back to a moment. On 29 March 2026 Kyiv's clocks jump from 03:00 to 04:00,
     // so 03:30 never happens; on 25 October they go back from 04:00 to 03:00, so 03:30 happens
@@ -95,16 +94,14 @@ func Main() -> int {
     //     let moment: Timestamp = kyiv.Resolve(local);
     //         error: cannot assign 'LocalTime' to 'Timestamp'
     PrintLine("Kyiv local times:");
-    ShowLocal(kyiv, "2026-07-01T15:00:00");
-    ShowLocal(kyiv, "2026-03-29T03:30:00");
-    ShowLocal(kyiv, "2026-10-25T03:30:00");
+    ShowLocal(&kyiv, "2026-07-01T15:00:00");
+    ShowLocal(&kyiv, "2026-03-29T03:30:00");
+    ShowLocal(&kyiv, "2026-10-25T03:30:00");
 
     // A rule must name its standard time with at least three letters, then give its offset.
-    try {
-        TimeZone::FromRule(allocator, "Nowhere", "X5");
-        PrintLine("rule X5 accepted");
-    } catch {
-        error => PrintLine("rule X5 refused: {}", Reason(error))
+    match TimeZone::FromRule(allocator, "Nowhere", "X5") {
+        _: TimeZone => PrintLine("rule X5 accepted"),
+        error: TimeZoneError => PrintLine("rule X5 refused: {}", Reason(error))
     }
     return 0;
 }

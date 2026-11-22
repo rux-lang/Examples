@@ -9,12 +9,12 @@
 //   extending it, which is what joining means in most languages and shells.
 //
 // The result is a `PathBuffer`: a path that owns its units and can grow with `Push`, which
-// follows the same rules. A buffer is move-only, so to print it or pass it to anything that
+// follows the same rules. A buffer is never copied, so to print it or pass it to anything that
 // reads a path, lend it out as a `Path` through `AsPath`.
 //
-// Joining cannot fail, so neither `Join` nor `Push` throws: it never looks at the disk, and
-// running out of memory for the new buffer panics, as it does in every collection. On Windows
-// the separators it adds are `\`; on Linux and macOS they are `/`.
+// Joining cannot fail, so neither `Join` nor `Push` declares an error: it never looks at the
+// disk, and running out of memory for the new buffer panics, as it does in every collection. On
+// Windows the separators it adds are `\`; on Linux and macOS they are `/`.
 import Allocator::{ Allocator, SystemAllocator };
 import Io::PrintLine;
 import Path::{ Join, OsString, Path, PathBuffer };
@@ -26,8 +26,8 @@ func JoinText(allocator: Allocator, base: char8[..], segment: char8[..]) -> Path
     return Join(allocator, Path::FromView(baseHolder.View()), segmentHolder.View());
 }
 
-func Main() {
-    let allocator = SystemAllocator();
+func Main() -> int {
+    let allocator = SystemAllocator::New();
 
     let plain = JoinText(allocator, "Bin", "reports");
     PrintLine("Bin  + reports     {}", plain.AsPath());
@@ -45,11 +45,12 @@ func Main() {
     PrintLine("Bin  + /etc/passwd {}", absolute.AsPath());
 
     // Growing one buffer in place, a segment at a time.
-    var built = PathBuffer(allocator);
+    var built = PathBuffer::New(allocator);
     let pieces = ["Bin", "reports", "2026", "summary.txt"];
     for piece in pieces {
         var holder = OsString::FromText(allocator, piece);
         built.Push(holder.View());
     }
     PrintLine("pushed four        {}", built.AsPath());
+    return 0;
 }

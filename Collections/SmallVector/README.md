@@ -2,7 +2,7 @@
 
 Collect the prime factors of numbers in a `SmallVector<uint64>`, which keeps up to eight of them inside itself without allocating, and watch the longer lists move to the heap.
 
-**You'll need:** [Vector](https://rux-lang.dev/docs/learn/vector), [Move](https://rux-lang.dev/docs/learn/move), [Optional](https://rux-lang.dev/docs/learn/optional)
+**You'll need:** [Vector](https://rux-lang.dev/docs/learn/vector), [GiveAway](https://rux-lang.dev/docs/learn/give-away), [Optional](https://rux-lang.dev/docs/learn/optional)
 
 ```sh
 rux run

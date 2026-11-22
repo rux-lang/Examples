@@ -1,8 +1,8 @@
 // An iterator hands out one item each time its `Next` is called. An adaptor is an iterator that
 // wraps another one and changes what comes out: `Map` passes each item through a function,
 // `Filter` drops the items that fail a test, `Take` stops after a number of them, and so on.
-// Core provides seven, and because each is an iterator itself they nest, each one wrapping the
-// next:
+// Algorithms provides seven, and because each is an iterator itself they nest, each one
+// wrapping the next:
 //
 //     Take(Filter(Map(source, Square), IsEven), 3)
 //
@@ -12,9 +12,9 @@
 // for an item only when it is itself asked for one. So no list of results is ever built, and a
 // chain can even draw from a source that never ends, as long as something stops asking.
 //
-// An adaptor takes anything whose `Next` returns `T?` — Core calls that a `Cursor<T>`. That is
-// a container's iterator, another adaptor, or a slice turned into one by `Walk`.
-import Core::{ Chain, Enumerate, Filter, Indexed, Map, Skip, Take, Walk, Zip };
+// An adaptor takes anything whose `Next` returns `T?` — Algorithms calls that a `Cursor<T>`.
+// That is a container's iterator, another adaptor, or a slice turned into one by `Walk`.
+import Algorithms::Adaptors::{ Chain, Enumerate, Filter, Indexed, Map, Skip, Take, Walk, Zip };
 import Io::{ Print, PrintLine };
 
 // Counts up from a number, for ever, and says each time it is asked.

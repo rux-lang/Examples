@@ -1,8 +1,8 @@
 # Date
 
-Read calendar dates with `ParseDate`, which throws a `TimeParseError` that says what was wrong and where, and see how leap years shape the calendar.
+Read calendar dates with `ParseDate`, which fails with a `TimeParseError` that says what was wrong and where, and see how leap years shape the calendar.
 
-**You'll need:** [Stopwatch](https://rux-lang.dev/docs/learn/stopwatch), [Catch](https://rux-lang.dev/docs/learn/catch), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
+**You'll need:** [Stopwatch](https://rux-lang.dev/docs/learn/stopwatch), [Catch](https://rux-lang.dev/docs/learn/catch), [Outcome](https://rux-lang.dev/docs/learn/outcome), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
 
 ```sh
 rux run

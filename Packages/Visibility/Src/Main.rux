@@ -22,7 +22,7 @@ import Tally::Counter;
 func Main() -> int {
     // The public constructor is the only way to make a `Counter` here. A struct literal would have
     // to set the private `count`, and is refused for that reason.
-    var counter = Counter(4);
+    var counter = Counter::New(4);
 
     counter.Tick();
     counter.Tick();

@@ -3,9 +3,9 @@
 // into independent pieces finishes sooner when each piece gets its own thread.
 //
 // Rux has no closures, so a thread cannot capture the variables around it. `Spawn(entry, context)`
-// takes a function and one value to call it with; the value moves to the new thread, and the
-// function's result waits there until someone collects it. Starting a thread can fail when the
-// system has none to spare, so `Spawn` is declared `-> JoinHandle<R> throws ThreadError`.
+// takes a function and one value to call it with; the value is given away to the new thread, and
+// the function's result waits there until someone collects it. Starting a thread can fail when the
+// system has none to spare, so `Spawn` is declared `-> JoinHandle<R> ! ThreadError`.
 //
 // `Join` on the handle waits for the thread to finish and hands back its result. Printing only
 // after joining keeps the output in a fixed order, however the threads were scheduled.
@@ -43,15 +43,16 @@ func Describe(error: ThreadError) -> char8[..] {
 
 func Main() -> int {
     // Four threads, each summing a quarter of 1..=1000000. They start at once and run side by side.
-    // `Spawn` can throw, so the failure is dealt with at each call; a call left unmarked is
-    // refused:
+    // `Spawn` can fail, so each call yields `JoinHandle<uint64> ! ThreadError`, not yet a handle.
+    // Here every call gives up with exit status 1; an outcome left unhandled is refused:
     //
-    //     error: call to 'Spawn' can throw 'ThreadError' but is not marked with 'try'
-    let first = try Spawn(SumSpan, Span { first: 1, last: 250000 }) catch { _ => return 1 };
-    let second = try Spawn(SumSpan, Span { first: 250001, last: 500000 }) catch { _ => return 1 };
-    let third = try Spawn(SumSpan, Span { first: 500001, last: 750000 }) catch { _ => return 1 };
-    let fourth = try Spawn(SumSpan, Span { first: 750001, last: 1000000 }) catch { _ => return 1 };
-    var handles: JoinHandle<uint64>[4] = [move first, move second, move third, move fourth];
+    //     error: array element 1 has type 'JoinHandle<uint64> ! ThreadError', but the array's
+    //            element type is 'JoinHandle<uint64>'
+    let first = Spawn(SumSpan, Span { first: 1, last: 250000 }) catch { _ => return 1 };
+    let second = Spawn(SumSpan, Span { first: 250001, last: 500000 }) catch { _ => return 1 };
+    let third = Spawn(SumSpan, Span { first: 500001, last: 750000 }) catch { _ => return 1 };
+    let fourth = Spawn(SumSpan, Span { first: 750001, last: 1000000 }) catch { _ => return 1 };
+    var handles: JoinHandle<uint64>[4] = [first, second, third, fourth];
 
     // `Join` waits for each thread in turn. A thread that finished early simply waits to be asked.
     var total: uint64 = 0;
@@ -64,23 +65,24 @@ func Main() -> int {
     PrintLine("joinable after join   {}", handles[0].IsJoinable());
 
     // `SpawnWith` takes options too: here, a 64 KiB stack instead of the system's default. Every
-    // thread has its own identifier, and this one hands its own back to compare. Inside a `try`
-    // block every call is covered, and the `catch` arms take the error.
-    let options = ThreadOptions().WithStackSize(65536u);
-    try {
-        let handle = SpawnWith(options, Identify, 0u8);
-        // A handle is moved, never copied, so `var other = handle;` is refused:
-        //
-        //     error: cannot copy 'JoinHandle<uint64>', which owns resources
-        var other = move handle;
-        PrintLine("a different id        {}", other.Join() != CurrentId());
-    } catch {
-        error => PrintLine("no thread: {}", Describe(error))
+    // thread has its own identifier, and this one hands its own back to compare. Matching the
+    // outcome runs one arm for the handle and another for the error.
+    let options = ThreadOptions::New().WithStackSize(65536u);
+    match SpawnWith(options, Identify, 0u8) {
+        handle: JoinHandle<uint64> => {
+            // A handle is given away, never copied, so `handle` cannot be used after
+            // `var other = handle;`:
+            //
+            //     error: 'handle' is used after it was given away
+            var other = handle;
+            PrintLine("a different id        {}", other.Join() != CurrentId());
+        },
+        error: ThreadError => PrintLine("no thread: {}", Describe(error)),
     }
 
     // A handle that is detached, or simply dropped, lets its thread run on unwatched. Nothing can
     // join it any more, so nothing can see its result.
-    var background = try Spawn(SumSpan, Span { first: 1, last: 10 }) catch { _ => return 1 };
+    var background = Spawn(SumSpan, Span { first: 1, last: 10 }) catch { _ => return 1 };
     background.Detach();
     PrintLine("joinable after detach {}", background.IsJoinable());
 

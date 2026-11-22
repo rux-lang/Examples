@@ -2,7 +2,7 @@
 
 Push values into a `Vector<T>` and watch its length and capacity grow apart.
 
-**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [GenericType](https://rux-lang.dev/docs/learn/generic-type), [FallibleMain](https://rux-lang.dev/docs/learn/fallible-main), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
+**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [GenericType](https://rux-lang.dev/docs/learn/generic-type), [ExitStatus](https://rux-lang.dev/docs/learn/exit-status), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
 
 ```sh
 rux run

@@ -2,7 +2,7 @@
 
 Write a text file and read it back, handling every `IoError` along the way.
 
-**You'll need:** [Path](https://rux-lang.dev/docs/learn/path), [ErrorSum](https://rux-lang.dev/docs/learn/error-sum), [Catch](https://rux-lang.dev/docs/learn/catch), [Guard](https://rux-lang.dev/docs/learn/guard)
+**You'll need:** [Path](https://rux-lang.dev/docs/learn/path), [ErrorSum](https://rux-lang.dev/docs/learn/error-sum), [Catch](https://rux-lang.dev/docs/learn/catch), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Guard](https://rux-lang.dev/docs/learn/guard)
 
 ```sh
 rux run

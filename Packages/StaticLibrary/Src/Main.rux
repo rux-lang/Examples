@@ -15,10 +15,13 @@
 // - It is not what Rux packages consume. A package that lists this one under `[Dependencies]`
 //   compiles its source, exactly as it would a source library; in Rux 0.4.0 dependencies are
 //   always taken as source. The archive is for native toolchains.
+
+/// The space a rectangle covers.
 pub func Area(width: int, height: int) -> int {
     return width * height;
 }
 
+/// The distance around a rectangle.
 pub func Perimeter(width: int, height: int) -> int {
     return Double(width + height);
 }

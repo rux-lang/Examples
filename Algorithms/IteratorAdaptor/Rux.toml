@@ -10,5 +10,5 @@ Description = "Chain lazy steps such as map, filter and take over an iterator"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
-Core = { Namespace = "Rux", Version = "*" }
+Algorithms = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }

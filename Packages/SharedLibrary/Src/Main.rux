@@ -17,10 +17,13 @@
 // package that depends on it compiles its source instead, as for every dependency in Rux 0.4.0.
 // Calling an export from a separately built program is done with `extern` and `#Link`, which the
 // Platform part covers.
+
+/// The space a rectangle covers.
 pub func Area(width: int, height: int) -> int {
     return width * height;
 }
 
+/// The distance around a rectangle.
 pub func Perimeter(width: int, height: int) -> int {
     return Double(width + height);
 }

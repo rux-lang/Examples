@@ -2,22 +2,22 @@
 // Text cut in the wrong place, or bytes that were never text, break its rules. The Text package
 // has the two tools underneath every view and String:
 //
-//     Validate(bytes) throws Utf8Failure
+//     Validate(bytes) -> !Utf8Failure
 //         is all of it UTF-8, and if not, where?
-//     DecodeAt(bytes, index) -> DecodedScalar throws Utf8Error
+//     DecodeAt(bytes, index) -> DecodedScalar ! Utf8Error
 //         which character starts here?
 //
 // A `Utf8Failure` carries two fields: `reason`, a `Utf8Error` saying what was wrong, and `index`,
 // the byte where the trouble starts. A `DecodedScalar` carries the character and its width.
 import Io::PrintLine;
-import Text::{ DecodeAt, Validate };
+import Text::Utf8::{ DecodeAt, Validate };
 
+// `Validate` has no value to give back, only success or a failure, so its two sides are matched
+// by name: `.Success` and `.Failure`.
 func Check(label: char8[..], bytes: char8[..]) {
-    try {
-        Validate(bytes);
-        PrintLine("{}  valid", label);
-    } catch {
-        failure => PrintLine("{}  {} at byte {}", label, failure.reason, failure.index)
+    match Validate(bytes) {
+        .Success(_) => PrintLine("{}  valid", label),
+        .Failure(failure) => PrintLine("{}  {} at byte {}", label, failure.reason, failure.index)
     }
 }
 
@@ -28,7 +28,7 @@ func Main() -> int {
     // Decoding walks the text one character at a time, stepping by each character's width.
     var index: uint = 0;
     while index < word.length {
-        let decoded = try DecodeAt(word, index) catch { _ => return 1 };
+        let decoded = DecodeAt(word, index) catch { _ => return 1 };
         PrintLine("byte {}  {}  {} byte(s)", index, decoded.scalar, decoded.width);
         index += decoded.width;
     }

@@ -1,8 +1,8 @@
 # Uuid
 
-Make a random identifier with `Random`, which throws an `EntropyError` when the system has no entropy, and read and write its strict text form with `Parse` and `{}`.
+Make a random identifier with `Random`, which fails with an `EntropyError` when the system has no entropy, and read and write its strict text form with `Parse` and `{}`.
 
-**You'll need:** [Entropy](https://rux-lang.dev/docs/learn/entropy), [Catch](https://rux-lang.dev/docs/learn/catch), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
+**You'll need:** [Entropy](https://rux-lang.dev/docs/learn/entropy), [Catch](https://rux-lang.dev/docs/learn/catch), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [Outcome](https://rux-lang.dev/docs/learn/outcome), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match)
 
 ```sh
 rux run

@@ -22,19 +22,19 @@ import Process::{
 // from one set to the empty string.
 func Show(name: char8[..]) {
     match Variable(name) {
-        .Some(value) => PrintLine("{:<13} = \"{}\"", name, value),
+        value? => PrintLine("{:<13} = \"{}\"", name, value),
         none => PrintLine("{:<13} is not set", name)
     }
 }
 
-func Main() throws IoError {
-    let allocator = SystemAllocator();
+func Run() -> !IoError {
+    let allocator = SystemAllocator::New();
 
     // Argument zero is the program itself, as it was started: a name or a path the parent chose,
     // so it differs from one machine to the next. The real arguments start at one.
     PrintLine("arguments     {}", ArgumentCount() - 1);
-    let program = Path::FromView(Argument(0) ?? OsStringView());
-    PrintLine("program       {}", program.Stem() ?? OsStringView());
+    let program = Path::FromView(Argument(0) ?? OsStringView::New());
+    PrintLine("program       {}", program.Stem() ?? OsStringView::New());
     var index: uint = 1;
     for argument in Arguments().Skip(1) {
         PrintLine("argument {}    {}", index, argument);
@@ -46,7 +46,7 @@ func Main() throws IoError {
     // branch. `Exit` ends the process at once with a status; nothing after it runs.
     var quit = OsString::FromText(allocator, "--quit");
     let wanted = quit.View();
-    let first = Argument(1) ?? OsStringView();
+    let first = Argument(1) ?? OsStringView::New();
     if first.Equals(wanted) {
         PrintLine("leaving early with status 3");
         Exit(3);
@@ -56,9 +56,9 @@ func Main() throws IoError {
     // change is seen by this process and by every child it starts from now on, never by the
     // parent that started it.
     Show("LESSON_COLOUR");
-    try SetVariable("LESSON_COLOUR", "teal");
+    SetVariable("LESSON_COLOUR", "teal")!;
     Show("LESSON_COLOUR");
-    try SetVariable("LESSON_COLOUR", "");
+    SetVariable("LESSON_COLOUR", "")!;
     Show("LESSON_COLOUR");
 
     // `Environment` walks every variable, as `EnvironmentVariable` pairs of name and value.
@@ -75,25 +75,28 @@ func Main() throws IoError {
     PrintLine("found in walk {}", found);
     PrintLine("any at all    {}", count > 0);
 
-    try RemoveVariable("LESSON_COLOUR");
+    RemoveVariable("LESSON_COLOUR")!;
     Show("LESSON_COLOUR");
 
     // A name may not contain `=`, since `=` is what ends a name in the environment.
-    try {
-        SetVariable("LESSON=COLOUR", "teal");
-        PrintLine("a name with = was accepted?");
-    } catch {
-        error if error.kind == IoErrorKind::InvalidInput =>
+    match SetVariable("LESSON=COLOUR", "teal") {
+        .Success(_) => PrintLine("a name with = was accepted?"),
+        .Failure(error) if error.kind == IoErrorKind::InvalidInput =>
             PrintLine("LESSON=COLOUR refused as invalid input"),
-        error => throw error
+        .Failure(error) => throw error
     }
 
     // The process identifier is the system's number for this run, and changes every time.
     PrintLine("process id    {}", CurrentId());
 
-    // Returning from `Main` is the ordinary way to finish: a success here is exit status 0, and
-    // an error passed out with `try` is status 1.
+    // Returning is the ordinary way to finish: `Main` turns a success here into exit status 0,
+    // and an error passed out with `!` into status 1.
     //
     //     let home: OsStringView = Variable("HOME");
     //         error: cannot assign 'OsStringView?' to 'OsStringView'
+}
+
+func Main() -> int {
+    Run() !! return 1;
+    return 0;
 }

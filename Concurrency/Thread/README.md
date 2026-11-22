@@ -1,8 +1,8 @@
 # Thread
 
-Start threads with `Spawn`, which moves a function's context to a new thread, and collect each result with `Join` on its `JoinHandle<R>`; detach a thread you will not wait for, and ask how many can run at once.
+Start threads with `Spawn`, which gives a function's context to a new thread, and collect each result with `Join` on its `JoinHandle<R>`; detach a thread you will not wait for, and ask how many can run at once.
 
-**You'll need:** [Struct](https://rux-lang.dev/docs/learn/struct), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match), [Catch](https://rux-lang.dev/docs/learn/catch), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [Move](https://rux-lang.dev/docs/learn/move)
+**You'll need:** [Struct](https://rux-lang.dev/docs/learn/struct), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match), [Catch](https://rux-lang.dev/docs/learn/catch), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback), [GiveAway](https://rux-lang.dev/docs/learn/give-away)
 
 ```sh
 rux run

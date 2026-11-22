@@ -1,6 +1,6 @@
 # UnitTest
 
-Write `#Test` functions that declare `throws TestFailure`, mark each of the `Test` package's `Expect` checks with `try` beside the code they test, and run them with `rux test`, all of them or only those whose names match a filter.
+Write `#Test` functions declared `-> !TestFailure` beside the code they test, pass each failed `Expect` check of the `Test` package on with `!`, and run them with `rux test`, all of them or only those whose names match a filter.
 
 **You'll need:** [SourceLibrary](https://rux-lang.dev/docs/learn/source-library), [Tooling](https://rux-lang.dev/docs/learn/tooling), [Module](https://rux-lang.dev/docs/learn/module), [Presence](https://rux-lang.dev/docs/learn/presence), [Propagate](https://rux-lang.dev/docs/learn/propagate)
 

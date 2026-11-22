@@ -12,7 +12,7 @@
 // Nothing here asks the filesystem anything: a path need not name a file that exists.
 //
 // Text goes in through `OsString::FromText` and comes back out through `ToText`. Only the way
-// out declares `throws TextError`, because it is the one that can really fail: a name from the
+// out declares `! TextError`, because it is the one that can really fail: a name from the
 // system may not be text at all, while valid text always makes a name. `{}` shows a path
 // anyway, swapping any unit that is not text for U+FFFD, which is fine for a message and useless
 // for reopening the file.
@@ -24,13 +24,13 @@ import Text::TextError;
 // The named parts are optional: a root has no file name, and `Makefile` has no extension.
 func ShowPart(label: char8[..], part: OsStringView?) {
     match part {
-        .Some(name) => PrintLine("{:10} {}", label, name),
+        name? => PrintLine("{:10} {}", label, name),
         none => PrintLine("{:10} (none)", label)
     }
 }
 
-func Main() throws TextError {
-    let allocator = SystemAllocator();
+func Explore() -> !TextError {
+    let allocator = SystemAllocator::New();
 
     var holder = OsString::FromText(allocator, "Bin//reports/summary.txt");
     let path = Path::FromView(holder.View());
@@ -48,10 +48,15 @@ func Main() throws TextError {
     ShowPart("extension", path.Extension());
 
     // `Parent` drops the last component, and is absent once there is nothing left to drop.
-    let parent = path.Parent() ?? Path();
+    let parent = path.Parent() ?? Path::New();
     PrintLine("{:10} {}", "parent", parent);
 
     // The exact conversion back to text. It succeeds here because the name began as text.
-    let text = try path.AsView().ToText(allocator);
+    let text = path.AsView().ToText(allocator)!;
     PrintLine("{:10} {}", "as text", text.View());
+}
+
+func Main() -> int {
+    Explore() !! return 1;
+    return 0;
 }

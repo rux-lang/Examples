@@ -15,7 +15,7 @@ import Io::{ Print, PrintLine };
 
 // Collects the prime factors of `number`, smallest first, by dividing out each factor in turn.
 func Factor(allocator: Allocator, number: uint64) -> SmallVector<uint64> {
-    var factors = SmallVector<uint64>(allocator);
+    var factors = SmallVector<uint64>::New(allocator);
     var rest = number;
     var divisor: uint64 = 2;
     while divisor * divisor <= rest {
@@ -28,19 +28,16 @@ func Factor(allocator: Allocator, number: uint64) -> SmallVector<uint64> {
     if rest > 1 {
         factors.Push(rest);
     }
-    // A small vector owns its elements and cannot be copied, so it is moved out. A plain
-    // `return factors;` is refused:
-    //
-    //     error: cannot copy 'SmallVector<uint64>', which owns resources
-    //     help: write 'move factors' to transfer it, or 'factors.Clone()' to copy it
-    return move factors;
+    // A small vector owns its elements, so returning it gives them to the caller. The ones kept
+    // inline are moved along with it.
+    return factors;
 }
 
-func Main() {
-    let allocator = SystemAllocator();
+func Main() -> int {
+    let allocator = SystemAllocator::New();
 
     // `InlineCapacity` is how many elements fit in the 64 bytes.
-    let probe = SmallVector<uint64>(allocator);
+    let probe = SmallVector<uint64>::New(allocator);
     PrintLine("inline room: {} uint64 values", probe.InlineCapacity());
 
     let numbers: uint64[5] = [97, 360, 9699690, 1024, 3072000];
@@ -58,9 +55,10 @@ func Main() {
     // A small vector also pops, truncates and clears like a vector. Once its elements have moved
     // to the heap they stay there, even when only a few are left.
     var factors = Factor(allocator, 1024);
-    if factors.Pop() is .Some(last) {
+    if let last? = factors.Pop() {
         PrintLine("popped {}, {} left", last, factors.Length());
     }
     factors.Truncate(2);
     PrintLine("after truncating: {} left, inline: {}", factors.Length(), factors.IsInline());
+    return 0;
 }

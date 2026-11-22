@@ -2,7 +2,7 @@
 
 Walk a path's components and named parts, and see why a path is not a string.
 
-**You'll need:** [FallibleMain](https://rux-lang.dev/docs/learn/fallible-main), [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [Iterator](https://rux-lang.dev/docs/learn/iterator), [Allocator](https://rux-lang.dev/docs/learn/allocator)
+**You'll need:** [ExitStatus](https://rux-lang.dev/docs/learn/exit-status), [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [Iterator](https://rux-lang.dev/docs/learn/iterator), [Allocator](https://rux-lang.dev/docs/learn/allocator)
 
 ```sh
 rux run
