@@ -1,4 +1,4 @@
-// `catch` turns a call that can throw back into a plain value. `try call catch { arms }` lets a
+// `catch` turns a call that can fail back into a plain value. `call catch { arms }` lets a
 // success straight through, unchanged. An error goes to the arms, which see only the error and
 // must produce a value of the success type in its place.
 //
@@ -15,7 +15,7 @@ variant DigitError {
     Symbol(char)
 }
 
-func ReadDigit(c: char) -> int throws DigitError {
+func ReadDigit(c: char) -> int ! DigitError {
     if c == ' ' {
         throw DigitError::Blank;
     }
@@ -30,7 +30,7 @@ func ReadDigit(c: char) -> int throws DigitError {
 
 // The result is a plain `int`: after the `catch`, there is no failure left to handle.
 func ForgivingDigit(c: char) -> int {
-    return try ReadDigit(c) catch {
+    return ReadDigit(c) catch {
         DigitError::Letter(letter) if letter == 'O' => 0,
         DigitError::Letter(letter) if letter == 'l' => 1,
         DigitError::Letter(_) => -1,

@@ -1,6 +1,6 @@
 # Presence
 
-Open an optional with `match` or `if ... is`: `.Some(value)` for a present value and `none` for absence.
+Open an optional with `match`, using `value?` for a present value and `none` for absence, and ask only whether it is there with `== none` or `!= none`.
 
 **You'll need:** [Optional](https://rux-lang.dev/docs/learn/optional), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match), [Guard](https://rux-lang.dev/docs/learn/guard)
 
@@ -11,7 +11,7 @@ rux run
 ```text
 #7 scored 12
 #9 is not on the team
-#10 scored 25
+#10 is on the team: true
 #4 has not scored yet
 #7 is a regular
 #10 is the top scorer

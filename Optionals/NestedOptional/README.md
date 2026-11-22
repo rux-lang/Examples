@@ -2,7 +2,7 @@
 
 Tell two kinds of absence apart with `int??`, an optional of an optional.
 
-**You'll need:** [Presence](https://rux-lang.dev/docs/learn/presence), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
+**You'll need:** [Presence](https://rux-lang.dev/docs/learn/presence), [IfLet](https://rux-lang.dev/docs/learn/if-let), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
 
 ```sh
 rux run

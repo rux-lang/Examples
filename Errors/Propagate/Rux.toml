@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "Propagate"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Passing an error to the caller with plain try"
+Description = "Passing an error to the caller with a postfix !"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

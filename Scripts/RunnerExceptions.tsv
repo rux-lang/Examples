@@ -8,4 +8,4 @@ Projects/Melody	windows	*	plays sound	0
 Projects/SystemInfo	windows	*	opens a window	0
 Platform/Extern	windows	*	-	0
 Platform/Asm	*	x86_64	-	0
-Errors/FallibleMain	*	*	-	1
+Errors/ExitStatus	*	*	-	1

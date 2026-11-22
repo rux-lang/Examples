@@ -1,10 +1,10 @@
 # ErrorSum
 
-Let one function throw either of two error types, `throws DigitError | RangeError`, and tell them apart with typed patterns in `catch`.
+Let one function fail with either of two error types, `-> int ! DigitError | RangeError`, and tell them apart with typed patterns.
 
 **You'll need:** [Outcome](https://rux-lang.dev/docs/learn/outcome), [Propagate](https://rux-lang.dev/docs/learn/propagate)
 
-`ParsePercent` passes a `DigitError` from `ParseNumber` on with plain `try` — it widens into the sum — and throws a `RangeError` of its own. `Show` handles both in one `try { ... } catch { ... }` block whose arms `e: DigitError` and `e: RangeError` each match one member; leave one out and the compiler names the missing member.
+`ParsePercent` passes a `DigitError` from `ParseNumber` on with `!` — it widens into the sum — and throws a `RangeError` of its own. `Show` matches the outcome: `percent: int` takes the success, and `e: DigitError` and `e: RangeError` each match one member of the error; leave one out and the compiler names the missing member.
 
 ```sh
 rux run

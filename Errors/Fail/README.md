@@ -1,10 +1,10 @@
 # Fail
 
-Leave a function through its `throws` channel with `throw`, carrying an error that says what went wrong.
+Leave a function through its error side with `throw`, carrying an error that says what went wrong.
 
 **You'll need:** [Fallible](https://rux-lang.dev/docs/learn/fallible), [Struct](https://rux-lang.dev/docs/learn/struct)
 
-`Withdraw` declares `-> int throws ShortOfFunds`. `return value;` is the success; `throw ShortOfFunds { ... };` leaves at once with the error. `Report` marks the call with `try` and handles the error in a `catch` arm that prints the shortfall and returns. Throwing a value of another type, or throwing from a function without `throws`, is a compile-time error.
+`Withdraw` declares `-> int ! ShortOfFunds`. `return value;` is the success; `throw ShortOfFunds { ... };` leaves at once with the error. `Report` writes `catch` after the call, and its arm, which sees only the error, prints the shortfall and returns; on success `left` is the plain `int`. Throwing a value of another type, or throwing from a function that cannot fail, is a compile-time error.
 
 ```sh
 rux run

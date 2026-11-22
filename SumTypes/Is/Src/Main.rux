@@ -5,12 +5,16 @@
 //       error: a sum type after 'is' must be grouped
 //       help: write 'value is (Plus | Minus)'
 //
-// Two things `is` does not do:
+// Three things `is` does not do:
 //
 // - It does not narrow. Inside `if token is Number { ... }`, `token` is still the whole sum, so
 //   `token.value` is rejected:
 //       error: type 'Minus | Name | Number | Plus' has no field 'value'
-//   To use what is inside, bind it with a typed pattern in a `match`.
+//
+// - It does not bind. `token is number: Number` is refused with
+//       error: 'is' tests and does not bind 'number'
+//   To use what is inside, bind it with `if let number: Number = token { ... }`, or with a typed
+//   pattern in a `match`.
 //
 // - It does not quietly answer `false`. A test that could never be true is a mistake, and the
 //   compiler says so. `token is bool` is refused because `bool` is not one of the members:
@@ -49,6 +53,7 @@ func Main() -> int {
 
     var numbers = 0;
     var operators = 0;
+    var sum = 0i32;
     for token in tokens {
         // `is` only asks; the token is untouched and keeps its type.
         if token is Number {
@@ -57,8 +62,13 @@ func Main() -> int {
         if token is (Plus | Minus) {
             operators++;
         }
+        // `if let` is the one that binds: `number` is the `Number` inside, here and only here.
+        if let number: Number = token {
+            sum += number.value;
+        }
     }
     PrintLine("{} numbers, {} operators", numbers, operators);
+    PrintLine("the numbers add up to {}", sum);
 
     // The result is an ordinary boolean, so it can be stored and printed like one.
     let startsWithName = tokens[0] is Name;

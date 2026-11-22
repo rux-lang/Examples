@@ -1,0 +1,53 @@
+// Every program so far ended with `return 0;` from `func Main() -> int`. That number is the
+// program's exit status: 0 says it worked, anything else says it did not. It is for whoever
+// started the program — a script, a build tool or a shell. In PowerShell, `echo $LASTEXITCODE`
+// shows it right after the program ends.
+//
+// `func Main() -> int` is the only signature `Main` may have, and `Main` cannot fail. An error is
+// not an exit status, so the program has to decide which status a failure means. The steps that
+// can fail go in a function of their own, and `Main` handles its error like any other:
+//
+//     Install() !! return 1;    // an error leaves `Main` with status 1
+//     return 0;                 // reaching this line means everything worked
+//
+// When the helper works out the status itself, `-> int ! E`, `Main` is a single line:
+// `return Run() !! 1;`.
+//
+// Leaving with status 1 is an ordinary `return`, so every `defer` and destructor on the way out
+// runs as usual. And the error is not printed anywhere: if the user should learn why, print a
+// message — a `catch` arm in `Main` can print one and then `return 1`.
+//
+// This program fails on purpose: the second install does not fit.
+import Io::PrintLine;
+
+struct SpaceError {
+    needed: int;
+    free: int;
+}
+
+func Reserve(needed: int, free: int) -> int ! SpaceError {
+    if needed > free {
+        throw SpaceError { needed: needed, free: free };
+    }
+    return free - needed;
+}
+
+// The steps that can fail, each passing its error on with `!`.
+func Install() -> !SpaceError {
+    var free = 100;
+    PrintLine("Installing the editor (40 MB of {} MB free)", free);
+    free = Reserve(40, free)!;
+
+    PrintLine("Installing the compiler (90 MB of {} MB free)", free);
+    free = Reserve(90, free)!;
+
+    // Never printed: the `!` above passed the error out of `Install`.
+    PrintLine("Everything is installed, {} MB left", free);
+}
+
+// `Main` cannot fail, so `func Main() -> !SpaceError` is refused:
+//     error: 'Main' must be 'func Main() -> int', but it returns '!SpaceError'
+func Main() -> int {
+    Install() !! return 1;
+    return 0;
+}

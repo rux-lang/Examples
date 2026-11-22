@@ -4,7 +4,7 @@ Turn a missing value into an error that says what was missing, with `option ?? t
 
 **You'll need:** [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [Fail](https://rux-lang.dev/docs/learn/fail)
 
-`PriceOf` returns `int?`: an unknown product code is simply `none`. `Total` declares `-> int throws UnknownProduct` and turns that absence into an error with `PriceOf(code) ?? throw UnknownProduct { code: code }` — the fallback runs only when the price is missing, so the error is built only when it is needed. `Order` handles it at the call with `try { ... } catch { e => ... }`.
+`PriceOf` returns `int?`: an unknown product code is simply `none`. `Total` declares `-> int ! UnknownProduct` and turns that absence into an error with `PriceOf(code) ?? throw UnknownProduct { code: code }` — the fallback runs only when the price is missing, so the error is built only when it is needed. `Order` handles it at the call with a `match` on the outcome, `total: int` or `e: UnknownProduct`.
 
 ```sh
 rux run

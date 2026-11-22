@@ -1,6 +1,6 @@
 # Panic
 
-Stop the program at once with `Core::Panic` when something that cannot happen has happened.
+Stop the program at once with `Panic`, from `Core::Diagnostics`, when something that cannot happen has happened.
 
 **You'll need:** [MatchExpression](https://rux-lang.dev/docs/learn/match-expression), [RangePattern](https://rux-lang.dev/docs/learn/range-pattern), [Fallible](https://rux-lang.dev/docs/learn/fallible)
 

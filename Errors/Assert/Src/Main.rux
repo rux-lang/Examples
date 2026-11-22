@@ -13,7 +13,7 @@
 // Write the message as what was expected, since the failing value is not
 // printed.
 //
-// `Core` has two of them, and the difference is the build:
+// `Core::Diagnostics` has two of them, and the difference is the build:
 //
 // - `Assert` is checked in every build. Use it for a promise that must hold
 //   in the program you ship.
@@ -24,7 +24,7 @@
 //
 // `InOrder` below prints a line so you can see that difference: run the
 // program both ways and the line appears only in the debug build.
-import Core::{ Assert, DebugAssert };
+import Core::Diagnostics::{ Assert, DebugAssert };
 import Io::PrintLine;
 
 // A whole pass over the scores: worth checking while developing, too slow to

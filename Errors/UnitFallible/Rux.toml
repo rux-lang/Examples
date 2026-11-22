@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "UnitFallible"
 Version = "0.1.0"
 Type = "Executable"
-Description = "A throwing function with no success value, where reaching the end is success"
+Description = "A function that can fail with no success value, -> !E, where reaching the end is success"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
