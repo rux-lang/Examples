@@ -10,18 +10,18 @@ rux run
 
 ```text
 $ grep -n ^func Src/Main.rux
-38:func SearchFile(allocator: Allocator, regex: &Regex, path: OsStringView, show: Show)
-70:func Pattern(allocator: Allocator, parsed: &Parsed) -> String throws TextError {
-77:func Run(allocator: Allocator, parsed: &Parsed, screen: &var TextWriter) -> int throws FormatError {
-124:func Split(text: OsStringView, words: var OsStringView[..]) -> uint {
-140:func Main() -> int {
+41:func SearchFile(allocator: Allocator, regex: &Regex, path: OsStringView, show: Show)
+74:func Pattern(allocator: Allocator, parsed: &Parsed) -> String ! TextError {
+81:func Run(allocator: Allocator, parsed: &Parsed, screen: &var TextWriter) -> int ! FormatError {
+128:func Split(text: OsStringView, words: var OsStringView[..]) -> uint {
+144:func Main() -> int {
 (exit status 0)
 $ grep -c -i regex Src/Main.rux Rux.toml
 Src/Main.rux:8
 Rux.toml:1
 (exit status 0)
 $ grep -v -c ^\s*// Src/Main.rux
-170
+172
 (exit status 0)
 $ grep -n (unclosed Src/Main.rux
 grep: bad pattern '(unclosed' at byte 0
