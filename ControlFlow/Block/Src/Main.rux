@@ -13,7 +13,7 @@
 // like the others, and the block yields `()`, the empty value:
 //
 //     let area: int = { let width = 3; let height = 4; width * height; };
-//         error: cannot assign '()' to 'int'
+//         error: this block yields '()' because of the ';'
 import Io::PrintLine;
 
 func Main() -> int {

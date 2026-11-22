@@ -99,7 +99,7 @@ func Main() -> int {
         }
     };
     PrintLine("a code:      {}", code[..]);
-    PrintLine("length {}, digits only: {}", code[..].length, AllFrom(code[..], "0123456789"));
+    PrintLine("length {}, digits only: {}", code.length, AllFrom(code[..], "0123456789"));
 
     // Alphabets that would make some characters likelier than others are refused.
     Check("0123456789abcdef");

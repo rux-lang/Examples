@@ -53,7 +53,7 @@ func Main() -> int {
 
     // Every arm has to give back an `int`, because that is what a success would have been; an
     // arm that has no sensible value may leave the function instead, with `return`. And the
-    // arms must cover every case: drop the `Blank` arm and the compiler says "match on
-    // 'DigitError' is not exhaustive; missing DigitError::Blank".
+    // arms must cover every case: drop the `Blank` arm and the compiler says "'catch' arms do
+    // not cover every error of type 'DigitError'; missing DigitError::Blank".
     return 0;
 }
