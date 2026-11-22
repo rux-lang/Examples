@@ -4,7 +4,7 @@
 //
 // Here `Scored` decides who wins and `Display` lets the body print a `T` with `{}`. With only
 // `<T: Scored>`, each `PrintLine` below is rejected: "no matching overload for 'PrintLine' with
-// argument types (char8[..], T, T)". A placeholder needs `Display`, and a `T` is only what its
+// argument types (char8[..], &T, &T)". A placeholder needs `Display`, and a `T` is only what its
 // bounds say it is.
 import Io::PrintLine;
 import Text::{ Display, TextWriter };
@@ -41,9 +41,9 @@ extend int32 : Scored {
 
 func Announce<T: Scored + Display>(first: T, second: T) {
     if second.Score() > first.Score() {
-        PrintLine("{} beats {}", second, first);
+        PrintLine("{} beats {}", &second, &first);
     } else {
-        PrintLine("{} holds off {}", first, second);
+        PrintLine("{} holds off {}", &first, &second);
     }
 }
 
