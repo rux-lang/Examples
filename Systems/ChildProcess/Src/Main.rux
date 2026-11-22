@@ -127,7 +127,8 @@ func RunParent() -> !IoError {
     //
     //     let status = failing.Run();
     //     PrintLine("{}", status.Success());
-    //         error: type 'ExitStatus ! IoError' has no field 'Success'
+    //         error: 'Success' is a member of 'ExitStatus', but the value is the fallible
+    //                'ExitStatus ! IoError'
     //
     // And an exit status is an `int32`, the width every system reports:
     //

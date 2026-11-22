@@ -53,7 +53,8 @@ func Search() -> !RegexError {
     // the whole outcome, a `Regex ! RegexError`, and that has no `IsMatch`:
     //
     //     let code = Regex::New(allocator, "^[A-Z]{3}-\\d{4}$");
-    //         error: type 'Regex ! RegexError' has no field 'IsMatch'
+    //         error: 'IsMatch' is a member of 'Regex', but the value is the fallible
+    //                'Regex ! RegexError'
 
     // `Find` answers with where the leftmost match is, as a `Match` of byte positions, or `none`.
     // `Slice` cuts the matched text out of the text that was searched.
