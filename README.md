@@ -426,6 +426,7 @@ Use the repository runners to check or test the examples. Running without argume
 ./Run.ps1 check
 ./Run.ps1 test -Filter Errors
 ./Run.ps1 test -RuxExecutable ../Rux/Bin/rux.exe
+./Run.ps1 clean
 ```
 
 On Linux, macOS, or FreeBSD, use the equivalent POSIX shell runner:
@@ -435,9 +436,12 @@ sh Run.sh
 sh Run.sh check
 sh Run.sh test --filter Errors
 sh Run.sh test --rux-executable ../Rux/Bin/rux
+sh Run.sh clean
 ```
 
 `check` type-checks the selected packages. `test` also runs eligible executables and builds static/shared libraries; source libraries are only checked. Tests verify exit codes, not printed output. Interactive, audible and windowed examples are checked but not run, and lessons that require another OS or architecture are reported as platform skips. Each run ends with checked, executed, built, skipped, and failed counts, returning a nonzero exit code if any check fails.
+
+`clean` removes the `Bin` and `Temp` folders that the compiler leaves beside every package manifest, including companion packages and workspace members, and the repository `Temp` folder. It needs no compiler, takes the same filter (a filtered clean keeps the repository `Temp`), and removes only a symbolic link, never its target. Run it after switching compilers so no build record from an older Rux is reused.
 
 Both runners use `rux` on PATH unless an executable is supplied. Dependencies must already be installed. The filter is a case-insensitive literal substring of a repository-relative package path; matching a workspace selects its members. An unmatched filter is an error. You can invoke a runner from another directory: package paths remain relative to the repository, while an explicit relative compiler path is resolved from your current directory.
 

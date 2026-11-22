@@ -209,6 +209,38 @@ exit 0
         Write-Host "$runner fixture tests passed."
     }
     Assert-True ($selections.powershell -ceq $selections.shell) 'Both runners invoke identical packages and stages'
+    foreach ($runner in @('powershell', 'shell')) {
+        $outputs = @('A/Good/Bin/Debug/App', 'A/Good/Temp/Cache/Record', 'A/Good/Companion/Temp/Cache',
+            'H/Workspace/App/Bin/Debug', 'Z/After/Temp/Cache', 'Temp/Leftover')
+        foreach ($relative in $outputs) {
+            Write-Text (Join-Path $fixtureRoot "$relative/file.txt") 'output'
+        }
+        $result = Invoke-Runner $runner (@('clean') + (Compiler-Args $runner))
+        Assert-True ($result.Status -ne 0) "$runner clean rejects a compiler"
+        $result = Invoke-Runner $runner (@('clean') + (Filter-Args $runner 'does-not-exist'))
+        Assert-True ($result.Status -ne 0 -and $result.Output -match '(?i)no packages match') "$runner clean unmatched filter"
+        $result = Invoke-Runner $runner (@('clean') + (Filter-Args $runner 'a/gOoD'))
+        Assert-True ($result.Status -eq 0 -and $result.Output -match "Removed 'Bin' and 'Temp' from 2 packages") "$runner filtered clean: $($result.Output)"
+        Assert-True (-not (Test-Path (Join-Path $fixtureRoot 'A/Good/Bin')) -and
+            -not (Test-Path (Join-Path $fixtureRoot 'A/Good/Companion/Temp')) -and
+            (Test-Path (Join-Path $fixtureRoot 'Z/After/Temp')) -and
+            (Test-Path (Join-Path $fixtureRoot 'Temp/Leftover'))) "$runner filtered clean scope"
+        $savedPath = $env:PATH
+        try {
+            if ($runner -eq 'powershell') { $env:PATH = '' }
+            $result = Invoke-Runner $runner @('clean')
+        } finally { $env:PATH = $savedPath }
+        Assert-True ($result.Status -eq 0 -and $result.Output -match "from 2 packages" -and
+            $result.Output -match "Removed the repository 'Temp' folder") "$runner full clean: $($result.Output)"
+        Assert-True (-not (Test-Path (Join-Path $fixtureRoot 'H/Workspace/App/Bin')) -and
+            -not (Test-Path (Join-Path $fixtureRoot 'Z/After/Temp')) -and
+            -not (Test-Path (Join-Path $fixtureRoot 'Temp')) -and
+            (Test-Path (Join-Path $fixtureRoot 'A/Good/Rux.toml')) -and
+            (Test-Path (Join-Path $fixtureRoot 'Bin/Ignore/Rux.toml'))) "$runner full clean scope"
+        $result = Invoke-Runner $runner @('clean')
+        Assert-True ($result.Status -eq 0 -and $result.Output -match 'Skipped package') "$runner clean when nothing is present"
+        Write-Host "$runner clean tests passed."
+    }
     Write-Host "All $assertions runner assertions passed."
 } finally {
     $env:PATH = $originalPath

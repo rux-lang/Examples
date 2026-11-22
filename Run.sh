@@ -11,20 +11,23 @@ Commands:
   help      Show this help (the default)
   check     Type-check selected packages supported on this host
   test      Check, then run eligible executables and build native libraries
+  clean     Remove the Bin and Temp folders beside every package manifest
 
-Options (check and test):
+Options:
   --filter TEXT          Literal, case-insensitive match in relative package paths
-  --rux-executable PATH  Compiler to use (default: rux on PATH)
+  --rux-executable PATH  Compiler to use (check and test; default: rux on PATH)
   -h, --help            Show this help
 
 Examples:
   sh Run.sh check
   sh Run.sh test --filter Errors
   sh Run.sh test --rux-executable ../Rux/Bin/rux
+  sh Run.sh clean
 
 Runs sequentially. Platform and execution skips are reported separately.
 Tests verify exit codes, not printed output. Dependencies must already be installed.
 Relative compiler paths are resolved from the caller's directory.
+Clean needs no compiler; without a filter it also removes the repository Temp folder.
 EOF
 }
 
@@ -32,7 +35,7 @@ command_name=${1:-help}
 [ "$#" -eq 0 ] || shift
 case $command_name in
     help|-h|--help) [ "$#" -eq 0 ] || die 'help takes no options'; usage; exit 0 ;;
-    check|test) ;;
+    check|test|clean) ;;
     *) die "unknown command '$command_name'" ;;
 esac
 filter=
@@ -92,6 +95,66 @@ format_duration() {
 }
 workflow_started=$(now_ms)
 repository_root=$(CDPATH= cd -P "$(dirname "$0")" && pwd)
+
+# Unlike discover below, keep descending: companions and members have their own outputs.
+discover_all() {
+    [ ! -f "$1/Rux.toml" ] || [ "$1" = "$repository_root" ] || printf '%s
+' "$1"
+    for child in "$1"/* "$1"/.[!.]* "$1"/..?*; do
+        [ -d "$child" ] && [ ! -L "$child" ] || continue
+        case ${child##*/} in .git|Bin|Temp) continue ;; esac
+        (discover_all "$child") || return 1
+    done
+}
+# Remove a directory, or only the link when it is a symbolic link.
+remove_output() {
+    if [ -L "$1" ]; then rm -f "$1"; return 0; fi
+    [ -d "$1" ] || return 1
+    rm -rf "$1"
+}
+if [ "$command_name" = clean ]; then
+    case " $options_seen " in *' --rux-executable '*) die 'clean does not take --rux-executable' ;; esac
+    filter_lower=$(printf '%s' "$filter" | tr '[:upper:]' '[:lower:]')
+    selected_list=$(discover_all "$repository_root" | while IFS= read -r directory; do
+        label_lower=$(printf '%s' "${directory#"$repository_root"/}" | tr '[:upper:]' '[:lower:]')
+        case $label_lower in *"$filter_lower"*) printf '%s
+' "$directory" ;; esac
+    done)
+    [ -n "$selected_list" ] || die "no packages match filter '$filter'"
+    printf '
+'
+    status_line '==>' 'Removing build outputs' 36
+    cleaned=$(printf '%s
+' "$selected_list" | {
+        count=0
+        while IFS= read -r directory; do
+            removed=false
+            if remove_output "$directory/Bin"; then removed=true; fi
+            if remove_output "$directory/Temp"; then removed=true; fi
+            if "$removed"; then count=$((count + 1)); fi
+        done
+        printf '%s
+' "$count"
+    })
+    if [ "$cleaned" -eq 0 ]; then
+        printf "  Skipped package 'Bin' and 'Temp' folders (not present)
+"
+    elif [ "$cleaned" -eq 1 ]; then
+        printf "  Removed 'Bin' and 'Temp' from 1 package
+"
+    else
+        printf "  Removed 'Bin' and 'Temp' from %s packages
+" "$cleaned"
+    fi
+    if [ -z "$filter" ] && remove_output "$repository_root/Temp"; then
+        printf "  Removed the repository 'Temp' folder
+"
+    fi
+    printf '
+'
+    status_line Finished "clean in $(format_duration "$(($(now_ms) - workflow_started))")" 32
+    exit 0
+fi
 case $compiler_name in
     */*)
         compiler_directory=$(CDPATH= cd -P "$(dirname "$compiler_name")" && pwd) ||

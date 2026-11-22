@@ -1,15 +1,17 @@
 <#
 .SYNOPSIS
-Check or test the example packages. With no command, show help.
+Check, test or clean the example packages. With no command, show help.
 .EXAMPLE
 ./Run.ps1 test -Filter Errors
+.EXAMPLE
+./Run.ps1 clean
 .EXAMPLE
 ./Run.ps1 check -RuxExecutable ../Rux/Bin/rux.exe
 #>
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('help', 'check', 'test')]
+    [ValidateSet('help', 'check', 'test', 'clean')]
     [string]$Command = 'help',
     [string]$Filter = '',
     [string]$RuxExecutable,
@@ -29,20 +31,23 @@ Commands:
   help      Show this help (the default)
   check     Type-check selected packages supported on this host
   test      Check, then run eligible executables and build native libraries
+  clean     Remove the Bin and Temp folders beside every package manifest
 
-Options (check and test):
+Options:
   -Filter TEXT          Literal, case-insensitive match in relative package paths
-  -RuxExecutable PATH   Compiler to use (default: rux on PATH)
+  -RuxExecutable PATH   Compiler to use (check and test; default: rux on PATH)
   -Help                 Show this help
 
 Examples:
   ./Run.ps1 check
   ./Run.ps1 test -Filter Errors
   ./Run.ps1 test -RuxExecutable ../Rux/Bin/rux.exe
+  ./Run.ps1 clean
 
 Runs sequentially. Platform and execution skips are reported separately.
 Tests verify exit codes, not printed output. Dependencies must already be installed.
 Relative compiler paths are resolved from the caller's directory.
+Clean needs no compiler; without a filter it also removes the repository Temp folder.
 '@ | Write-Host
 }
 
@@ -138,6 +143,56 @@ function Find-Manifests([string]$Directory) {
     }
 }
 
+function Find-AllManifests([string]$Directory) {
+    # Unlike Find-Manifests, keep descending: companions and members have their own outputs.
+    if (Test-Path -LiteralPath (Join-Path $Directory 'Rux.toml') -PathType Leaf) { $Directory }
+    foreach ($child in Get-ChildItem -LiteralPath $Directory -Directory -Force) {
+        if ($child.Name -in @('.git', 'Bin', 'Temp')) { continue }
+        if ($child.Attributes -band [IO.FileAttributes]::ReparsePoint) { continue }
+        Find-AllManifests $child.FullName
+    }
+}
+
+function Remove-Output([string]$Path) {
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if (-not $item -or -not $item.PSIsContainer) { return $false }
+    if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+        # Remove only the link, never the directory it points to.
+        [IO.Directory]::Delete($item.FullName, $false)
+    } else {
+        Remove-Item -LiteralPath $item.FullName -Recurse -Force
+    }
+    return $true
+}
+
+function Invoke-Clean([string]$Root) {
+    $timer = [Diagnostics.Stopwatch]::StartNew()
+    $directories = @(Find-AllManifests $Root | Where-Object { $_ -ne $Root } | Where-Object {
+        $_.Substring($Root.Length + 1).Replace('\', '/').IndexOf(
+            $Filter, [StringComparison]::OrdinalIgnoreCase) -ge 0
+    })
+    if (-not $directories.Count) { throw "No packages match filter '$Filter'." }
+    Write-Host ''
+    Write-Status '==>' 'Removing build outputs' Cyan
+    $cleaned = 0
+    foreach ($directory in $directories) {
+        $removedBin = Remove-Output (Join-Path $directory 'Bin')
+        $removedTemp = Remove-Output (Join-Path $directory 'Temp')
+        if ($removedBin -or $removedTemp) { $cleaned++ }
+    }
+    if ($cleaned) {
+        $packageNoun = if ($cleaned -eq 1) { 'package' } else { 'packages' }
+        Write-Host "  Removed 'Bin' and 'Temp' from $cleaned $packageNoun"
+    } else {
+        Write-Host "  Skipped package 'Bin' and 'Temp' folders (not present)"
+    }
+    if (-not $Filter -and (Remove-Output (Join-Path $Root 'Temp'))) {
+        Write-Host "  Removed the repository 'Temp' folder"
+    }
+    Write-Host ''
+    Write-Status 'Finished' "clean in $(Format-Duration $timer.Elapsed)" Green
+}
+
 function Invoke-Stage([string]$Directory, [string]$Label, [string]$Stage, [int]$Expected) {
     $timer = [Diagnostics.Stopwatch]::StartNew()
     Push-Location -LiteralPath $Directory
@@ -171,9 +226,14 @@ try {
     if (($Command -eq 'help' -or $Help) -and
         ($PSBoundParameters.ContainsKey('Filter') -or
          $PSBoundParameters.ContainsKey('RuxExecutable'))) {
-        throw 'Filter and RuxExecutable require check or test without -Help.'
+        throw 'Filter and RuxExecutable require check, test or clean without -Help.'
     }
     if ($Command -eq 'help' -or $Help) { Show-Usage; exit 0 }
+    if ($Command -eq 'clean') {
+        if ($PSBoundParameters.ContainsKey('RuxExecutable')) { throw 'Clean does not take RuxExecutable.' }
+        Invoke-Clean $PSScriptRoot
+        exit 0
+    }
     $workflowTimer = [Diagnostics.Stopwatch]::StartNew()
     if ($PSBoundParameters.ContainsKey('RuxExecutable') -and
         [string]::IsNullOrWhiteSpace($RuxExecutable)) { throw 'RuxExecutable cannot be empty.' }
