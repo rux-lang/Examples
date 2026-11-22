@@ -1,6 +1,6 @@
 # Pointer
 
-Take an address with `@`, then read through a `*T` and write through a `*var T` inside `unsafe` blocks.
+Take an address with `@`, then read through a `*T` and write through a `*var T`, with a `// Safety:` comment saying why each one is sound.
 
 **You'll need:** [Mutable](https://rux-lang.dev/docs/learn/mutable), [Reference](https://rux-lang.dev/docs/learn/reference), [MutableReference](https://rux-lang.dev/docs/learn/mutable-reference)
 

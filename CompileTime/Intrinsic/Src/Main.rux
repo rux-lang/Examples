@@ -4,9 +4,15 @@
 // usually provides both. An `intrinsic` declaration names something the compiler supplies and
 // gives its type, with no body.
 //
-// This lesson takes the declarations from `Basis`, a small provider package beside this one,
-// instead of from `Core`. Open `Basis/Src/Basis.rux`: it is a handful of lines, and the program
-// below works the same as it would with `Core`.
+// Exactly one package in a build may declare intrinsics, so that every name the compiler supplies
+// is declared once. That package is `Core` unless the root manifest names another, and this
+// lesson's `Rux.toml` does: `Intrinsics = "Basis"` takes the declarations from `Basis`, a small
+// provider package beside this one. Open `Basis/Src/Basis.rux`: it is a handful of lines.
+//
+// The price is that `Core` cannot be part of the build, and neither can any package built on it,
+// such as `Io`: its declarations would be refused with "'intrinsic' is allowed only in the
+// intrinsics package". So this program prints nothing. Its answer is its exit status: 0 when
+// every check below holds, and the number of the check that failed otherwise.
 //
 // Only real intrinsics can be declared this way. An `intrinsic func` the compiler does not
 // implement "is not a supported intrinsic function", and a type cannot be declared at all: every
@@ -14,15 +20,26 @@
 // have been removed". Writing a provider is a way to replace `Core`, not a way to invent new
 // language features.
 import Basis::{ #target, Assert, float64, int8 };
-import Io::PrintLine;
 
 func Main() -> int {
-    PrintLine("int8 runs from {} to {}", int8::Min, int8::Max);
-    PrintLine("float64 can hold {}", float64::Infinity);
-    PrintLine("Pointers on this target are {} bits wide", #target.pointerBits);
+    // Constants from an extension, written as ordinary source in `Basis`.
+    if int8::Min != -128i8 || int8::Max != 127i8 {
+        return 1;
+    }
 
+    // A constant whose value the compiler supplies, since no literal can spell it.
+    if !(float64::Infinity > 1.0e308) {
+        return 2;
+    }
+
+    // A value the compiler fills in for the target. Every supported target has 64-bit pointers.
+    if #target.pointerBits != 64 {
+        return 3;
+    }
+
+    // A function the compiler emits inline. Raise `level` to 127 and the program stops with
+    // "Assertion failed: the level must leave room to grow".
     let level: int8 = 100;
     Assert(level < int8::Max, "the level must leave room to grow");
-    PrintLine("Level {} passed the check", level);
     return 0;
 }

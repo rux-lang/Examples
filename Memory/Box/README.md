@@ -2,7 +2,7 @@
 
 Own one allocated value with `Box<T>`, which destroys the value and returns its memory when the box's life ends.
 
-**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Destructor](https://rux-lang.dev/docs/learn/destructor), [Move](https://rux-lang.dev/docs/learn/move), [FallibleMain](https://rux-lang.dev/docs/learn/fallible-main)
+**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Destructor](https://rux-lang.dev/docs/learn/destructor), [GiveAway](https://rux-lang.dev/docs/learn/give-away), [ExitStatus](https://rux-lang.dev/docs/learn/exit-status)
 
 ```sh
 rux run

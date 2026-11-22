@@ -1,7 +1,8 @@
 // Everything here is either an extension of a built-in type or a declaration the compiler already
 // knows how to implement. `intrinsic` says "the compiler supplies this; here is its name and its
 // type", and gives it no body. The package gets no special powers from this: Core declares the
-// same things in exactly the same way.
+// same things in exactly the same way. It may declare them only because the program's `Rux.toml`
+// binds it with `Intrinsics = "Basis"`; any other package of the build would be refused.
 
 // The one-byte signed integer is built into the compiler, so nothing declares it. Its constants
 // are ordinary source in an extension, so the provider chooses which ones to offer.

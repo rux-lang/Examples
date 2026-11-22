@@ -8,7 +8,7 @@ Version = "0.1.0"
 Type = "Executable"
 Description = "Declaring compiler-provided constants and values in a provider package of your own"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
+Intrinsics = "Basis"
 
 [Dependencies]
 Basis = { Path = "Basis" }
-Io = { Namespace = "Rux", Version = "*" }

@@ -2,7 +2,7 @@
 
 Convert between number types with `ConvertChecked`, which reports when the value did not survive, and clamp with `ConvertSaturating`.
 
-**You'll need:** [Convert](https://rux-lang.dev/docs/learn/convert), [CheckedArithmetic](https://rux-lang.dev/docs/learn/checked-arithmetic), [Optional](https://rux-lang.dev/docs/learn/optional), [Presence](https://rux-lang.dev/docs/learn/presence)
+**You'll need:** [Convert](https://rux-lang.dev/docs/learn/convert), [OutParameter](https://rux-lang.dev/docs/learn/out-parameter), [CheckedArithmetic](https://rux-lang.dev/docs/learn/checked-arithmetic), [Optional](https://rux-lang.dev/docs/learn/optional), [Presence](https://rux-lang.dev/docs/learn/presence)
 
 ```sh
 rux run

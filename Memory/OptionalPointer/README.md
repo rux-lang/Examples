@@ -2,7 +2,7 @@
 
 Tell an optional pointer `(*T)?` from a pointer to an optional `*T?`, and use each for its own job.
 
-**You'll need:** [Pointer](https://rux-lang.dev/docs/learn/pointer), [Presence](https://rux-lang.dev/docs/learn/presence), [Coalesce](https://rux-lang.dev/docs/learn/coalesce), [Is](https://rux-lang.dev/docs/learn/is)
+**You'll need:** [Pointer](https://rux-lang.dev/docs/learn/pointer), [Presence](https://rux-lang.dev/docs/learn/presence), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
 
 ```sh
 rux run

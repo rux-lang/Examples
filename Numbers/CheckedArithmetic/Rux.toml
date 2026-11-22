@@ -6,7 +6,7 @@ MinRux = "0.4.0"
 Name = "CheckedArithmetic"
 Version = "0.1.0"
 Type = "Executable"
-Description = "AddChecked, SubChecked and MulChecked: arithmetic that reports overflow"
+Description = "CheckedAdd, CheckedSub and CheckedMul: arithmetic that reports overflow"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]

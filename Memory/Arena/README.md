@@ -2,7 +2,7 @@
 
 Allocate a round of work from an `Arena` and release all of it at once with `Reset`.
 
-**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Box](https://rux-lang.dev/docs/learn/box), [PointerSlice](https://rux-lang.dev/docs/learn/pointer-slice), [FallibleMain](https://rux-lang.dev/docs/learn/fallible-main)
+**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Box](https://rux-lang.dev/docs/learn/box), [PointerSlice](https://rux-lang.dev/docs/learn/pointer-slice), [ExitStatus](https://rux-lang.dev/docs/learn/exit-status)
 
 ```sh
 rux run

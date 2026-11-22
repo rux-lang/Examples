@@ -2,7 +2,7 @@
 
 Reuse fixed-size blocks from a `Pool`, where a released block goes straight back to the next request of its size.
 
-**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Arena](https://rux-lang.dev/docs/learn/arena), [AbsenceToError](https://rux-lang.dev/docs/learn/absence-to-error), [FallibleMain](https://rux-lang.dev/docs/learn/fallible-main)
+**You'll need:** [Allocator](https://rux-lang.dev/docs/learn/allocator), [Arena](https://rux-lang.dev/docs/learn/arena), [AbsenceToError](https://rux-lang.dev/docs/learn/absence-to-error), [ExitStatus](https://rux-lang.dev/docs/learn/exit-status)
 
 ```sh
 rux run

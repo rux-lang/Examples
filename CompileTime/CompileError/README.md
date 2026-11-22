@@ -11,8 +11,8 @@ rux run
 The build prints the warning that `#Warn` asked for, then the program runs:
 
 ```text
-Src\Main.rux:38:41: warning: Average rounds toward zero; call AverageRounded instead
-  38 |     PrintLine("Average of 7 and 8: {}", Average(15, 2));
+Src\Main.rux:39:41: warning: Average rounds toward zero; call AverageRounded instead
+  39 |     PrintLine("Average of 7 and 8: {}", Average(15, 2));
      |                                         ^
   note: compiler phase: Analyzing
 Average of 7 and 8: 7
