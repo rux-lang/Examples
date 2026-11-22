@@ -69,13 +69,14 @@ Naming a piece of work and reusing it.
 Many values of one type, and groups of values of different types.
 
 - 5.1 **[Array](Sequences/Array/)** — an inline array holding a fixed number of values of one type
-- 5.2 **[ArrayRepeat](Sequences/ArrayRepeat/)** — fill an array with one repeated value: `[0; 16]`
-- 5.3 **[ArrayNested](Sequences/ArrayNested/)** — arrays of arrays: a grid with rows and columns
-- 5.4 **[Slice](Sequences/Slice/)** — view part of an array without copying it, and pass it to a function
-- 5.5 **[WritableSlice](Sequences/WritableSlice/)** — change an array through a `var T[..]` view
-- 5.6 **[Variadic](Sequences/Variadic/)** — accept any number of arguments, the way `PrintLine` does
-- 5.7 **[Tuple](Sequences/Tuple/)** — group a few values without declaring a type, and return more than one result
-- 5.8 **[Destructure](Sequences/Destructure/)** — unpack a tuple into separate names with `let (x, y) = ...`
+- 5.2 **[Greetings](Sequences/Greetings/)** — an array of strings in twelve languages, walked with `for`: Unicode text works out of the box
+- 5.3 **[ArrayRepeat](Sequences/ArrayRepeat/)** — fill an array with one repeated value: `[0; 16]`
+- 5.4 **[ArrayNested](Sequences/ArrayNested/)** — arrays of arrays: a grid with rows and columns
+- 5.5 **[Slice](Sequences/Slice/)** — view part of an array without copying it, and pass it to a function
+- 5.6 **[WritableSlice](Sequences/WritableSlice/)** — change an array through a `var T[..]` view
+- 5.7 **[Variadic](Sequences/Variadic/)** — accept any number of arguments, the way `PrintLine` does
+- 5.8 **[Tuple](Sequences/Tuple/)** — group a few values without declaring a type, and return more than one result
+- 5.9 **[Destructure](Sequences/Destructure/)** — unpack a tuple into separate names with `let (x, y) = ...`
 
 ### 6. Types
 

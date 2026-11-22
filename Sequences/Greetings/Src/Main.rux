@@ -1,0 +1,36 @@
+// Text in any language works out of the box. A source file is UTF-8, and a string literal keeps
+// its bytes exactly as they were typed, so Chinese, Hindi, Arabic, Cyrillic or emoji can go
+// straight between the quotes: no escapes, no special string type and nothing to set up.
+import Io::PrintLine;
+
+func Main() -> int {
+    // An array of twelve strings, one greeting per language. Strings of different lengths are
+    // still values of one type, so they fit in one array just as the numbers in Array did.
+    let greetings = [
+        "Hello World",
+        "你好，世界",
+        "नमस्ते दुनिया",
+        "Hola Mundo",
+        "Bonjour le monde",
+        "مرحبا يا عالم",
+        "হ্যালো বিশ্ব",
+        "Привет мир",
+        "Olá Mundo",
+        "سلام دنیا",
+        "Привіт світ",
+        "🐯🐶🐱🐭"
+    ];
+
+    // `for` walks the array one greeting at a time. `PrintLine` writes each one as it is: given
+    // a single string and nothing to fill in, it prints the text rather than reading `{}`
+    // placeholders in it.
+    for greeting in greetings {
+        PrintLine(greeting);
+    }
+
+    // The program writes the right bytes every time, but how they look is up to the terminal: an
+    // old console or a font without these scripts may show boxes, or lay right-to-left text out
+    // the wrong way. And a string's length counts bytes, not letters, so "你好" is 6 long. The
+    // Text part comes back to that gap.
+    return 0;
+}
