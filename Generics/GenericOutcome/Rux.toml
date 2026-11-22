@@ -6,9 +6,8 @@ MinRux = "0.4.0"
 Name = "GenericOutcome"
 Version = "0.1.0"
 Type = "Executable"
-Description = "Generic helper functions over optionals and Core's Result"
+Description = "Generic helper functions over optionals and fallible values"
 Authors = ["Rux Contributors <info@rux-lang.dev>"]
 
 [Dependencies]
-Core = { Namespace = "Rux", Version = "*" }
 Io = { Namespace = "Rux", Version = "*" }

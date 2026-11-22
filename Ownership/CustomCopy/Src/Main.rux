@@ -1,16 +1,16 @@
 // Between "the compiler copies each field" and "no copies at all" there is a third choice: write
-// the copy yourself, as a `Clone` method. A type with a destructor is move-only, so `let b = a;`
-// is refused; `a.Clone()` makes the copy instead, and it runs your code. `self` is the value being
-// copied, borrowed read-only so the copy cannot change or consume it, and the method returns the
-// new value.
+// the copy yourself, as a `Clone` method. A type with a destructor is never copied, so
+// `let b = a;` gives `a` away; `let b = a.Clone();` makes a copy instead, and it runs your code.
+// `self` is the value being copied, borrowed read-only so the copy cannot change or consume it,
+// and the method returns the new value.
 //
 // Because `Clone` is an ordinary method call, every copy is written where it happens: nothing is
 // duplicated behind your back by an assignment or a call. In real code the body does what a
 // field-by-field copy cannot, typically duplicating something the value owns so the copy gets its
 // own instead of sharing. Here each copy of a sheet is a photocopy and remembers how many
 // generations it is from the original. The destructor shows that every copy is a value of its
-// own, with its own end. (A type that implements `Core::Cloneable` with this method can also be
-// copied by generic code bounded by `T: Cloneable`.)
+// own, with its own end. (A type that implements `Core::Ownership::Cloneable` with this method
+// can also be copied by generic code bounded by `T: Cloneable`.)
 import Io::PrintLine;
 
 struct Sheet {
@@ -24,12 +24,12 @@ extend Sheet {
         return Sheet { text: self.text, generation: self.generation + 1 };
     }
 
-    func ~Sheet(&var self) {
+    destructor {
         PrintLine("    shredding generation {}", self.generation);
     }
 }
 
-// Taken by value, so the call needs a sheet of its own: the caller hands over a clone.
+// Taken by value, so the call needs a sheet of its own: the caller gives it a clone.
 func Show(sheet: Sheet) {
     PrintLine("    showing '{}', generation {}", sheet.text, sheet.generation);
 }
@@ -45,7 +45,7 @@ func Main() -> int {
 
     // Assigning over a live value makes the new copy first, then ends the old value's life.
     // Only `Clone` makes a photocopy. A sheet made on the spot is not a copy of anything, so it
-    // moves straight in with no photocopy, here and in `board = Sheet { ... };`.
+    // goes straight in with no photocopy, here and in `board = Sheet { ... };`.
     PrintLine("assigning:");
     var board = Sheet { text: "Agenda", generation: 1 };
     board = copy.Clone();

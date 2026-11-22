@@ -13,15 +13,15 @@ fill 40:
     open supply
     open drain
     filling 40 litres
-    close drain
-    close supply
+    shut drain
+    shut supply
     filled: true
 fill 500:
     open supply
     open drain
     500 litres is too much, stopping
-    close drain
-    close supply
+    shut drain
+    shut supply
     filled: false
 ```
 

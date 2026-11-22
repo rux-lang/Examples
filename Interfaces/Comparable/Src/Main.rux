@@ -10,7 +10,7 @@
 //
 // The promise that comes with Comparable: exactly one of the three answers holds for any pair,
 // swapping the two sides swaps `Less` and `Greater`, and if a < b and b < c then a < c.
-import Core::{ Comparable, Ordering };
+import Core::Compare::{ Comparable, Ordering };
 import Io::PrintLine;
 
 struct Release {

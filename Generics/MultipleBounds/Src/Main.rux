@@ -7,7 +7,8 @@
 // argument types (char8[..], T, T)". A placeholder needs `Display`, and a `T` is only what its
 // bounds say it is.
 import Io::PrintLine;
-import Text::{ Display, FormatError, FormatSpec, TextWriter };
+import Text::{ Display, TextWriter };
+import Text::Formatting::{ FormatError, FormatSpec };
 
 interface Scored {
     func Score() -> int32;
@@ -26,8 +27,8 @@ extend Player : Scored {
 
 // A player prints as their name.
 extend Player : Display {
-    func WriteDisplay(&self, writer: &var TextWriter, spec: FormatSpec) throws FormatError {
-        try writer.Write(self.name);
+    func WriteDisplay(&self, writer: &var TextWriter, spec: FormatSpec) -> !FormatError {
+        writer.Write(self.name)!;
     }
 }
 

@@ -2,7 +2,7 @@
 
 Copy a move-only type on purpose with a `Clone` method, so that every copy is written out and runs your own code.
 
-**You'll need:** [NoCopy](https://rux-lang.dev/docs/learn/no-copy), [Destructor](https://rux-lang.dev/docs/learn/destructor), [Move](https://rux-lang.dev/docs/learn/move)
+**You'll need:** [NoCopy](https://rux-lang.dev/docs/learn/no-copy), [Destructor](https://rux-lang.dev/docs/learn/destructor), [GiveAway](https://rux-lang.dev/docs/learn/give-away)
 
 ```sh
 rux run

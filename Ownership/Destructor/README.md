@@ -1,8 +1,8 @@
 # Destructor
 
-Write a destructor, `func ~T(&var self)`, and watch when the compiler runs it.
+Write a destructor, `destructor { ... }` inside `extend`, and watch when the compiler runs it.
 
-**You'll need:** [Move](https://rux-lang.dev/docs/learn/move), [Method](https://rux-lang.dev/docs/learn/method)
+**You'll need:** [GiveAway](https://rux-lang.dev/docs/learn/give-away), [Method](https://rux-lang.dev/docs/learn/method)
 
 ```sh
 rux run
@@ -15,7 +15,7 @@ a short visit:
     back in Main
 swapping the seat:
     Bob leaves
-moving:
+giving away:
 end of Main:
     Dee leaves
     Cy leaves

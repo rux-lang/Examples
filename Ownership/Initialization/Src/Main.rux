@@ -6,8 +6,8 @@
 // A `let` has no such freedom. It cannot be assigned later, so it needs its value where it is
 // declared.
 //
-// One exception to "holds nothing": when the type has a constructor taking no arguments,
-// `var value: T;` calls it, and the variable starts out initialized.
+// Nothing is built behind your back. `var value: T;` is empty storage even when `T` has a
+// constructor; a variable that should start from one calls it by name, `var value = T::New();`.
 import Io::PrintLine;
 
 // Every branch assigns `grade`, so the read in `return` is accepted. Delete the final `else` and
@@ -33,8 +33,8 @@ struct Tally {
 }
 
 extend Tally {
-    func Tally() -> Tally {
-        PrintLine("    Tally() starts the count at zero");
+    func New() -> Tally {
+        PrintLine("    Tally::New() starts the count at zero");
         return Tally { count: 0 };
     }
 }
@@ -60,11 +60,28 @@ func Main() -> int {
     //     table.guest = Guest { name: "Gus" };
     //
     // error: cannot write field 'guest' of 'table', which holds no value
+    //   note: 'table' was declared without a value at 59:5
+    //   note: 'Table' needs destruction, and a value written into a part of storage that holds
+    //         none would never be destroyed
     //   help: initialize 'table' whole, as in 'table = Table { ... }'
+    //
+    // Such a variable is also assigned on every path or on none. Nothing records at run time
+    // whether it holds a guest, so the end of its scope could not tell whether to destroy one:
+    //
+    //     var seated: Guest;
+    //     if early {
+    //         seated = Guest { name: "Gus" };
+    //     }
+    //
+    // error: 'seated' is assigned on this path only, so nothing could tell later whether it holds
+    //        a value
+    //   note: a value that may be absent is a 'Guest?'
+    //   help: assign 'seated' on every path or on none
 
-    // `Tally` has a constructor without arguments, so this declaration runs it.
+    // `var tally: Tally;` would run no constructor, so `tally.count += 1` would read empty
+    // storage and be refused as `total` was above. The constructor is called where it is wanted.
     PrintLine("tally:");
-    var tally: Tally;
+    var tally = Tally::New();
     tally.count += 1;
     PrintLine("    count {}", tally.count);
     return 0;

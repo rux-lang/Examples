@@ -1,5 +1,5 @@
-// Some work has to be undone however a function ends: a valve that is opened must be closed, on
-// the normal path and on every early `return` as well. Writing the close before each exit is easy
+// Some work has to be undone however a function ends: a valve that is opened must be shut, on
+// the normal path and on every early `return` as well. Shutting it before each exit by hand is easy
 // to get wrong, and the mistake is silent.
 //
 // `defer` registers a statement now and runs it when the enclosing scope ends, by whichever way
@@ -22,21 +22,21 @@ extend Valve {
         PrintLine("    open {}", self.name);
     }
 
-    func Close(&self) {
-        PrintLine("    close {}", self.name);
+    func Shut(&self) {
+        PrintLine("    shut {}", self.name);
     }
 }
 
 func Fill(litres: int32) -> bool {
     let supply = Valve { name: "supply" };
     supply.Open();
-    defer supply.Close();
+    defer supply.Shut();
 
     let drain = Valve { name: "drain" };
     drain.Open();
-    defer drain.Close();
+    defer drain.Shut();
 
-    // An early exit. Both valves are still closed, drain first.
+    // An early exit. Both valves are still shut, drain first.
     if litres > 100 {
         PrintLine("    {} litres is too much, stopping", litres);
         return false;

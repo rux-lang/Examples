@@ -1,6 +1,6 @@
 # Exclusivity
 
-Hold one `&var` borrow of a value at a time, and see that a borrow ends at its last use.
+Write a loan where it starts, `&var x` to write and `&x` to read, hold one `&var` loan of a value at a time, and see that a loan ends at its last use.
 
 **You'll need:** [MutableReference](https://rux-lang.dev/docs/learn/mutable-reference), [Reference](https://rux-lang.dev/docs/learn/reference)
 

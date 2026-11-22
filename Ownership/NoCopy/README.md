@@ -1,8 +1,8 @@
 # NoCopy
 
-Mark a plain-data type `#NoCopy`, so that it can only be moved.
+Mark a plain-data type `#NoCopy`, so that it is given away instead of copied and lent with a written `&`.
 
-**You'll need:** [Destructor](https://rux-lang.dev/docs/learn/destructor), [Move](https://rux-lang.dev/docs/learn/move)
+**You'll need:** [Destructor](https://rux-lang.dev/docs/learn/destructor), [GiveAway](https://rux-lang.dev/docs/learn/give-away)
 
 ```sh
 rux run
@@ -11,6 +11,7 @@ rux run
 ```text
 check in:
     key 12 issued
+    key 12 opens room 12
 give the key to a friend:
     friend holds key 12
 check out:

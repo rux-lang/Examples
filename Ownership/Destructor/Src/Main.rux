@@ -1,18 +1,18 @@
-// A destructor is code that runs when a value's life ends. It is written inside `extend`, named
-// after the type with a leading `~`, and borrows the dying value mutably:
+// A destructor is code that runs when a value's life ends. It is written inside `extend` as a
+// block with no name and no parameters, and `self` in it is a `&var` loan of the dying value:
 //
-//     func ~Guest(&var self) { ... }
+//     destructor { ... }
 //
 // Nobody calls it. The compiler does, exactly once for every value that is still alive when its
 // life ends: when its scope closes, when a function returns, or when `=` replaces it with a new
-// value, whether it is a whole variable or one field of a struct. A value that was moved away is
+// value, whether it is a whole variable or one field of a struct. A value that was given away is
 // not destroyed where it was, because its new owner will destroy it later. Values that end
 // together are destroyed in reverse order of creation, newest first.
 //
 // Here the destructor only prints, so its timing can be watched. In real code it gives back what
 // the value was holding: a file, a connection, a block of memory. A copy would be a second guest
-// that leaves too, so a type with a destructor is move-only: `let other = guest;` is refused with
-// `cannot copy 'Guest', which owns resources`, and a guest is handed on with `move` instead.
+// that leaves too, so a type with a destructor is never copied: `let other = guest;` gives the
+// guest away, as GiveAway showed, and `guest` is finished.
 import Io::PrintLine;
 
 struct Guest {
@@ -20,7 +20,7 @@ struct Guest {
 }
 
 extend Guest {
-    func ~Guest(&var self) {
+    destructor {
         PrintLine("    {} leaves", self.name);
     }
 }
@@ -41,10 +41,10 @@ func Main() -> int {
     var seat = Guest { name: "Bob" };
     seat = Guest { name: "Cy" };
 
-    // After a move only the new owner is destroyed, so Dee leaves once, at the end.
-    PrintLine("moving:");
+    // Given away, only the new owner is destroyed, so Dee leaves once, at the end.
+    PrintLine("giving away:");
     let host = Guest { name: "Dee" };
-    let moved = move host;
+    let moved = host;
 
     // `moved` was created after `seat`, so it is destroyed before it.
     PrintLine("end of Main:");
