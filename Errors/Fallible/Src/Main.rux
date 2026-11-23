@@ -47,10 +47,10 @@ func Main() -> int {
     Report(12, 0);
     Report(13, 4);
 
-    // A fallible is not its success. `let half = ExactDivide(12, 2) / 2;` is rejected — "operator
-    // '/' cannot combine left operand 'int ! DivideError' with right operand 'int'" — and so is
-    // calling `ExactDivide(12, 4);` and ignoring what comes back — "'ExactDivide' can fail with
-    // 'DivideError', and the result is not used". An error can never be dropped without the code
+    // A fallible is not its success. `let half = ExactDivide(12, 2) / 2;` is rejected ("operator
+    // '/' cannot combine left operand 'int ! DivideError' with right operand 'int'"), and so is
+    // calling `ExactDivide(12, 4);` and ignoring what comes back ("'ExactDivide' can fail with
+    // 'DivideError', and the result is not used"). An error can never be dropped without the code
     // saying so. The lessons ahead show the shorter ways to handle one: `catch`, `!!` and `!`.
     return 0;
 }

@@ -3,7 +3,7 @@
 // its text came from line 3 of a settings file. The function that *does* know
 // is the one calling it.
 //
-// A `!` passes an error on unchanged, so it cannot add that context — and it
+// A `!` passes an error on unchanged, so it cannot add that context, and it
 // is rejected here anyway, because a `DigitError` is not a `SettingError` and
 // an error is never converted on its way out:
 //

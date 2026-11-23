@@ -5,7 +5,7 @@
 // `PriorityQueue<T>` keeps its items in a vector arranged as a binary heap: a tree, flattened
 // into the vector, in which every parent is at least as large as its children. The largest is
 // therefore always at the front, and a `Push` or a `Pop` only repairs one path from the top to
-// the bottom of the tree — a few steps even for a million items. What the heap does not keep is
+// the bottom of the tree: a few steps even for a million items. What the heap does not keep is
 // a sorted order: only the front is known to be the largest.
 //
 // "Largest" means the element type's own `<`. There is no ordering function to pass, as there is

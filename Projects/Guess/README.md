@@ -2,7 +2,7 @@
 
 A number guessing game: find a number from 1 to 100 in seven guesses, with a hint after each one.
 
-**You'll need:** Parts 1–20 — this project is a checkpoint for Utilities, and leans on [Entropy](https://rux-lang.dev/docs/learn/entropy), [Input](https://rux-lang.dev/docs/learn/input) and [Parse](https://rux-lang.dev/docs/learn/parse).
+**You'll need:** Parts 1–20. This project is a checkpoint for Utilities, and leans on [Entropy](https://rux-lang.dev/docs/learn/entropy), [Input](https://rux-lang.dev/docs/learn/input) and [Parse](https://rux-lang.dev/docs/learn/parse).
 
 ```sh
 rux run

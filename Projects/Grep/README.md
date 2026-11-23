@@ -2,7 +2,7 @@
 
 Search files for lines that match a regular expression, like the Unix tool of the same name, with `-i`, `-n`, `-c`, `-v` and `--help` read by the CommandLine package and an exit status that says whether anything matched. Run with no arguments, it takes a tour of fixed command lines over its own source.
 
-**You'll need:** Parts 1–26 — this project is the checkpoint for Systems, and leans on [CommandLine](https://rux-lang.dev/docs/learn/command-line), [Regex](https://rux-lang.dev/docs/learn/regex), [File](https://rux-lang.dev/docs/learn/file) and [BufferedIo](https://rux-lang.dev/docs/learn/buffered-io).
+**You'll need:** Parts 1–26. This project is the checkpoint for Systems, and leans on [CommandLine](https://rux-lang.dev/docs/learn/command-line), [Regex](https://rux-lang.dev/docs/learn/regex), [File](https://rux-lang.dev/docs/learn/file) and [BufferedIo](https://rux-lang.dev/docs/learn/buffered-io).
 
 ```sh
 rux run

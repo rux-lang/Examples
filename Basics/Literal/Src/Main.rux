@@ -1,5 +1,5 @@
 // A literal is a value written straight into the source: 42, 2.5, 'A', true. This lesson is about
-// the numeric ones — the many ways one number can be spelled, and how a literal gets its type.
+// the numeric ones: the many ways one number can be spelled, and how a literal gets its type.
 import Io::PrintLine;
 
 func Main() -> int {

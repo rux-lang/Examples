@@ -2,7 +2,7 @@
 
 Print Celsius and Fahrenheit conversion tables, each column and word produced by a small function.
 
-**You'll need:** Parts 1–4 — this project is the checkpoint for Functions, and leans on [Function](https://rux-lang.dev/docs/learn/function), [Recursion](https://rux-lang.dev/docs/learn/recursion) and [DefaultArgument](https://rux-lang.dev/docs/learn/default-argument).
+**You'll need:** Parts 1–4. This project is the checkpoint for Functions, and leans on [Function](https://rux-lang.dev/docs/learn/function), [Recursion](https://rux-lang.dev/docs/learn/recursion) and [DefaultArgument](https://rux-lang.dev/docs/learn/default-argument).
 
 ```sh
 rux run

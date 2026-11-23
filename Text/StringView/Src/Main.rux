@@ -4,7 +4,7 @@
 // and everything after may rely on them being text.
 //
 // A view owns nothing. Making one copies no bytes and allocates nothing, and each operation
-// below answers with another view into the same bytes — so the text it looks at must outlive
+// below answers with another view into the same bytes, so the text it looks at must outlive
 // it, exactly as an array must outlive a slice of it.
 import Io::PrintLine;
 import Text::StringView;

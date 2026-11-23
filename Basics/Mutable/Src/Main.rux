@@ -1,6 +1,6 @@
 // A `let` variable keeps its first value for good. A `var` variable may change: after it is
 // declared, `=` gives it a new value, as often as the program needs. That is the whole difference,
-// and it is why `let` is the default — `var` says "watch this name, it moves".
+// and it is why `let` is the default: `var` says "watch this name, it moves".
 import Io::PrintLine;
 
 func Main() -> int {

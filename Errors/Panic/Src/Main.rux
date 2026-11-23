@@ -7,7 +7,7 @@
 // `Panic` prints its message and where it was called, then stops the program
 // at once. It is not an error: nothing unwinds, no cleanup runs, no `catch`
 // can take it, and the program exits with a failure status. That is on
-// purpose — once something "impossible" has happened, the program's
+// purpose: once something "impossible" has happened, the program's
 // assumptions are broken, and running more of its code would only spread the
 // damage.
 //

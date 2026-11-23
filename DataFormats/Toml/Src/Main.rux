@@ -1,4 +1,4 @@
-// TOML is a configuration format — the one every `Rux.toml` in this course is written in. A
+// TOML is a configuration format, the one every `Rux.toml` in this course is written in. A
 // document is a table of keys and values, `[name]` opens a nested table, and unlike JSON the
 // values have real types: an integer is not a float even when the float is whole, and a date is
 // a date rather than a string that looks like one.

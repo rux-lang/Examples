@@ -1,5 +1,5 @@
 // A vector answers "what is at position 3". A hash map answers "what is stored under this key",
-// where the key is whatever suits — a number, an id, a name.
+// where the key is whatever suits: a number, an id, a name.
 //
 // It finds an entry by computing a number from the key, its hash, and going straight to the slot
 // that number points at. So a lookup costs about the same whether the map holds ten entries or

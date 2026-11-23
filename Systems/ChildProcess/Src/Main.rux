@@ -1,12 +1,12 @@
 // A program can start another program: a child process. The child runs on its own, with its own
-// memory, and the two can talk only through what the system connects between them — the child's
+// memory, and the two can talk only through what the system connects between them: the child's
 // arguments and environment on the way in, its three standard streams while it runs, and its
 // exit status at the end.
 //
 // `Command` describes the child: the program, its arguments, environment changes and where each
 // stream goes. `Run` starts it and waits, `Spawn` starts it and hands back a `Child` to talk to,
-// and `Capture` starts it and keeps everything it writes. Starting a program can fail — it may
-// not exist — so each can fail with `IoError`, and every call says where that error goes.
+// and `Capture` starts it and keeps everything it writes. Starting a program can fail (it may
+// not exist), so each can fail with `IoError`, and every call says where that error goes.
 //
 // To read the same on Windows, Linux and macOS, this program is its own child. Argument zero is
 // how it was started, so a `Command` built from it starts this executable again; an extra

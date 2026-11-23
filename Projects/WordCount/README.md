@@ -2,7 +2,7 @@
 
 Count how often each word appears in a tongue twister, and print the counts in alphabetical order.
 
-**You'll need:** Parts 1–17 — this project is a checkpoint for Collections, and leans on [StringBuilder](https://rux-lang.dev/docs/learn/string-builder), [HashMap](https://rux-lang.dev/docs/learn/hash-map) and [TreeMap](https://rux-lang.dev/docs/learn/tree-map).
+**You'll need:** Parts 1–17. This project is a checkpoint for Collections, and leans on [StringBuilder](https://rux-lang.dev/docs/learn/string-builder), [HashMap](https://rux-lang.dev/docs/learn/hash-map) and [TreeMap](https://rux-lang.dev/docs/learn/tree-map).
 
 ```sh
 rux run

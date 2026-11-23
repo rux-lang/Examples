@@ -1,5 +1,5 @@
 // UDP is TCP's simpler sibling. There is no connection to set up and no stream: a program sends
-// a datagram — one self-contained message of up to about 64 KB — to an address, and the other
+// a datagram (one self-contained message of up to about 64 KB) to an address, and the other
 // side receives it whole, or not at all. Nothing is resent if it is lost and nothing keeps
 // datagrams in order. In exchange each message costs one packet and no handshake, which suits
 // games, voice, time and name lookups: small messages where a late answer is worth nothing.

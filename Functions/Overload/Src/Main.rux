@@ -5,7 +5,7 @@
 // This is not new: `PrintLine` has been an overload set since the first lesson.
 // There is one for `int`, one for `float64`, one for `bool`, one for a single
 // character, one taking nothing at all, one taking a format string and values,
-// and more — over twenty in total. Writing `PrintLine(x)` has been choosing
+// and more: over twenty in total. Writing `PrintLine(x)` has been choosing
 // among them all along.
 import Io::PrintLine;
 

@@ -1,7 +1,7 @@
 // A vector is quick at its end and slow at its front: putting a value at position zero means
 // shifting every other value along to make room.
 //
-// A `Deque<T>` — a double-ended queue, said "deck" — is quick at both ends. It remembers where its
+// A `Deque<T>` (a double-ended queue, said "deck") is quick at both ends. It remembers where its
 // contents start as well as where they end, so adding at the front moves a marker, not the
 // values. The everyday use is a queue: work joins at the back and is served from the front,
 // which is exactly the pair of operations a vector is bad at.

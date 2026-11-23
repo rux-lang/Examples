@@ -4,7 +4,7 @@
 // A `TreeMap<K, V>` keeps its keys sorted instead. However they were inserted, a walk visits
 // them smallest first, and questions about order become cheap: the first key, the last, the
 // nearest one below a bound, everything between two bounds. A lookup costs a little more than a
-// hash map's — the map is searched rather than jumped into — and that is the trade.
+// hash map's (the map is searched rather than jumped into), and that is the trade.
 import Allocator::SystemAllocator;
 import Collections::TreeMap;
 import Collections::Comparing::CompareInt32;
@@ -33,7 +33,7 @@ func Main() -> int {
         PrintLine("  {:2}:00  {} C", entry.key, entry.value);
     }
 
-    // `Range(start, end)` walks only the keys from `start` up to, but not including, `end` — the
+    // `Range(start, end)` walks only the keys from `start` up to, but not including, `end`: the
     // same half-open shape as `a..b`. It starts at `start` rather than at the smallest key.
     PrintLine("working hours, 9 to 17");
     for entry in readings.Range(9, 17) {

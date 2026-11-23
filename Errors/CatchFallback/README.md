@@ -1,6 +1,6 @@
 # CatchFallback
 
-Use `call !! fallback` to get the success or a default value — the short form of `call catch { _ => fallback }` and of `(call !! none) ?? fallback`.
+Use `call !! fallback` to get the success or a default value: the short form of `call catch { _ => fallback }` and of `(call !! none) ?? fallback`.
 
 **You'll need:** [Catch](https://rux-lang.dev/docs/learn/catch), [Discard](https://rux-lang.dev/docs/learn/discard), [Coalesce](https://rux-lang.dev/docs/learn/coalesce)
 

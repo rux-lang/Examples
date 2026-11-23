@@ -1,5 +1,5 @@
 // A variable gives a value a name. `let` makes one: a name, an `=` and a value, and from then on
-// the name stands for that value. A `let` variable never changes — the next lesson, Mutable,
+// the name stands for that value. A `let` variable never changes; the next lesson, Mutable,
 // introduces the kind that does. Reach for `let` first: a name that cannot change is one less
 // thing to keep track of while reading the code.
 import Io::PrintLine;

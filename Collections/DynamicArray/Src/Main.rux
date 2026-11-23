@@ -1,5 +1,5 @@
 // An inline array, `int32[4]`, carries its length in its type. The compiler fixes it, and the
-// elements live wherever the array itself lives — inside a local, a struct, another array.
+// elements live wherever the array itself lives: inside a local, a struct, another array.
 //
 // Sometimes the length is only known once the program runs: a count read from a file, a size
 // passed in by a caller. `Collections::Array<T>` is for that case. It asks an allocator for a

@@ -12,7 +12,7 @@
 // for an item only when it is itself asked for one. So no list of results is ever built, and a
 // chain can even draw from a source that never ends, as long as something stops asking.
 //
-// An adaptor takes anything whose `Next` returns `T?` — Algorithms calls that a `Cursor<T>`.
+// An adaptor takes anything whose `Next` returns `T?`. Algorithms calls that a `Cursor<T>`.
 // That is a container's iterator, another adaptor, or a slice turned into one by `Walk`.
 import Algorithms::Adaptors::{ Chain, Enumerate, Filter, Indexed, Map, Skip, Take, Walk, Zip };
 import Io::{ Print, PrintLine };

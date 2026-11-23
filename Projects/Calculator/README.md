@@ -2,7 +2,7 @@
 
 Evaluate a list of sums and two tapes of key presses, where every way a sum can fail is a case of an error variant.
 
-**You'll need:** Parts 1–9 — this project is the checkpoint for Errors, and leans on [Fail](https://rux-lang.dev/docs/learn/fail), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Propagate](https://rux-lang.dev/docs/learn/propagate), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback) and [ErrorVariant](https://rux-lang.dev/docs/learn/error-variant).
+**You'll need:** Parts 1–9. This project is the checkpoint for Errors, and leans on [Fail](https://rux-lang.dev/docs/learn/fail), [Outcome](https://rux-lang.dev/docs/learn/outcome), [Propagate](https://rux-lang.dev/docs/learn/propagate), [CatchFallback](https://rux-lang.dev/docs/learn/catch-fallback) and [ErrorVariant](https://rux-lang.dev/docs/learn/error-variant).
 
 ```sh
 rux run

@@ -19,7 +19,7 @@
 //   in the program you ship.
 // - `DebugAssert` is checked in a debug build (`rux run`) and removed from a
 //   release build (`rux run --release`). Removed means its condition is not
-//   even evaluated, so an expensive check costs nothing when shipped — and a
+//   even evaluated, so an expensive check costs nothing when shipped, and a
 //   condition with a side effect loses that effect.
 //
 // `InOrder` below prints a line so you can see that difference: run the

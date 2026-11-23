@@ -6,7 +6,7 @@
 //     func ParsePercent(text: char8[..]) -> int ! DigitError | RangeError
 //
 // `A | B` is a sum: one value that is an `A` or a `B`, and knows which. The
-// order does not matter — `RangeError | DigitError` is the same type. The `!`
+// order does not matter: `RangeError | DigitError` is the same type. The `!`
 // binds loosest, so the whole sum is the error and no parentheses are needed.
 //
 // The surprise is how little the function body has to do. A `DigitError`

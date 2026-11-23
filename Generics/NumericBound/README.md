@@ -1,6 +1,6 @@
 # NumericBound
 
-Bound a type parameter by `Integer`, `SignedInteger` or `Float` from `Core::Arithmetic`, so the generic can do arithmetic on it — `func Sum<T: Integer>(values: T[..]) -> T` — and see a wrong type argument refused at the call.
+Bound a type parameter by `Integer`, `SignedInteger` or `Float` from `Core::Arithmetic`, so the generic can do arithmetic on it (`func Sum<T: Integer>(values: T[..]) -> T`), and see a wrong type argument refused at the call.
 
 **You'll need:** [GenericBound](https://rux-lang.dev/docs/learn/generic-bound), [GiveAway](https://rux-lang.dev/docs/learn/give-away), [Slice](https://rux-lang.dev/docs/learn/slice), [Convert](https://rux-lang.dev/docs/learn/convert)
 

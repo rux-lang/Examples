@@ -4,7 +4,7 @@
 //
 // A program describes what it accepts as plain values: a `CommandSpec` with its options —
 // `Flag`s that are present or not, `ValueOption`s that take a value — its positional
-// arguments — `Required`, `Optional` or `Remaining` — and its subcommands. `Parse` checks a
+// arguments (`Required`, `Optional` or `Remaining`) and its subcommands. `Parse` checks a
 // list of arguments against that description and returns a `Parsed`, or fails with a
 // `CommandLineError`; the parse then answers questions such as `Has`, `Count`, `Value` and
 // `Positional`. The same description writes the help text, so the two can never disagree.

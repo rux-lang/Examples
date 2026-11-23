@@ -3,8 +3,8 @@
 // record has a level, so the noisy ones can be switched off; and its details are fields with
 // names and types, `port=8080` rather than prose, so a tool can search and count them.
 //
-// The `Log` package builds those records. A `Logger` writes them to any `Io::Writer` — a file, a
-// socket, or here standard output — as one line of text or one JSON object per line. Logging
+// The `Log` package builds those records. A `Logger` writes them to any `Io::Writer` (a file, a
+// socket, or here standard output) as one line of text or one JSON object per line. Logging
 // never fails: a record that cannot be written is dropped, and the logger remembers the first
 // failure for `Failure` to report.
 //

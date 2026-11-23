@@ -4,7 +4,7 @@
 // a page of text, where the same job by hand would be a loop full of special cases.
 //
 // `Regex::New` compiles a pattern once, and the compiled `Regex` is then searched as often as
-// needed. Compiling can fail — the pattern may be malformed — so it is declared
+// needed. Compiling can fail (the pattern may be malformed), so it is declared
 // `-> Self ! RegexError`, and the error says what went wrong and at which byte of the pattern.
 //
 // The package matches in linear time: a search never takes more than a fixed amount of work per

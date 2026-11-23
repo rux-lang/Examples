@@ -1,10 +1,10 @@
 // A hash set of small numbers spends many bytes on each one. When the members are small
-// non-negative integers — the days of a month, seat numbers, the ids of a few hundred features
-// — one bit per possible member is enough: bit 7 set means 7 is in the set.
+// non-negative integers — the days of a month, seat numbers, the ids of a few hundred
+// features — one bit per possible member is enough: bit 7 set means 7 is in the set.
 //
 // `BitSet` keeps those bits in 64-bit words. A membership test is a shift and a mask, counting
 // the members is a population count per word, and union, intersection and difference combine
-// two sets a whole word — 64 members — at a time. Setting a bit past the end grows the set;
+// two sets a whole word (64 members) at a time. Setting a bit past the end grows the set;
 // asking about a bit past the end answers false, since an absent bit is an unset one.
 //
 // A bit set owns its words, so assigning it gives it away instead of copying it:

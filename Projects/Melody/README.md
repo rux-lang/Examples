@@ -2,7 +2,7 @@
 
 Play the opening of Ode to Joy through the console speaker by calling the Windows `Beep` function directly. Each call has a `// Safety:` comment that says why it is sound, because the compiler cannot check what a foreign function does.
 
-**You'll need:** Parts 1–24 — this project is the checkpoint for Platform, and leans on [Extern](https://rux-lang.dev/docs/learn/extern), [Target](https://rux-lang.dev/docs/learn/target) and [CompileError](https://rux-lang.dev/docs/learn/compile-error).
+**You'll need:** Parts 1–24. This project is the checkpoint for Platform, and leans on [Extern](https://rux-lang.dev/docs/learn/extern), [Target](https://rux-lang.dev/docs/learn/target) and [CompileError](https://rux-lang.dev/docs/learn/compile-error).
 
 **Windows only.** On any other system the build stops with an error that says so.
 

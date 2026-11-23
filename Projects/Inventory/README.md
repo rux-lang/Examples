@@ -2,7 +2,7 @@
 
 Keep a shop's stock as structs in a vector and apply a day of orders, refusing the ones that cannot be carried out.
 
-**You'll need:** Parts 1–17 — this project is a checkpoint for Collections, and leans on [AbsenceToError](https://rux-lang.dev/docs/learn/absence-to-error), [ErrorSum](https://rux-lang.dev/docs/learn/error-sum), [Outcome](https://rux-lang.dev/docs/learn/outcome), [TypedPattern](https://rux-lang.dev/docs/learn/typed-pattern) and [Vector](https://rux-lang.dev/docs/learn/vector).
+**You'll need:** Parts 1–17. This project is a checkpoint for Collections, and leans on [AbsenceToError](https://rux-lang.dev/docs/learn/absence-to-error), [ErrorSum](https://rux-lang.dev/docs/learn/error-sum), [Outcome](https://rux-lang.dev/docs/learn/outcome), [TypedPattern](https://rux-lang.dev/docs/learn/typed-pattern) and [Vector](https://rux-lang.dev/docs/learn/vector).
 
 ```sh
 rux run

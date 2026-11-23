@@ -6,7 +6,7 @@
 // `_` arm takes every error: `call catch { _ => fallback }`. `(call !! none) ?? fallback` says the
 // same thing in two steps: `!! none` turns the error into absence, and `??` supplies the default.
 // Every way, the fallback is only worked out when it is needed, and it must have the success type
-// — an `int` here.
+// (an `int` here).
 //
 // `!!` takes everything to its left, like `??`, so a `!!` that is one operand of a larger
 // expression sits in parentheses.

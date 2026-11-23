@@ -10,408 +10,408 @@ The course is read in order: each lesson is one package that teaches one idea, a
 
 First programs: printing, values and their types.
 
-- 1.1 **[Hello](Basics/Hello/)** — print "Hello, World!", the minimal Rux application
-- 1.2 **[Comment](Basics/Comment/)** — explain code with `//` and `/* */` comments, which can nest
-- 1.3 **[Variable](Basics/Variable/)** — name a value with `let`, and let the compiler infer its type
-- 1.4 **[Mutable](Basics/Mutable/)** — declare a binding with `var` so it can be reassigned
-- 1.5 **[Integer](Basics/Integer/)** — whole numbers: signed and unsigned widths, `int` and `uint`
-- 1.6 **[Float](Basics/Float/)** — fractional numbers: `float32`, `float64`, and why `0.1 + 0.2` is not `0.3`
-- 1.7 **[Boolean](Basics/Boolean/)** — `true`, `false` and the `bool` type
-- 1.8 **[Character](Basics/Character/)** — single characters, character literals and the `char` type
-- 1.9 **[Literal](Basics/Literal/)** — write numbers in other bases, with separators and suffixes
-- 1.10 **[Console](Basics/Console/)** — write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
-- 1.11 **[Const](Basics/Const/)** — name a value the compiler folds in, and see where it differs from `let`
-- 1.12 **[Convert](Basics/Convert/)** — convert between numeric types with `as`, and see what a value that does not fit becomes
+- 1.1 **[Hello](Basics/Hello/)**: print "Hello, World!", the minimal Rux application
+- 1.2 **[Comment](Basics/Comment/)**: explain code with `//` and `/* */` comments, which can nest
+- 1.3 **[Variable](Basics/Variable/)**: name a value with `let`, and let the compiler infer its type
+- 1.4 **[Mutable](Basics/Mutable/)**: declare a binding with `var` so it can be reassigned
+- 1.5 **[Integer](Basics/Integer/)**: whole numbers: signed and unsigned widths, `int` and `uint`
+- 1.6 **[Float](Basics/Float/)**: fractional numbers: `float32`, `float64`, and why `0.1 + 0.2` is not `0.3`
+- 1.7 **[Boolean](Basics/Boolean/)**: `true`, `false` and the `bool` type
+- 1.8 **[Character](Basics/Character/)**: single characters, character literals and the `char` type
+- 1.9 **[Literal](Basics/Literal/)**: write numbers in other bases, with separators and suffixes
+- 1.10 **[Console](Basics/Console/)**: write to the console with `Print` and `PrintLine`, and fill `{}` placeholders
+- 1.11 **[Const](Basics/Const/)**: name a value the compiler folds in, and see where it differs from `let`
+- 1.12 **[Convert](Basics/Convert/)**: convert between numeric types with `as`, and see what a value that does not fit becomes
 
 ### 2. Operators
 
 Combining values into new ones.
 
-- 2.1 **[Arithmetic](Operators/Arithmetic/)** — add, subtract, multiply, divide and take the remainder
-- 2.2 **[Comparison](Operators/Comparison/)** — compare two values with `==`, `!=`, `<`, `<=`, `>` and `>=`
-- 2.3 **[Logical](Operators/Logical/)** — combine conditions with `&&`, `||` and `!`
-- 2.4 **[Assignment](Operators/Assignment/)** — update a variable in place with `+=`, `-=`, `++` and friends
-- 2.5 **[Precedence](Operators/Precedence/)** — which operator binds first, and how parentheses change it
+- 2.1 **[Arithmetic](Operators/Arithmetic/)**: add, subtract, multiply, divide and take the remainder
+- 2.2 **[Comparison](Operators/Comparison/)**: compare two values with `==`, `!=`, `<`, `<=`, `>` and `>=`
+- 2.3 **[Logical](Operators/Logical/)**: combine conditions with `&&`, `||` and `!`
+- 2.4 **[Assignment](Operators/Assignment/)**: update a variable in place with `+=`, `-=`, `++` and friends
+- 2.5 **[Precedence](Operators/Precedence/)**: which operator binds first, and how parentheses change it
 
 ### 3. Control flow
 
 Choosing and repeating.
 
-- 3.1 **[If](ControlFlow/If/)** — run code only when a condition holds, with `if` and `else`
-- 3.2 **[ElseIf](ControlFlow/ElseIf/)** — choose one of several branches with an `else if` chain
-- 3.3 **[Ternary](ControlFlow/Ternary/)** — pick one of two values inside an expression with an `if` value, since Rux has no `? :`
-- 3.4 **[While](ControlFlow/While/)** — repeat while a condition holds — possibly zero times
-- 3.5 **[DoWhile](ControlFlow/DoWhile/)** — run the body first and test afterwards, so it runs at least once
-- 3.6 **[Loop](ControlFlow/Loop/)** — repeat forever with `loop` until a `break` leaves
-- 3.7 **[Break](ControlFlow/Break/)** — leave a loop early when the answer is found
-- 3.8 **[Continue](ControlFlow/Continue/)** — skip the rest of one iteration and carry on with the next
-- 3.9 **[Range](ControlFlow/Range/)** — describe a run of numbers with `..` and `..=`
-- 3.10 **[For](ControlFlow/For/)** — walk a range with `for`
-- 3.11 **[Label](ControlFlow/Label/)** — name a loop, so `break` can leave an outer one
-- 3.12 **[Match](ControlFlow/Match/)** — select a branch by value with `match`, and catch the rest with `_`
-- 3.13 **[MatchExpression](ControlFlow/MatchExpression/)** — use `match` as a value, not only as a statement
-- 3.14 **[Block](ControlFlow/Block/)** — use a plain block `{ ... }` as a scope of its own and as a value that yields its last expression, and parenthesize one in a condition
+- 3.1 **[If](ControlFlow/If/)**: run code only when a condition holds, with `if` and `else`
+- 3.2 **[ElseIf](ControlFlow/ElseIf/)**: choose one of several branches with an `else if` chain
+- 3.3 **[Ternary](ControlFlow/Ternary/)**: pick one of two values inside an expression with an `if` value, since Rux has no `? :`
+- 3.4 **[While](ControlFlow/While/)**: repeat while a condition holds, possibly zero times
+- 3.5 **[DoWhile](ControlFlow/DoWhile/)**: run the body first and test afterwards, so it runs at least once
+- 3.6 **[Loop](ControlFlow/Loop/)**: repeat forever with `loop` until a `break` leaves
+- 3.7 **[Break](ControlFlow/Break/)**: leave a loop early when the answer is found
+- 3.8 **[Continue](ControlFlow/Continue/)**: skip the rest of one iteration and carry on with the next
+- 3.9 **[Range](ControlFlow/Range/)**: describe a run of numbers with `..` and `..=`
+- 3.10 **[For](ControlFlow/For/)**: walk a range with `for`
+- 3.11 **[Label](ControlFlow/Label/)**: name a loop, so `break` can leave an outer one
+- 3.12 **[Match](ControlFlow/Match/)**: select a branch by value with `match`, and catch the rest with `_`
+- 3.13 **[MatchExpression](ControlFlow/MatchExpression/)**: use `match` as a value, not only as a statement
+- 3.14 **[Block](ControlFlow/Block/)**: use a plain block `{ ... }` as a scope of its own and as a value that yields its last expression, and parenthesize one in a condition
 
 ### 4. Functions
 
 Naming a piece of work and reusing it.
 
-- 4.1 **[Function](Functions/Function/)** — declare functions with parameters and a return value, and call them
-- 4.2 **[Return](Functions/Return/)** — return early, and write functions that return nothing
-- 4.3 **[Recursion](Functions/Recursion/)** — a function that calls itself, and the base case that stops it
-- 4.4 **[Overload](Functions/Overload/)** — give several functions one name, and let the arguments choose between them
-- 4.5 **[DefaultArgument](Functions/DefaultArgument/)** — give a parameter a default value so callers may leave it out, and name an argument to skip the defaults before it
-- 4.6 **[Generic](Functions/Generic/)** — write one function that works for many types
-- 4.7 **[Callback](Functions/Callback/)** — pass a function to another function as an ordinary value
+- 4.1 **[Function](Functions/Function/)**: declare functions with parameters and a return value, and call them
+- 4.2 **[Return](Functions/Return/)**: return early, and write functions that return nothing
+- 4.3 **[Recursion](Functions/Recursion/)**: a function that calls itself, and the base case that stops it
+- 4.4 **[Overload](Functions/Overload/)**: give several functions one name, and let the arguments choose between them
+- 4.5 **[DefaultArgument](Functions/DefaultArgument/)**: give a parameter a default value so callers may leave it out, and name an argument to skip the defaults before it
+- 4.6 **[Generic](Functions/Generic/)**: write one function that works for many types
+- 4.7 **[Callback](Functions/Callback/)**: pass a function to another function as an ordinary value
 
 ### 5. Sequences
 
 Many values of one type, and groups of values of different types.
 
-- 5.1 **[Array](Sequences/Array/)** — an inline array holding a fixed number of values of one type
-- 5.2 **[Greetings](Sequences/Greetings/)** — an array of strings in twelve languages, walked with `for`: Unicode text works out of the box
-- 5.3 **[ArrayRepeat](Sequences/ArrayRepeat/)** — fill an array with one repeated value: `[0; 16]`
-- 5.4 **[ArrayNested](Sequences/ArrayNested/)** — arrays of arrays: a grid with rows and columns
-- 5.5 **[Slice](Sequences/Slice/)** — view part of an array without copying it, and pass it to a function
-- 5.6 **[WritableSlice](Sequences/WritableSlice/)** — change an array through a `var T[..]` view
-- 5.7 **[Variadic](Sequences/Variadic/)** — accept any number of arguments, the way `PrintLine` does
-- 5.8 **[Tuple](Sequences/Tuple/)** — group a few values without declaring a type, and return more than one result
-- 5.9 **[Destructure](Sequences/Destructure/)** — unpack a tuple into separate names with `let (x, y) = ...`
+- 5.1 **[Array](Sequences/Array/)**: an inline array holding a fixed number of values of one type
+- 5.2 **[Greetings](Sequences/Greetings/)**: an array of strings in twelve languages, walked with `for`: Unicode text works out of the box
+- 5.3 **[ArrayRepeat](Sequences/ArrayRepeat/)**: fill an array with one repeated value: `[0; 16]`
+- 5.4 **[ArrayNested](Sequences/ArrayNested/)**: arrays of arrays: a grid with rows and columns
+- 5.5 **[Slice](Sequences/Slice/)**: view part of an array without copying it, and pass it to a function
+- 5.6 **[WritableSlice](Sequences/WritableSlice/)**: change an array through a `var T[..]` view
+- 5.7 **[Variadic](Sequences/Variadic/)**: accept any number of arguments, the way `PrintLine` does
+- 5.8 **[Tuple](Sequences/Tuple/)**: group a few values without declaring a type, and return more than one result
+- 5.9 **[Destructure](Sequences/Destructure/)**: unpack a tuple into separate names with `let (x, y) = ...`
 
 ### 6. Types
 
 Declaring types of your own.
 
-- 6.1 **[Struct](Types/Struct/)** — group related values into a struct with named fields
-- 6.2 **[Reference](Types/Reference/)** — borrow a value with `&T` instead of copying it, and see when the call writes the loan as `&x`
-- 6.3 **[MutableReference](Types/MutableReference/)** — let a function change the caller's value through `&var T`
-- 6.4 **[Method](Types/Method/)** — give a struct behaviour with `extend` and a `&self` receiver
-- 6.5 **[MutatingMethod](Types/MutatingMethod/)** — a method that changes its receiver through `&var self`
-- 6.6 **[Constructor](Types/Constructor/)** — build a valid value in one place with a named constructor such as `Time::New`
-- 6.7 **[Extension](Types/Extension/)** — add methods to a type you did not write
-- 6.8 **[Enum](Types/Enum/)** — name a fixed set of cases
-- 6.9 **[EnumValue](Types/EnumValue/)** — give an enum an explicit underlying type and convert to and from it
-- 6.10 **[Variant](Types/Variant/)** — attach data to each case
-- 6.11 **[VariantMatch](Types/VariantMatch/)** — take a variant apart in a `match` arm
-- 6.12 **[TypeAlias](Types/TypeAlias/)** — give an existing type a second name to make a signature read clearly
-- 6.13 **[FunctionField](Types/FunctionField/)** — store a function in a struct field and call it later
+- 6.1 **[Struct](Types/Struct/)**: group related values into a struct with named fields
+- 6.2 **[Reference](Types/Reference/)**: borrow a value with `&T` instead of copying it, and see when the call writes the loan as `&x`
+- 6.3 **[MutableReference](Types/MutableReference/)**: let a function change the caller's value through `&var T`
+- 6.4 **[Method](Types/Method/)**: give a struct behaviour with `extend` and a `&self` receiver
+- 6.5 **[MutatingMethod](Types/MutatingMethod/)**: a method that changes its receiver through `&var self`
+- 6.6 **[Constructor](Types/Constructor/)**: build a valid value in one place with a named constructor such as `Time::New`
+- 6.7 **[Extension](Types/Extension/)**: add methods to a type you did not write
+- 6.8 **[Enum](Types/Enum/)**: name a fixed set of cases
+- 6.9 **[EnumValue](Types/EnumValue/)**: give an enum an explicit underlying type and convert to and from it
+- 6.10 **[Variant](Types/Variant/)**: attach data to each case
+- 6.11 **[VariantMatch](Types/VariantMatch/)**: take a variant apart in a `match` arm
+- 6.12 **[TypeAlias](Types/TypeAlias/)**: give an existing type a second name to make a signature read clearly
+- 6.13 **[FunctionField](Types/FunctionField/)**: store a function in a struct field and call it later
 
 ### 7. Patterns
 
 Everything a `match` arm can say.
 
-- 7.1 **[Guard](Patterns/Guard/)** — add an `if` condition to a match arm
-- 7.2 **[RangePattern](Patterns/RangePattern/)** — match a whole range of numbers in one arm
-- 7.3 **[TuplePattern](Patterns/TuplePattern/)** — match several values at once as a tuple
-- 7.4 **[StructPattern](Patterns/StructPattern/)** — take a struct-shaped variant case apart by field name
-- 7.5 **[CharacterPattern](Patterns/CharacterPattern/)** — match single characters
-- 7.6 **[Exhaustive](Patterns/Exhaustive/)** — why a match must cover every value: name every case of a variant, and end an integer match with `_`
+- 7.1 **[Guard](Patterns/Guard/)**: add an `if` condition to a match arm
+- 7.2 **[RangePattern](Patterns/RangePattern/)**: match a whole range of numbers in one arm
+- 7.3 **[TuplePattern](Patterns/TuplePattern/)**: match several values at once as a tuple
+- 7.4 **[StructPattern](Patterns/StructPattern/)**: take a struct-shaped variant case apart by field name
+- 7.5 **[CharacterPattern](Patterns/CharacterPattern/)**: match single characters
+- 7.6 **[Exhaustive](Patterns/Exhaustive/)**: why a match must cover every value: name every case of a variant, and end an integer match with `_`
 
 ### 8. Optionals
 
 A value that may be absent: `T?`.
 
-- 8.1 **[Optional](Optionals/Optional/)** — a value that may be missing: `int?` and `none`
-- 8.2 **[Presence](Optionals/Presence/)** — match an optional with `value?` and `none` arms, or ask only whether it is there with `== none` and `!= none`
-- 8.3 **[IfLet](Optionals/IfLet/)** — bind a present value in a condition with `if let value? = optional`, add conditions with `&&`, loop with `while let`, and see that `is` only tests
-- 8.4 **[Coalesce](Optionals/Coalesce/)** — supply a fallback for a missing value with `??`
-- 8.5 **[CoalesceExit](Optionals/CoalesceExit/)** — leave with `?? return`, `?? continue` or `?? break` when a value is missing
-- 8.6 **[OptionalPropagate](Optionals/OptionalPropagate/)** — pass absence to the caller with `?`
-- 8.7 **[NestedOptional](Optionals/NestedOptional/)** — `int??`: telling "nothing found" from "found nothing"
+- 8.1 **[Optional](Optionals/Optional/)**: a value that may be missing: `int?` and `none`
+- 8.2 **[Presence](Optionals/Presence/)**: match an optional with `value?` and `none` arms, or ask only whether it is there with `== none` and `!= none`
+- 8.3 **[IfLet](Optionals/IfLet/)**: bind a present value in a condition with `if let value? = optional`, add conditions with `&&`, loop with `while let`, and see that `is` only tests
+- 8.4 **[Coalesce](Optionals/Coalesce/)**: supply a fallback for a missing value with `??`
+- 8.5 **[CoalesceExit](Optionals/CoalesceExit/)**: leave with `?? return`, `?? continue` or `?? break` when a value is missing
+- 8.6 **[OptionalPropagate](Optionals/OptionalPropagate/)**: pass absence to the caller with `?`
+- 8.7 **[NestedOptional](Optionals/NestedOptional/)**: `int??`: telling "nothing found" from "found nothing"
 
 ### 9. Errors
 
 Operations that can fail: `-> T ! E`, `throw`, and the forms `!`, `!!` and `catch`.
 
-- 9.1 **[Fallible](Errors/Fallible/)** — return a value or fail with an error with `-> T ! E`, and take the outcome apart with a `match` on its sides
-- 9.2 **[Fail](Errors/Fail/)** — leave a function with an error using `throw`
-- 9.3 **[UnitFallible](Errors/UnitFallible/)** — a function that returns nothing but can still fail: `func F() -> !E`
-- 9.4 **[Outcome](Errors/Outcome/)** — keep an outcome as the fallible itself, `let kept = F();`, and match it by side
-- 9.5 **[Discard](Errors/Discard/)** — why a call that can fail must be handled, and how to drop its error on purpose with `F() !!;` or `F() !! none`
-- 9.6 **[Catch](Errors/Catch/)** — handle each way an operation can fail with `F() catch { arms }`
-- 9.7 **[CatchFallback](Errors/CatchFallback/)** — turn any error into a default value with `F() !! fallback`
-- 9.8 **[Propagate](Errors/Propagate/)** — pass an error straight to the caller with a postfix `!` instead of catching it
-- 9.9 **[ErrorVariant](Errors/ErrorVariant/)** — describe the ways an operation can fail with a variant
-- 9.10 **[ErrorMapping](Errors/ErrorMapping/)** — add context to an error as it passes through with `F() catch { e => throw Mapped(e) }`
-- 9.11 **[ErrorSum](Errors/ErrorSum/)** — fail with more than one kind of error with `-> T ! A | B`
-- 9.12 **[ExitStatus](Errors/ExitStatus/)** — keep `Main` as `func Main() -> int`, which cannot fail, and turn a helper's error into the exit status with `Install() !! return 1;` or `return Run() !! 1;`
-- 9.13 **[AbsenceToError](Errors/AbsenceToError/)** — turn a missing value into an error with `?? throw`
-- 9.14 **[NestedFallible](Errors/NestedFallible/)** — keep levels apart: `-> T? ! E` and `-> (T ! E1) ! E2`
-- 9.15 **[Panic](Errors/Panic/)** — stop the program when something impossible happens
-- 9.16 **[Assert](Errors/Assert/)** — check an assumption while the program runs
+- 9.1 **[Fallible](Errors/Fallible/)**: return a value or fail with an error with `-> T ! E`, and take the outcome apart with a `match` on its sides
+- 9.2 **[Fail](Errors/Fail/)**: leave a function with an error using `throw`
+- 9.3 **[UnitFallible](Errors/UnitFallible/)**: a function that returns nothing but can still fail: `func F() -> !E`
+- 9.4 **[Outcome](Errors/Outcome/)**: keep an outcome as the fallible itself, `let kept = F();`, and match it by side
+- 9.5 **[Discard](Errors/Discard/)**: why a call that can fail must be handled, and how to drop its error on purpose with `F() !!;` or `F() !! none`
+- 9.6 **[Catch](Errors/Catch/)**: handle each way an operation can fail with `F() catch { arms }`
+- 9.7 **[CatchFallback](Errors/CatchFallback/)**: turn any error into a default value with `F() !! fallback`
+- 9.8 **[Propagate](Errors/Propagate/)**: pass an error straight to the caller with a postfix `!` instead of catching it
+- 9.9 **[ErrorVariant](Errors/ErrorVariant/)**: describe the ways an operation can fail with a variant
+- 9.10 **[ErrorMapping](Errors/ErrorMapping/)**: add context to an error as it passes through with `F() catch { e => throw Mapped(e) }`
+- 9.11 **[ErrorSum](Errors/ErrorSum/)**: fail with more than one kind of error with `-> T ! A | B`
+- 9.12 **[ExitStatus](Errors/ExitStatus/)**: keep `Main` as `func Main() -> int`, which cannot fail, and turn a helper's error into the exit status with `Install() !! return 1;` or `return Run() !! 1;`
+- 9.13 **[AbsenceToError](Errors/AbsenceToError/)**: turn a missing value into an error with `?? throw`
+- 9.14 **[NestedFallible](Errors/NestedFallible/)**: keep levels apart: `-> T? ! E` and `-> (T ! E1) ! E2`
+- 9.15 **[Panic](Errors/Panic/)**: stop the program when something impossible happens
+- 9.16 **[Assert](Errors/Assert/)**: check an assumption while the program runs
 
 ### 10. Sum types
 
 A value that is one of several types: `A | B`.
 
-- 10.1 **[SumType](SumTypes/SumType/)** — a value that can be an `int32` or a `bool`: `int32 | bool`
-- 10.2 **[TypedPattern](SumTypes/TypedPattern/)** — match a sum by the type it holds
-- 10.3 **[SubsetPattern](SumTypes/SubsetPattern/)** — match several members of a sum in one arm
-- 10.4 **[Is](SumTypes/Is/)** — ask which type a sum holds with `is`
-- 10.5 **[SumWidening](SumTypes/SumWidening/)** — pass a smaller sum where a larger one is expected
+- 10.1 **[SumType](SumTypes/SumType/)**: a value that can be an `int32` or a `bool`: `int32 | bool`
+- 10.2 **[TypedPattern](SumTypes/TypedPattern/)**: match a sum by the type it holds
+- 10.3 **[SubsetPattern](SumTypes/SubsetPattern/)**: match several members of a sum in one arm
+- 10.4 **[Is](SumTypes/Is/)**: ask which type a sum holds with `is`
+- 10.5 **[SumWidening](SumTypes/SumWidening/)**: pass a smaller sum where a larger one is expected
 
 ### 11. Ownership
 
 Who owns a value, and when it is cleaned up.
 
-- 11.1 **[Exclusivity](Ownership/Exclusivity/)** — write a loan where it starts with `&x` or `&var x`, and hold one writer at a time
-- 11.2 **[Copy](Ownership/Copy/)** — assignment copies a value, and the copies are independent
-- 11.3 **[GiveAway](Ownership/GiveAway/)** — give a value away by writing it bare in a binding, an argument, a return or a field, and lend it with `&` to keep it
-- 11.4 **[Destructor](Ownership/Destructor/)** — run cleanup when a value goes out of scope with `destructor { ... }`
-- 11.5 **[Destroy](Ownership/Destroy/)** — end a value early with `destroy`, or with a `~self` method that replaces its destructor and can return a field or fail
-- 11.6 **[NoCopy](Ownership/NoCopy/)** — mark plain data `#NoCopy` so it is given away instead of copied
-- 11.7 **[CustomCopy](Ownership/CustomCopy/)** — copy a move-only type on purpose with a `Clone` method
-- 11.8 **[ReplaceSwap](Ownership/ReplaceSwap/)** — why one field cannot be given away by itself, taking it with `Replace` or `Swap`, and taking a whole struct apart with a pattern
-- 11.9 **[Defer](Ownership/Defer/)** — schedule cleanup at the point you start the work, so it cannot be forgotten
-- 11.10 **[DeferReturn](Ownership/DeferReturn/)** — what a deferred action sees when the function returns a value, and how defers and destructors run as one sequence
-- 11.11 **[Initialization](Ownership/Initialization/)** — `var x: T;` is empty storage that every path must assign before it is read
+- 11.1 **[Exclusivity](Ownership/Exclusivity/)**: write a loan where it starts with `&x` or `&var x`, and hold one writer at a time
+- 11.2 **[Copy](Ownership/Copy/)**: assignment copies a value, and the copies are independent
+- 11.3 **[GiveAway](Ownership/GiveAway/)**: give a value away by writing it bare in a binding, an argument, a return or a field, and lend it with `&` to keep it
+- 11.4 **[Destructor](Ownership/Destructor/)**: run cleanup when a value goes out of scope with `destructor { ... }`
+- 11.5 **[Destroy](Ownership/Destroy/)**: end a value early with `destroy`, or with a `~self` method that replaces its destructor and can return a field or fail
+- 11.6 **[NoCopy](Ownership/NoCopy/)**: mark plain data `#NoCopy` so it is given away instead of copied
+- 11.7 **[CustomCopy](Ownership/CustomCopy/)**: copy a move-only type on purpose with a `Clone` method
+- 11.8 **[ReplaceSwap](Ownership/ReplaceSwap/)**: why one field cannot be given away by itself, taking it with `Replace` or `Swap`, and taking a whole struct apart with a pattern
+- 11.9 **[Defer](Ownership/Defer/)**: schedule cleanup at the point you start the work, so it cannot be forgotten
+- 11.10 **[DeferReturn](Ownership/DeferReturn/)**: what a deferred action sees when the function returns a value, and how defers and destructors run as one sequence
+- 11.11 **[Initialization](Ownership/Initialization/)**: `var x: T;` is empty storage that every path must assign before it is read
 
 ### 12. Interfaces
 
 Describing behaviour that many types share.
 
-- 12.1 **[Interface](Interfaces/Interface/)** — declare an interface and implement it for your own types
-- 12.2 **[InterfaceValue](Interfaces/InterfaceValue/)** — borrow values of different types as one interface
-- 12.3 **[InterfaceParameter](Interfaces/InterfaceParameter/)** — write a function that accepts any type implementing an interface
-- 12.4 **[Display](Interfaces/Display/)** — make your own type printable with `{}`
-- 12.5 **[Equatable](Interfaces/Equatable/)** — define what it means for two of your values to be equal
-- 12.6 **[Comparable](Interfaces/Comparable/)** — define an order for your own type
-- 12.7 **[StructuralEquality](Interfaces/StructuralEquality/)** — compare whole structs and tuples with `==`
-- 12.8 **[OperatorOverload](Interfaces/OperatorOverload/)** — define `==`, `+` and the other operators for your own type
-- 12.9 **[DerivedOperator](Interfaces/DerivedOperator/)** — define one operator and get its partners for free
-- 12.10 **[Indexer](Interfaces/Indexer/)** — let your own type be indexed with `[]`
-- 12.11 **[Iterator](Interfaces/Iterator/)** — implement `Next` so a type of your own can be used with `for`
-- 12.12 **[Iterable](Interfaces/Iterable/)** — let a container hand out an iterator for `for`
+- 12.1 **[Interface](Interfaces/Interface/)**: declare an interface and implement it for your own types
+- 12.2 **[InterfaceValue](Interfaces/InterfaceValue/)**: borrow values of different types as one interface
+- 12.3 **[InterfaceParameter](Interfaces/InterfaceParameter/)**: write a function that accepts any type implementing an interface
+- 12.4 **[Display](Interfaces/Display/)**: make your own type printable with `{}`
+- 12.5 **[Equatable](Interfaces/Equatable/)**: define what it means for two of your values to be equal
+- 12.6 **[Comparable](Interfaces/Comparable/)**: define an order for your own type
+- 12.7 **[StructuralEquality](Interfaces/StructuralEquality/)**: compare whole structs and tuples with `==`
+- 12.8 **[OperatorOverload](Interfaces/OperatorOverload/)**: define `==`, `+` and the other operators for your own type
+- 12.9 **[DerivedOperator](Interfaces/DerivedOperator/)**: define one operator and get its partners for free
+- 12.10 **[Indexer](Interfaces/Indexer/)**: let your own type be indexed with `[]`
+- 12.11 **[Iterator](Interfaces/Iterator/)**: implement `Next` so a type of your own can be used with `for`
+- 12.12 **[Iterable](Interfaces/Iterable/)**: let a container hand out an iterator for `for`
 
 ### 13. Generics
 
 Types and functions that work for many types.
 
-- 13.1 **[GenericType](Generics/GenericType/)** — a struct with a type parameter: `Pair<T>`
-- 13.2 **[GenericMethod](Generics/GenericMethod/)** — methods on a generic type, and methods with type parameters of their own
-- 13.3 **[GenericBound](Generics/GenericBound/)** — require a type parameter to implement an interface
-- 13.4 **[NumericBound](Generics/NumericBound/)** — do arithmetic on a type parameter bounded by `Integer`, `SignedInteger` or `Float`, and see a wrong type argument refused at the call
-- 13.5 **[MultipleBounds](Generics/MultipleBounds/)** — require several interfaces at once with `A + B`
-- 13.6 **[GenericOutcome](Generics/GenericOutcome/)** — write helpers that work for any optional `T?` or fallible `T ! E`
-- 13.7 **[GenericSum](Generics/GenericSum/)** — generic sums, and what happens when both members are the same type
+- 13.1 **[GenericType](Generics/GenericType/)**: a struct with a type parameter: `Pair<T>`
+- 13.2 **[GenericMethod](Generics/GenericMethod/)**: methods on a generic type, and methods with type parameters of their own
+- 13.3 **[GenericBound](Generics/GenericBound/)**: require a type parameter to implement an interface
+- 13.4 **[NumericBound](Generics/NumericBound/)**: do arithmetic on a type parameter bounded by `Integer`, `SignedInteger` or `Float`, and see a wrong type argument refused at the call
+- 13.5 **[MultipleBounds](Generics/MultipleBounds/)**: require several interfaces at once with `A + B`
+- 13.6 **[GenericOutcome](Generics/GenericOutcome/)**: write helpers that work for any optional `T?` or fallible `T ! E`
+- 13.7 **[GenericSum](Generics/GenericSum/)**: generic sums, and what happens when both members are the same type
 
 ### 14. Text
 
 Strings, characters, formatting, parsing and input.
 
-- 14.1 **[StringLiteral](Text/StringLiteral/)** — what a string literal is: read-only `char8` code units
-- 14.2 **[Encoding](Text/Encoding/)** — `c8`, `c16` and `c32` literals, and code units versus characters
-- 14.3 **[StringView](Text/StringView/)** — borrow text without copying it
-- 14.4 **[String](Text/String/)** — own text that lives as long as you need it
-- 14.5 **[StringBuilder](Text/StringBuilder/)** — build text a piece at a time
-- 14.6 **[Utf8](Text/Utf8/)** — check and decode UTF-8 bytes
-- 14.7 **[Unicode](Text/Unicode/)** — bytes, code points and grapheme clusters, and why their counts differ
-- 14.8 **[UnicodeCase](Text/UnicodeCase/)** — change case beyond ASCII, where one letter can become two
-- 14.9 **[Format](Text/Format/)** — control width and alignment when formatting values
-- 14.10 **[FormatNumber](Text/FormatNumber/)** — control precision and number base when formatting numbers
-- 14.11 **[Render](Text/Render/)** — format values into a `String` instead of the console
-- 14.12 **[Parse](Text/Parse/)** — turn text into a number, and handle text that is not one
-- 14.13 **[Input](Text/Input/)** — read a line typed by the user, and notice when input ends
-- 14.14 **[JoinLines](Text/JoinLines/)** — split text into lines and join pieces back together, and change its case
-- 14.15 **[Regex](Text/Regex/)** — test and find matches of a regular expression
-- 14.16 **[RegexCapture](Text/RegexCapture/)** — capture groups, every match, splitting and replacing
+- 14.1 **[StringLiteral](Text/StringLiteral/)**: what a string literal is: read-only `char8` code units
+- 14.2 **[Encoding](Text/Encoding/)**: `c8`, `c16` and `c32` literals, and code units versus characters
+- 14.3 **[StringView](Text/StringView/)**: borrow text without copying it
+- 14.4 **[String](Text/String/)**: own text that lives as long as you need it
+- 14.5 **[StringBuilder](Text/StringBuilder/)**: build text a piece at a time
+- 14.6 **[Utf8](Text/Utf8/)**: check and decode UTF-8 bytes
+- 14.7 **[Unicode](Text/Unicode/)**: bytes, code points and grapheme clusters, and why their counts differ
+- 14.8 **[UnicodeCase](Text/UnicodeCase/)**: change case beyond ASCII, where one letter can become two
+- 14.9 **[Format](Text/Format/)**: control width and alignment when formatting values
+- 14.10 **[FormatNumber](Text/FormatNumber/)**: control precision and number base when formatting numbers
+- 14.11 **[Render](Text/Render/)**: format values into a `String` instead of the console
+- 14.12 **[Parse](Text/Parse/)**: turn text into a number, and handle text that is not one
+- 14.13 **[Input](Text/Input/)**: read a line typed by the user, and notice when input ends
+- 14.14 **[JoinLines](Text/JoinLines/)**: split text into lines and join pieces back together, and change its case
+- 14.15 **[Regex](Text/Regex/)**: test and find matches of a regular expression
+- 14.16 **[RegexCapture](Text/RegexCapture/)**: capture groups, every match, splitting and replacing
 
 ### 15. Memory
 
 Pointers, raw memory and allocators.
 
-- 15.1 **[Pointer](Memory/Pointer/)** — the difference between `*T` and `*var T`, and taking an address with `@`
-- 15.2 **[OutParameter](Memory/OutParameter/)** — return an answer through a `&var T` out-parameter, and why an optional `T?` is usually better
-- 15.3 **[RawMemory](Memory/RawMemory/)** — allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
-- 15.4 **[PointerArithmetic](Memory/PointerArithmetic/)** — step a pointer through memory one element at a time
-- 15.5 **[PointerSlice](Memory/PointerSlice/)** — turn a pointer and a length into a slice
-- 15.6 **[OptionalPointer](Memory/OptionalPointer/)** — `*T?` and `(*T)?`: a pointer to an optional, or an optional pointer
-- 15.7 **[Layout](Memory/Layout/)** — how big a type is and how it is aligned: `sizeof` and `alignof`
-- 15.8 **[Union](Memory/Union/)** — overlay one piece of storage with several types, and why that needs care
-- 15.9 **[Allocator](Memory/Allocator/)** — allocate through the `Allocator` interface instead of straight from the system
-- 15.10 **[Box](Memory/Box/)** — own one value allocated on the heap
-- 15.11 **[Arena](Memory/Arena/)** — allocate many values and free them all at once
-- 15.12 **[FixedBuffer](Memory/FixedBuffer/)** — allocate from a buffer you provide
-- 15.13 **[Pool](Memory/Pool/)** — reuse fixed-size blocks instead of allocating new ones
-- 15.14 **[Zeroize](Memory/Zeroize/)** — clear sensitive memory explicitly
-- 15.15 **[Rc](Memory/Rc/)** — share one value between several owners with reference counting
+- 15.1 **[Pointer](Memory/Pointer/)**: the difference between `*T` and `*var T`, and taking an address with `@`
+- 15.2 **[OutParameter](Memory/OutParameter/)**: return an answer through a `&var T` out-parameter, and why an optional `T?` is usually better
+- 15.3 **[RawMemory](Memory/RawMemory/)**: allocate, use and free memory by hand (`Alloc`, `Zero`, `Free`)
+- 15.4 **[PointerArithmetic](Memory/PointerArithmetic/)**: step a pointer through memory one element at a time
+- 15.5 **[PointerSlice](Memory/PointerSlice/)**: turn a pointer and a length into a slice
+- 15.6 **[OptionalPointer](Memory/OptionalPointer/)**: `*T?` and `(*T)?`: a pointer to an optional, or an optional pointer
+- 15.7 **[Layout](Memory/Layout/)**: how big a type is and how it is aligned: `sizeof` and `alignof`
+- 15.8 **[Union](Memory/Union/)**: overlay one piece of storage with several types, and why that needs care
+- 15.9 **[Allocator](Memory/Allocator/)**: allocate through the `Allocator` interface instead of straight from the system
+- 15.10 **[Box](Memory/Box/)**: own one value allocated on the heap
+- 15.11 **[Arena](Memory/Arena/)**: allocate many values and free them all at once
+- 15.12 **[FixedBuffer](Memory/FixedBuffer/)**: allocate from a buffer you provide
+- 15.13 **[Pool](Memory/Pool/)**: reuse fixed-size blocks instead of allocating new ones
+- 15.14 **[Zeroize](Memory/Zeroize/)**: clear sensitive memory explicitly
+- 15.15 **[Rc](Memory/Rc/)**: share one value between several owners with reference counting
 
 ### 16. Numbers
 
 Numbers in depth.
 
-- 16.1 **[WideInteger](Numbers/WideInteger/)** — 128-, 256- and 512-bit integers
-- 16.2 **[NumberLimit](Numbers/NumberLimit/)** — the smallest and largest value each number type can hold
-- 16.3 **[FloatSpecial](Numbers/FloatSpecial/)** — infinity and NaN, and how they compare
-- 16.4 **[Bitwise](Numbers/Bitwise/)** — `&`, `|`, `^` and `~`: set, clear, flip and test bits with masks
-- 16.5 **[Shift](Numbers/Shift/)** — move bits left and right with `<<`, `>>` and `>>>`
-- 16.6 **[CheckedArithmetic](Numbers/CheckedArithmetic/)** — detect overflow instead of getting a wrong answer
-- 16.7 **[WrappingArithmetic](Numbers/WrappingArithmetic/)** — arithmetic that wraps around or saturates on purpose
-- 16.8 **[CheckedConvert](Numbers/CheckedConvert/)** — convert between number types and detect values that do not fit
-- 16.9 **[BitOperation](Numbers/BitOperation/)** — count, find and rotate bits
-- 16.10 **[Endian](Numbers/Endian/)** — write a number's bytes in a chosen byte order
-- 16.11 **[Math](Numbers/Math/)** — roots, powers, logarithms, trigonometry, and rounding
-- 16.12 **[Complex](Numbers/Complex/)** — complex numbers: arithmetic, magnitude and polar form
+- 16.1 **[WideInteger](Numbers/WideInteger/)**: 128-, 256- and 512-bit integers
+- 16.2 **[NumberLimit](Numbers/NumberLimit/)**: the smallest and largest value each number type can hold
+- 16.3 **[FloatSpecial](Numbers/FloatSpecial/)**: infinity and NaN, and how they compare
+- 16.4 **[Bitwise](Numbers/Bitwise/)**: `&`, `|`, `^` and `~`: set, clear, flip and test bits with masks
+- 16.5 **[Shift](Numbers/Shift/)**: move bits left and right with `<<`, `>>` and `>>>`
+- 16.6 **[CheckedArithmetic](Numbers/CheckedArithmetic/)**: detect overflow instead of getting a wrong answer
+- 16.7 **[WrappingArithmetic](Numbers/WrappingArithmetic/)**: arithmetic that wraps around or saturates on purpose
+- 16.8 **[CheckedConvert](Numbers/CheckedConvert/)**: convert between number types and detect values that do not fit
+- 16.9 **[BitOperation](Numbers/BitOperation/)**: count, find and rotate bits
+- 16.10 **[Endian](Numbers/Endian/)**: write a number's bytes in a chosen byte order
+- 16.11 **[Math](Numbers/Math/)**: roots, powers, logarithms, trigonometry, and rounding
+- 16.12 **[Complex](Numbers/Complex/)**: complex numbers: arithmetic, magnitude and polar form
 
 ### 17. Collections
 
 Containers from the `Collections` package.
 
-- 17.1 **[Vector](Collections/Vector/)** — a growable array that manages its own memory and capacity
-- 17.2 **[DynamicArray](Collections/DynamicArray/)** — `Collections::Array`, and how it differs from an inline array
-- 17.3 **[Deque](Collections/Deque/)** — add and remove at both ends, and see where that beats a vector
-- 17.4 **[HashMap](Collections/HashMap/)** — look values up by key
-- 17.5 **[HashSet](Collections/HashSet/)** — test membership with a hash set
-- 17.6 **[TreeMap](Collections/TreeMap/)** — keep keys in order, and walk them in order
-- 17.7 **[TreeSet](Collections/TreeSet/)** — keep a set of values in order
-- 17.8 **[PriorityQueue](Collections/PriorityQueue/)** — always take the most urgent item next
-- 17.9 **[BitSet](Collections/BitSet/)** — a set of small integers kept as bits
-- 17.10 **[SmallVector](Collections/SmallVector/)** — a vector that keeps its first few items without allocating
-- 17.11 **[LruCache](Collections/LruCache/)** — a bounded cache that forgets the least recently used entry
+- 17.1 **[Vector](Collections/Vector/)**: a growable array that manages its own memory and capacity
+- 17.2 **[DynamicArray](Collections/DynamicArray/)**: `Collections::Array`, and how it differs from an inline array
+- 17.3 **[Deque](Collections/Deque/)**: add and remove at both ends, and see where that beats a vector
+- 17.4 **[HashMap](Collections/HashMap/)**: look values up by key
+- 17.5 **[HashSet](Collections/HashSet/)**: test membership with a hash set
+- 17.6 **[TreeMap](Collections/TreeMap/)**: keep keys in order, and walk them in order
+- 17.7 **[TreeSet](Collections/TreeSet/)**: keep a set of values in order
+- 17.8 **[PriorityQueue](Collections/PriorityQueue/)**: always take the most urgent item next
+- 17.9 **[BitSet](Collections/BitSet/)**: a set of small integers kept as bits
+- 17.10 **[SmallVector](Collections/SmallVector/)**: a vector that keeps its first few items without allocating
+- 17.11 **[LruCache](Collections/LruCache/)**: a bounded cache that forgets the least recently used entry
 
 ### 18. Algorithms
 
 Algorithms over slices from the `Algorithms` package.
 
-- 18.1 **[Sort](Algorithms/Sort/)** — sort a slice in place
-- 18.2 **[Search](Algorithms/Search/)** — find a value in a slice, and handle not finding it
-- 18.3 **[BinarySearch](Algorithms/BinarySearch/)** — find a value in sorted data quickly
-- 18.4 **[MinMax](Algorithms/MinMax/)** — the smallest and largest values, and the empty case
-- 18.5 **[Fold](Algorithms/Fold/)** — combine all elements into one value with a function
-- 18.6 **[IteratorAdaptor](Algorithms/IteratorAdaptor/)** — chain lazy steps such as map, filter and take over an iterator
-- 18.7 **[Scan](Algorithms/Scan/)** — running sums and scans, counting sequences and safe midpoints
+- 18.1 **[Sort](Algorithms/Sort/)**: sort a slice in place
+- 18.2 **[Search](Algorithms/Search/)**: find a value in a slice, and handle not finding it
+- 18.3 **[BinarySearch](Algorithms/BinarySearch/)**: find a value in sorted data quickly
+- 18.4 **[MinMax](Algorithms/MinMax/)**: the smallest and largest values, and the empty case
+- 18.5 **[Fold](Algorithms/Fold/)**: combine all elements into one value with a function
+- 18.6 **[IteratorAdaptor](Algorithms/IteratorAdaptor/)**: chain lazy steps such as map, filter and take over an iterator
+- 18.7 **[Scan](Algorithms/Scan/)**: running sums and scans, counting sequences and safe midpoints
 
 ### 19. Files
 
 Paths, files and directories.
 
-- 19.1 **[Path](Files/Path/)** — split a path into its parts, and see why a path is not a string
-- 19.2 **[PathJoin](Files/PathJoin/)** — build a path from parts
-- 19.3 **[PathNormalize](Files/PathNormalize/)** — tidy a path by removing `.` and `..`
-- 19.4 **[File](Files/File/)** — write text to a file and read it back, handling failure at every step
-- 19.5 **[Directory](Files/Directory/)** — create, list, and remove directories
-- 19.6 **[Metadata](Files/Metadata/)** — ask a file for its size and kind
-- 19.7 **[Binary](Files/Binary/)** — read and write fixed-width values and raw bytes
-- 19.8 **[BufferedIo](Files/BufferedIo/)** — buffer writes and flush them
-- 19.9 **[AtomicFile](Files/AtomicFile/)** — replace a file's contents all at once or not at all
-- 19.10 **[TemporaryFile](Files/TemporaryFile/)** — a scratch file that cleans up after itself
-- 19.11 **[MemoryStream](Files/MemoryStream/)** — read and write bytes in memory through the same reader and writer interfaces as a file
+- 19.1 **[Path](Files/Path/)**: split a path into its parts, and see why a path is not a string
+- 19.2 **[PathJoin](Files/PathJoin/)**: build a path from parts
+- 19.3 **[PathNormalize](Files/PathNormalize/)**: tidy a path by removing `.` and `..`
+- 19.4 **[File](Files/File/)**: write text to a file and read it back, handling failure at every step
+- 19.5 **[Directory](Files/Directory/)**: create, list, and remove directories
+- 19.6 **[Metadata](Files/Metadata/)**: ask a file for its size and kind
+- 19.7 **[Binary](Files/Binary/)**: read and write fixed-width values and raw bytes
+- 19.8 **[BufferedIo](Files/BufferedIo/)**: buffer writes and flush them
+- 19.9 **[AtomicFile](Files/AtomicFile/)**: replace a file's contents all at once or not at all
+- 19.10 **[TemporaryFile](Files/TemporaryFile/)**: a scratch file that cleans up after itself
+- 19.11 **[MemoryStream](Files/MemoryStream/)**: read and write bytes in memory through the same reader and writer interfaces as a file
 
 ### 20. Utilities
 
 Time, randomness, hashing and identifiers.
 
-- 20.1 **[Duration](Utilities/Duration/)** — lengths of time, and arithmetic on them
-- 20.2 **[Stopwatch](Utilities/Stopwatch/)** — measure how long something takes
-- 20.3 **[Date](Utilities/Date/)** — calendar dates, parsing them, and leap years
-- 20.4 **[DateTime](Utilities/DateTime/)** — a date with a time and an offset, in RFC 3339
-- 20.5 **[Random](Utilities/Random/)** — a reproducible random number generator
-- 20.6 **[Distribution](Utilities/Distribution/)** — draw from a range, shuffle, and sample a normal distribution
-- 20.7 **[Entropy](Utilities/Entropy/)** — unpredictable bytes from the operating system
-- 20.8 **[Hash](Utilities/Hash/)** — fast non-cryptographic hashes and checksums
-- 20.9 **[Uuid](Utilities/Uuid/)** — create, print and parse UUIDs
-- 20.10 **[NanoId](Utilities/NanoId/)** — short, URL-safe random identifiers
-- 20.11 **[TimeZone](Utilities/TimeZone/)** — turn a moment into local time in a time zone, and back
+- 20.1 **[Duration](Utilities/Duration/)**: lengths of time, and arithmetic on them
+- 20.2 **[Stopwatch](Utilities/Stopwatch/)**: measure how long something takes
+- 20.3 **[Date](Utilities/Date/)**: calendar dates, parsing them, and leap years
+- 20.4 **[DateTime](Utilities/DateTime/)**: a date with a time and an offset, in RFC 3339
+- 20.5 **[Random](Utilities/Random/)**: a reproducible random number generator
+- 20.6 **[Distribution](Utilities/Distribution/)**: draw from a range, shuffle, and sample a normal distribution
+- 20.7 **[Entropy](Utilities/Entropy/)**: unpredictable bytes from the operating system
+- 20.8 **[Hash](Utilities/Hash/)**: fast non-cryptographic hashes and checksums
+- 20.9 **[Uuid](Utilities/Uuid/)**: create, print and parse UUIDs
+- 20.10 **[NanoId](Utilities/NanoId/)**: short, URL-safe random identifiers
+- 20.11 **[TimeZone](Utilities/TimeZone/)**: turn a moment into local time in a time zone, and back
 
 ### 21. Data formats
 
 Reading and writing JSON and TOML.
 
-- 21.1 **[Json](DataFormats/Json/)** — parse JSON into a value and walk it
-- 21.2 **[JsonWrite](DataFormats/JsonWrite/)** — write a value out as JSON
-- 21.3 **[JsonStream](DataFormats/JsonStream/)** — read JSON as a stream of events
-- 21.4 **[Toml](DataFormats/Toml/)** — parse a TOML document and read its values
-- 21.5 **[TomlWrite](DataFormats/TomlWrite/)** — write a TOML document
-- 21.6 **[BaseEncoding](DataFormats/BaseEncoding/)** — bytes as hexadecimal, Base64, Base32 and Base58 text
-- 21.7 **[Url](DataFormats/Url/)** — parse, resolve and build URLs and their queries
-- 21.8 **[Compress](DataFormats/Compress/)** — compress and decompress data in the Deflate, zlib and gzip formats
+- 21.1 **[Json](DataFormats/Json/)**: parse JSON into a value and walk it
+- 21.2 **[JsonWrite](DataFormats/JsonWrite/)**: write a value out as JSON
+- 21.3 **[JsonStream](DataFormats/JsonStream/)**: read JSON as a stream of events
+- 21.4 **[Toml](DataFormats/Toml/)**: parse a TOML document and read its values
+- 21.5 **[TomlWrite](DataFormats/TomlWrite/)**: write a TOML document
+- 21.6 **[BaseEncoding](DataFormats/BaseEncoding/)**: bytes as hexadecimal, Base64, Base32 and Base58 text
+- 21.7 **[Url](DataFormats/Url/)**: parse, resolve and build URLs and their queries
+- 21.8 **[Compress](DataFormats/Compress/)**: compress and decompress data in the Deflate, zlib and gzip formats
 
 ### 22. Packages
 
 Modules, packages, libraries and tools.
 
-- 22.1 **[Module](Packages/Module/)** — split a package across source files and modules
-- 22.2 **[Visibility](Packages/Visibility/)** — choose what a package shows to others with `pub`
-- 22.3 **[Package](Packages/Package/)** — what a manifest says about a package
-- 22.4 **[Dependency](Packages/Dependency/)** — depend on another package
-- 22.5 **[Workspace](Packages/Workspace/)** — build several packages together
-- 22.6 **[SourceLibrary](Packages/SourceLibrary/)** — write a library and use it from an executable
-- 22.7 **[StaticLibrary](Packages/StaticLibrary/)** — build a static library
-- 22.8 **[SharedLibrary](Packages/SharedLibrary/)** — build a shared library
-- 22.9 **[Documentation](Packages/Documentation/)** — document your code with `///` comments
-- 22.10 **[Tooling](Packages/Tooling/)** — format, lint, test and document with the `rux` tool
-- 22.11 **[UnitTest](Packages/UnitTest/)** — write `#Test` functions declared `-> !TestFailure` that pass each failed `Expect` check on with `!`, and run them with `rux test`
-- 22.12 **[Benchmark](Packages/Benchmark/)** — measure how long code takes with the `Test` package's benchmarks
+- 22.1 **[Module](Packages/Module/)**: split a package across source files and modules
+- 22.2 **[Visibility](Packages/Visibility/)**: choose what a package shows to others with `pub`
+- 22.3 **[Package](Packages/Package/)**: what a manifest says about a package
+- 22.4 **[Dependency](Packages/Dependency/)**: depend on another package
+- 22.5 **[Workspace](Packages/Workspace/)**: build several packages together
+- 22.6 **[SourceLibrary](Packages/SourceLibrary/)**: write a library and use it from an executable
+- 22.7 **[StaticLibrary](Packages/StaticLibrary/)**: build a static library
+- 22.8 **[SharedLibrary](Packages/SharedLibrary/)**: build a shared library
+- 22.9 **[Documentation](Packages/Documentation/)**: document your code with `///` comments
+- 22.10 **[Tooling](Packages/Tooling/)**: format, lint, test and document with the `rux` tool
+- 22.11 **[UnitTest](Packages/UnitTest/)**: write `#Test` functions declared `-> !TestFailure` that pass each failed `Expect` check on with `!`, and run them with `rux test`
+- 22.12 **[Benchmark](Packages/Benchmark/)**: measure how long code takes with the `Test` package's benchmarks
 
 ### 23. Compile time
 
 Code that runs or is chosen while compiling.
 
-- 23.1 **[When](CompileTime/When/)** — select code at compile time with `when`
-- 23.2 **[Target](CompileTime/Target/)** — the operating system and architecture being compiled for
-- 23.3 **[BuildMode](CompileTime/BuildMode/)** — tell debug builds from release builds
-- 23.4 **[SourceLocation](CompileTime/SourceLocation/)** — the file and line of an expression
-- 23.5 **[CompileError](CompileTime/CompileError/)** — stop the build with `#Error`, or warn with `#Warn`
-- 23.6 **[Define](CompileTime/Define/)** — values passed to the build from the manifest or the command line
-- 23.7 **[Intrinsic](CompileTime/Intrinsic/)** — declarations the compiler implements itself, provided by the one package a build binds with `Intrinsics`
+- 23.1 **[When](CompileTime/When/)**: select code at compile time with `when`
+- 23.2 **[Target](CompileTime/Target/)**: the operating system and architecture being compiled for
+- 23.3 **[BuildMode](CompileTime/BuildMode/)**: tell debug builds from release builds
+- 23.4 **[SourceLocation](CompileTime/SourceLocation/)**: the file and line of an expression
+- 23.5 **[CompileError](CompileTime/CompileError/)**: stop the build with `#Error`, or warn with `#Warn`
+- 23.6 **[Define](CompileTime/Define/)**: values passed to the build from the manifest or the command line
+- 23.7 **[Intrinsic](CompileTime/Intrinsic/)**: declarations the compiler implements itself, provided by the one package a build binds with `Intrinsics`
 
 ### 24. Platform
 
 Talking to the operating system and the machine.
 
-- 24.1 **[Extern](Platform/Extern/)** — call a platform API directly through an extern declaration and `#Link`
-- 24.2 **[CInterop](Platform/CInterop/)** — C-compatible types, pointers and handles
-- 24.3 **[Abi](Platform/Abi/)** — choose a calling convention with `#Abi`
-- 24.4 **[Asm](Platform/Asm/)** — write a function body in assembly
-- 24.5 **[AsmArm](Platform/AsmArm/)** — the same function in AArch64 assembly, chosen with `when`
+- 24.1 **[Extern](Platform/Extern/)**: call a platform API directly through an extern declaration and `#Link`
+- 24.2 **[CInterop](Platform/CInterop/)**: C-compatible types, pointers and handles
+- 24.3 **[Abi](Platform/Abi/)**: choose a calling convention with `#Abi`
+- 24.4 **[Asm](Platform/Asm/)**: write a function body in assembly
+- 24.5 **[AsmArm](Platform/AsmArm/)**: the same function in AArch64 assembly, chosen with `when`
 
 ### 25. Concurrency
 
 Threads, and the tools that let them share work safely.
 
-- 25.1 **[Thread](Concurrency/Thread/)** — start a thread, wait for its result, and ask how many can run at once
-- 25.2 **[Atomic](Concurrency/Atomic/)** — count across threads without a lock
-- 25.3 **[Mutex](Concurrency/Mutex/)** — guard shared data with a lock that only one thread holds at a time
-- 25.4 **[Arc](Concurrency/Arc/)** — share ownership of one value between threads
-- 25.5 **[Channel](Concurrency/Channel/)** — send values from one thread to another
-- 25.6 **[WaitGroup](Concurrency/WaitGroup/)** — wait until a group of threads has finished
-- 25.7 **[Once](Concurrency/Once/)** — run initialization exactly once, whichever thread gets there first
-- 25.8 **[RwLock](Concurrency/RwLock/)** — many readers at once, or one writer alone
+- 25.1 **[Thread](Concurrency/Thread/)**: start a thread, wait for its result, and ask how many can run at once
+- 25.2 **[Atomic](Concurrency/Atomic/)**: count across threads without a lock
+- 25.3 **[Mutex](Concurrency/Mutex/)**: guard shared data with a lock that only one thread holds at a time
+- 25.4 **[Arc](Concurrency/Arc/)**: share ownership of one value between threads
+- 25.5 **[Channel](Concurrency/Channel/)**: send values from one thread to another
+- 25.6 **[WaitGroup](Concurrency/WaitGroup/)**: wait until a group of threads has finished
+- 25.7 **[Once](Concurrency/Once/)**: run initialization exactly once, whichever thread gets there first
+- 25.8 **[RwLock](Concurrency/RwLock/)**: many readers at once, or one writer alone
 
 ### 26. Systems
 
 Processes, command lines, logs and networks.
 
-- 26.1 **[Environment](Systems/Environment/)** — the program's arguments, environment variables and exit status
-- 26.2 **[ChildProcess](Systems/ChildProcess/)** — run another program and capture its output
-- 26.3 **[CommandLine](Systems/CommandLine/)** — declare options and arguments, and get the help text for free
-- 26.4 **[Log](Systems/Log/)** — structured log records with levels and typed fields
-- 26.5 **[IpAddress](Systems/IpAddress/)** — IPv4 and IPv6 addresses, and socket addresses with a port
-- 26.6 **[Tcp](Systems/Tcp/)** — a TCP server and client talking over the loopback interface
-- 26.7 **[Udp](Systems/Udp/)** — datagrams between two UDP sockets
+- 26.1 **[Environment](Systems/Environment/)**: the program's arguments, environment variables and exit status
+- 26.2 **[ChildProcess](Systems/ChildProcess/)**: run another program and capture its output
+- 26.3 **[CommandLine](Systems/CommandLine/)**: declare options and arguments, and get the help text for free
+- 26.4 **[Log](Systems/Log/)**: structured log records with levels and typed fields
+- 26.5 **[IpAddress](Systems/IpAddress/)**: IPv4 and IPv6 addresses, and socket addresses with a port
+- 26.6 **[Tcp](Systems/Tcp/)**: a TCP server and client talking over the loopback interface
+- 26.7 **[Udp](Systems/Udp/)**: datagrams between two UDP sockets
 
 ### 27. Projects
 
 Complete small programs. Each one needs only the parts before its checkpoint.
 
-- 27.1 **[Thanks](Projects/Thanks/)** — draw RUX as an ASCII banner and thank everyone who helps build it _(after Control flow)_
-- 27.2 **[FizzBuzz](Projects/FizzBuzz/)** — the classic counting game _(after Control flow)_
-- 27.3 **[Temperature](Projects/Temperature/)** — a table of Celsius and Fahrenheit temperatures _(after Functions)_
-- 27.4 **[Prime](Projects/Prime/)** — every prime below 100, found with the sieve of Eratosthenes _(after Sequences)_
-- 27.5 **[Calculator](Projects/Calculator/)** — evaluate expressions and report every way they can go wrong _(after Errors)_
-- 27.6 **[Circle](Projects/Circle/)** — read a radius, check it, and print the circle's measurements _(after Numbers)_
-- 27.7 **[Quadratic](Projects/Quadratic/)** — solve a quadratic equation, including linear and degenerate cases _(after Numbers)_
-- 27.8 **[WordCount](Projects/WordCount/)** — count how often each word appears _(after Collections)_
-- 27.9 **[Inventory](Projects/Inventory/)** — keep a stock list of items, with updates that can fail _(after Collections)_
-- 27.10 **[Statistics](Projects/Statistics/)** — count, extremes, mean, variance and median, including empty and single-value input _(after Algorithms)_
-- 27.11 **[Guess](Projects/Guess/)** — a number guessing game with seven valid guesses from 1 to 100 _(after Utilities)_
-- 27.12 **[Age](Projects/Age/)** — an age in completed years, months and days, with month-end clamping _(after Utilities)_
-- 27.13 **[Password](Projects/Password/)** — a 16-character password drawn from system entropy with rejection sampling _(after Utilities)_
-- 27.14 **[Launch](Projects/Launch/)** — a mission checklist, a bounded countdown and a launch _(after Utilities)_
-- 27.15 **[Notes](Projects/Notes/)** — keep notes in a JSON file _(after Data formats)_
-- 27.16 **[Melody](Projects/Melody/)** — play a tune through the Windows console speaker (Windows only) _(after Platform)_
-- 27.17 **[SystemInfo](Projects/SystemInfo/)** — show the Windows version, build, processor and memory in a window (Windows only) _(after Platform)_
-- 27.18 **[Grep](Projects/Grep/)** — search files for lines that match a regular expression, with command-line options _(after Systems)_
+- 27.1 **[Thanks](Projects/Thanks/)**: draw RUX as an ASCII banner and thank everyone who helps build it _(after Control flow)_
+- 27.2 **[FizzBuzz](Projects/FizzBuzz/)**: the classic counting game _(after Control flow)_
+- 27.3 **[Temperature](Projects/Temperature/)**: a table of Celsius and Fahrenheit temperatures _(after Functions)_
+- 27.4 **[Prime](Projects/Prime/)**: every prime below 100, found with the sieve of Eratosthenes _(after Sequences)_
+- 27.5 **[Calculator](Projects/Calculator/)**: evaluate expressions and report every way they can go wrong _(after Errors)_
+- 27.6 **[Circle](Projects/Circle/)**: read a radius, check it, and print the circle's measurements _(after Numbers)_
+- 27.7 **[Quadratic](Projects/Quadratic/)**: solve a quadratic equation, including linear and degenerate cases _(after Numbers)_
+- 27.8 **[WordCount](Projects/WordCount/)**: count how often each word appears _(after Collections)_
+- 27.9 **[Inventory](Projects/Inventory/)**: keep a stock list of items, with updates that can fail _(after Collections)_
+- 27.10 **[Statistics](Projects/Statistics/)**: count, extremes, mean, variance and median, including empty and single-value input _(after Algorithms)_
+- 27.11 **[Guess](Projects/Guess/)**: a number guessing game with seven valid guesses from 1 to 100 _(after Utilities)_
+- 27.12 **[Age](Projects/Age/)**: an age in completed years, months and days, with month-end clamping _(after Utilities)_
+- 27.13 **[Password](Projects/Password/)**: a 16-character password drawn from system entropy with rejection sampling _(after Utilities)_
+- 27.14 **[Launch](Projects/Launch/)**: a mission checklist, a bounded countdown and a launch _(after Utilities)_
+- 27.15 **[Notes](Projects/Notes/)**: keep notes in a JSON file _(after Data formats)_
+- 27.16 **[Melody](Projects/Melody/)**: play a tune through the Windows console speaker (Windows only) _(after Platform)_
+- 27.17 **[SystemInfo](Projects/SystemInfo/)**: show the Windows version, build, processor and memory in a window (Windows only) _(after Platform)_
+- 27.18 **[Grep](Projects/Grep/)**: search files for lines that match a regular expression, with command-line options _(after Systems)_
 
 ## Running an Example
 

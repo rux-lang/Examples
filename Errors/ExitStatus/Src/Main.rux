@@ -1,6 +1,6 @@
 // Every program so far ended with `return 0;` from `func Main() -> int`. That number is the
 // program's exit status: 0 says it worked, anything else says it did not. It is for whoever
-// started the program — a script, a build tool or a shell. In PowerShell, `echo $LASTEXITCODE`
+// started the program: a script, a build tool or a shell. In PowerShell, `echo $LASTEXITCODE`
 // shows it right after the program ends.
 //
 // `func Main() -> int` is the only signature `Main` may have, and `Main` cannot fail. An error is
@@ -15,7 +15,7 @@
 //
 // Leaving with status 1 is an ordinary `return`, so every `defer` and destructor on the way out
 // runs as usual. And the error is not printed anywhere: if the user should learn why, print a
-// message — a `catch` arm in `Main` can print one and then `return 1`.
+// message: a `catch` arm in `Main` can print one and then `return 1`.
 //
 // This program fails on purpose: the second install does not fit.
 import Io::PrintLine;

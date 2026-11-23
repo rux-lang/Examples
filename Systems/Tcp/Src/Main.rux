@@ -8,8 +8,8 @@
 // lessons works on it. Every failure is an `IoError`, with kinds such as `ConnectionRefused`.
 //
 // A stream is only bytes: TCP keeps no message boundaries, so the two sides agree on their own.
-// Here each message is one line. Both sides run in this one program — the server in `Serve`, the
-// client on a second thread — and talk over the loopback address, 127.0.0.1, which never leaves
+// Here each message is one line. Both sides run in this one program (the server in `Serve`, the
+// client on a second thread) and talk over the loopback address, 127.0.0.1, which never leaves
 // the machine.
 import Allocator::SystemAllocator;
 import Io::{ IoError, IoErrorKind, PrintLine, ReadLineFrom, WriteAll };
@@ -69,7 +69,7 @@ func Serve() -> !IoError {
     PrintLine("server: the client has finished");
     PrintLine("client: read {} replies", client.Join());
 
-    // A stream is a reader and a writer, but it is not copied — each one owns its connection, so
+    // A stream is a reader and a writer, but it is not copied: each one owns its connection, so
     // naming it again gives it away, and the old name is finished:
     //
     //     let other = stream;

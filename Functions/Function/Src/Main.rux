@@ -53,7 +53,7 @@ func Main() -> int {
     PrintLine("Add(Square(3), Square(4))    {}", Add(Square(3), Square(4)));
 
     // Arguments must match the parameter types. `Square(2.5)` is rejected,
-    // because `2.5` is a `float64` and `Square` takes an `int` — the value is
+    // because `2.5` is a `float64` and `Square` takes an `int`; the value is
     // not converted for you. And assigning to a parameter inside its function
     // is an error:
     //

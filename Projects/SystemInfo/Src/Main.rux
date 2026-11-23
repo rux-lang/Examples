@@ -3,7 +3,7 @@
 //
 // Every value comes from Windows itself, through the Windows package. `RtlGetVersion` gives the
 // true version and build, because `GetVersionExW` tells a program without a manifest that it runs
-// on Windows 8. The registry gives the names — the edition, the release, the processor — and
+// on Windows 8. The registry gives the names (the edition, the release, the processor) and
 // `GlobalMemoryStatusEx` and `GetLogicalProcessorInformationEx` give the numbers. Windows 11 still
 // calls itself version 10, so it is told apart by its build, which starts at 22000; the registry's
 // edition name says "Windows 10" there too, and is corrected the same way.

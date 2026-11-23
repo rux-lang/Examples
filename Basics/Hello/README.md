@@ -1,6 +1,6 @@
 # Hello
 
-Print one line of text — the smallest complete Rux program.
+Print one line of text: the smallest complete Rux program.
 
 **You'll need:** nothing — this is the first lesson.
 

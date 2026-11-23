@@ -2,7 +2,7 @@
 
 Open a window that shows the Windows edition, version and build, the processor, and the memory. The values come from the Win32 calls in the Windows package, and the program draws them with GDI in a classic window with a message loop. Every Win32 call is `extern`, so each sits under a `// Safety:` comment that says why it is sound there.
 
-**You'll need:** Parts 1–24 — this project is a checkpoint for Platform, and leans on [Extern](https://rux-lang.dev/docs/learn/extern), [CInterop](https://rux-lang.dev/docs/learn/c-interop), [Target](https://rux-lang.dev/docs/learn/target) and [CompileError](https://rux-lang.dev/docs/learn/compile-error).
+**You'll need:** Parts 1–24. This project is a checkpoint for Platform, and leans on [Extern](https://rux-lang.dev/docs/learn/extern), [CInterop](https://rux-lang.dev/docs/learn/c-interop), [Target](https://rux-lang.dev/docs/learn/target) and [CompileError](https://rux-lang.dev/docs/learn/compile-error).
 
 **Windows only**, written for Windows 11, which it tells apart from Windows 10 by its build number. Windows 10 from version 1703 runs it too, since that is when the per-monitor scaling it asks for arrived. On any other system the build stops with an error that says so.
 

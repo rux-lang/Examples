@@ -1,6 +1,6 @@
 // `Parse` builds the whole tree before a program sees any of it, so a large document costs its
 // size several times over in memory. `JsonEventReader` reads the same text as a stream of
-// events instead — an object opened, a name, a text value, an array closed — pulling bytes from
+// events instead (an object opened, a name, a text value, an array closed), pulling bytes from
 // a `Reader` as it needs them and keeping only the token it is on. The program keeps whatever it
 // wants and lets the rest go by.
 //

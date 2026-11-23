@@ -1,6 +1,6 @@
 // `Fold` collapses a slice into one answer: the total of a month's sales. A scan keeps every
 // step of the way instead: the total so far after each day. That running answer is a slice of
-// its own, as long as the input, and it answers questions a single total cannot — when did the
+// its own, as long as the input, and it answers questions a single total cannot: when did the
 // sales pass 100, what was the best day up to Friday, where does record 4 start in a file.
 //
 // `PartialSum` writes the running sums; `InclusiveScan` does the same with any combining function;
@@ -50,7 +50,7 @@ func Main() -> int {
     Show("best", best[..]);
 
     // Records of these lengths sit one after another in a file. Where does each start? At the
-    // sum of the lengths before it — an exclusive scan from 0.
+    // sum of the lengths before it, an exclusive scan from 0.
     let lengths: int32[4] = [14, 6, 22, 10];
     var offsets: int32[4] = [0; 4];
     ExclusiveScan<int32>(lengths[..], offsets[..], 0, Add);
@@ -63,8 +63,8 @@ func Main() -> int {
 
     // Halfway between two large positions. Their sum, 4100000000, does not fit in an `int32`, so
     // `(low + high) / 2` stops with an overflow panic, and `(low +% high) / 2` wraps round to a
-    // negative number. `Midpoint` takes the distance between them instead — always representable
-    // as a `uint32` — and adds half of it to `low`.
+    // negative number. `Midpoint` takes the distance between them instead (always representable
+    // as a `uint32`) and adds half of it to `low`.
     let low: int32 = 2000000000;
     let high: int32 = 2100000000;
     PrintLine("(low +% high) / 2 {}", (low +% high) / 2);

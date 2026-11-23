@@ -2,7 +2,7 @@
 
 Keep a to-do list as JSON in a file: save it, load it back, add to it, and handle a damaged or missing file.
 
-**You'll need:** Parts 1–21 — this project is the checkpoint for Data formats, and leans on [File](https://rux-lang.dev/docs/learn/file), [AtomicFile](https://rux-lang.dev/docs/learn/atomic-file), [Json](https://rux-lang.dev/docs/learn/json) and [JsonWrite](https://rux-lang.dev/docs/learn/json-write).
+**You'll need:** Parts 1–21. This project is the checkpoint for Data formats, and leans on [File](https://rux-lang.dev/docs/learn/file), [AtomicFile](https://rux-lang.dev/docs/learn/atomic-file), [Json](https://rux-lang.dev/docs/learn/json) and [JsonWrite](https://rux-lang.dev/docs/learn/json-write).
 
 ```sh
 rux run

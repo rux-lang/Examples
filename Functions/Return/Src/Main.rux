@@ -1,6 +1,6 @@
 // `return` does two things at once: it hands back the result, and it leaves
 // the function on the spot. Nothing after it runs. That makes it a way to
-// answer early — as soon as the function knows the answer — instead of
+// answer early, as soon as the function knows the answer, instead of
 // carrying a result down to the last line.
 //
 // And some functions have no result at all. They are called for what they do,
@@ -31,7 +31,7 @@ func IsLeapYear(year: int) -> bool {
     return year % 4 == 0;
 }
 
-// `return` inside a loop leaves the loop and the function together — further
+// `return` inside a loop leaves the loop and the function together, further
 // than `break` goes. The line after the loop runs only if nothing was found.
 func SmallestDivisor(number: int) -> int {
     for candidate in 2..number {

@@ -3,7 +3,7 @@
 //
 // A `HashSet<T>` is that map with the values left out. It holds each element at most once and
 // answers membership in about the same time however large it grows. It is built the same way as
-// a hash map — a hash function and an equality test — and, like a hash map, keeps no order.
+// a hash map (a hash function and an equality test) and, like a hash map, keeps no order.
 import Allocator::SystemAllocator;
 import Collections::HashSet;
 import Collections::Hashing::{ EqualsSlice, HashSlice };

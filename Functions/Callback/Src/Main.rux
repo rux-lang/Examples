@@ -46,7 +46,7 @@ func CountWhere(last: int32, test: func(int32) -> bool) -> int32 {
 }
 
 func Main() -> int {
-    // `Double` is passed, not called — no parentheses after it. `ShowTable`
+    // `Double` is passed, not called: no parentheses after it. `ShowTable`
     // does the calling, once per number.
     ShowTable(5, Double);
     ShowTable(5, Square);

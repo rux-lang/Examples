@@ -1,6 +1,6 @@
 # IteratorAdaptor
 
-Chain the lazy adaptors of `Algorithms::Adaptors` — `Map`, `Filter`, `Skip`, `Take`, `Enumerate`, `Zip` and `Chain` — over slices and over an endless iterator, and see that each item is computed only when it is asked for.
+Chain the lazy adaptors of `Algorithms::Adaptors` (`Map`, `Filter`, `Skip`, `Take`, `Enumerate`, `Zip` and `Chain`) over slices and over an endless iterator, and see that each item is computed only when it is asked for.
 
 **You'll need:** [Iterator](https://rux-lang.dev/docs/learn/iterator), [Iterable](https://rux-lang.dev/docs/learn/iterable), [Callback](https://rux-lang.dev/docs/learn/callback)
 

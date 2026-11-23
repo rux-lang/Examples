@@ -9,8 +9,8 @@
 //                   with `EndOfStream`, like a file
 //
 // That is how a format is tested without touching the disk, how a message is built in memory
-// before it is sent in one piece, and how bytes that arrived some other way — over a network,
-// embedded in the program — are read with the code that reads files.
+// before it is sent in one piece, and how bytes that arrived some other way (over a network,
+// embedded in the program) are read with the code that reads files.
 //
 // The file this program also writes lives in its package's `Bin/` folder, and is deleted at
 // the end.

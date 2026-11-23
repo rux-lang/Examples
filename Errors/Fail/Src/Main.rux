@@ -3,7 +3,7 @@
 // carrying an error value for the caller.
 //
 // The error can be any type you like. Here it is a struct, so it can report exactly what went
-// wrong — how much money the account held and how much was asked for.
+// wrong: how much money the account held and how much was asked for.
 // `throw ShortOfFunds { ... };` builds that struct and hands it over in one statement. Nothing
 // after a `throw` runs, just as nothing after a `return` does. A throw costs what a return costs:
 // nothing unwinds the stack.
@@ -44,9 +44,9 @@ func Main() -> int {
     Report(0, 5);
 
     // `throw` must carry a value of the error type named after the `!`. `throw 30;` inside
-    // `Withdraw` is rejected — "'throw' value must have type 'ShortOfFunds', but found 'int'".
+    // `Withdraw` is rejected with "'throw' value must have type 'ShortOfFunds', but found 'int'".
     // And `throw` belongs only in a function that can fail: here in `Main`, which returns a plain
-    // `int`, it is an error too — "'throw' needs a function that can fail, but 'Main' returns
+    // `int`, it is an error too: "'throw' needs a function that can fail, but 'Main' returns
     // 'int'".
     return 0;
 }

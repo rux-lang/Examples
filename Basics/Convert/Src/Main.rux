@@ -59,7 +59,7 @@ func Main() -> int {
     // None of the conversions above reported a problem. A float or boolean `as` always produces
     // a value, and when the original does not fit, that value is simply a different one; an
     // integer `as` that does not fit stops the program instead. To find out first whether a value
-    // fits, compare it with the target type's limits — comparisons are the next part, and choosing
+    // fits, compare it with the target type's limits. Comparisons are the next part, and choosing
     // what to do with the answer the one after.
     return 0;
 }

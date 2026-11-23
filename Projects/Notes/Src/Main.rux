@@ -7,8 +7,8 @@
 //
 // A file is also where things go wrong. It may be missing, or it may hold something that is not
 // JSON, perhaps because someone edited it by hand. Every step that touches the disk or parses
-// text can fail, and the program handles the two failures it expects — a damaged file and a
-// missing one — while `!` passes anything stranger on, and `Main` then ends with status 1.
+// text can fail, and the program handles the two failures it expects (a damaged file and a
+// missing one), while `!` passes anything stranger on, and `Main` then ends with status 1.
 //
 // The file lives in this package's `Bin/` folder, and the program deletes it at the end.
 import Allocator::{ Allocator, SystemAllocator };

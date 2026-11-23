@@ -6,7 +6,7 @@
 // colons are not mistaken for the port's.
 //
 // The `Net` package keeps these as plain values. `Parse` reads the text and returns an optional:
-// text that is not an address is `none`. It is strict on purpose — no leading zeros, which some
+// text that is not an address is `none`. It is strict on purpose: no leading zeros, which some
 // systems read as octal, and no shortened forms such as `127.1`. `WriteText` writes the one
 // canonical form into a buffer, IPv6 in lower case with the longest run of zeros shortened.
 import Allocator::SystemAllocator;

@@ -2,7 +2,7 @@
 
 Run a mission checklist, ask for a countdown from 1 to 10, count down and launch a rocket up the terminal.
 
-**You'll need:** Parts 1–20 — this project is a checkpoint for Utilities, and leans on [Input](https://rux-lang.dev/docs/learn/input), [Parse](https://rux-lang.dev/docs/learn/parse) and [Stopwatch](https://rux-lang.dev/docs/learn/stopwatch).
+**You'll need:** Parts 1–20. This project is a checkpoint for Utilities, and leans on [Input](https://rux-lang.dev/docs/learn/input), [Parse](https://rux-lang.dev/docs/learn/parse) and [Stopwatch](https://rux-lang.dev/docs/learn/stopwatch).
 
 ```sh
 rux run

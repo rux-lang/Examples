@@ -2,7 +2,7 @@
 
 Read a radius and print the circle's circumference and area, telling apart the end of input, a read error, text that is not a number, and a number that is not a valid radius.
 
-**You'll need:** Parts 1–14 — this project is the checkpoint for Text, and leans on [Input](https://rux-lang.dev/docs/learn/input), [Parse](https://rux-lang.dev/docs/learn/parse), [StringView](https://rux-lang.dev/docs/learn/string-view), [ErrorVariant](https://rux-lang.dev/docs/learn/error-variant) and [Destructor](https://rux-lang.dev/docs/learn/destructor) — plus [FloatSpecial](https://rux-lang.dev/docs/learn/float-special) and [Math](https://rux-lang.dev/docs/learn/math) from Part 16.
+**You'll need:** Parts 1–14. This project is the checkpoint for Text, and leans on [Input](https://rux-lang.dev/docs/learn/input), [Parse](https://rux-lang.dev/docs/learn/parse), [StringView](https://rux-lang.dev/docs/learn/string-view), [ErrorVariant](https://rux-lang.dev/docs/learn/error-variant) and [Destructor](https://rux-lang.dev/docs/learn/destructor), plus [FloatSpecial](https://rux-lang.dev/docs/learn/float-special) and [Math](https://rux-lang.dev/docs/learn/math) from Part 16.
 
 ```sh
 rux run

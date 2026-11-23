@@ -1,6 +1,6 @@
 # TypedPattern
 
-Match a sum by the type it holds — `n: int32 =>` — and use the member as an ordinary value.
+Match a sum by the type it holds, `n: int32 =>`, and use the member as an ordinary value.
 
 **You'll need:** [SumType](https://rux-lang.dev/docs/learn/sum-type), [VariantMatch](https://rux-lang.dev/docs/learn/variant-match), [MatchExpression](https://rux-lang.dev/docs/learn/match-expression)
 

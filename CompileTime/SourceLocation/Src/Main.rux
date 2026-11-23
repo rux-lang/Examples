@@ -1,6 +1,6 @@
 // `#source` tells a program where it is in its own source code: the file, the line and column,
 // and the function around it. Like `#target`, the compiler fills it in while compiling, so a read
-// costs nothing at run time — it is just a constant.
+// costs nothing at run time: it is just a constant.
 //
 // The surprise is *which* place it describes. Every read of `#source` describes the expression
 // that reads it, wherever that is written. A helper that reads `#source.line` inside its own body

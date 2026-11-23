@@ -1,5 +1,5 @@
-// A cache keeps answers that were slow to get — a file read from disk, a page fetched over the
-// network, a row from a database — so asking again is quick. But memory is finite, so a cache
+// A cache keeps answers that were slow to get (a file read from disk, a page fetched over the
+// network, a row from a database), so asking again is quick. But memory is finite, so a cache
 // that only ever grows is a leak with good intentions. It needs a rule for what to forget.
 //
 // "Least recently used" is the usual rule: when the cache is full, forget the entry nobody has

@@ -2,7 +2,7 @@
 
 Count to 100, saying Fizz for multiples of 3, Buzz for multiples of 5 and FizzBuzz for both.
 
-**You'll need:** Parts 1–3 — this project is a checkpoint for Control flow, and leans on [Arithmetic](https://rux-lang.dev/docs/learn/arithmetic), [ElseIf](https://rux-lang.dev/docs/learn/else-if) and [For](https://rux-lang.dev/docs/learn/for).
+**You'll need:** Parts 1–3. This project is a checkpoint for Control flow, and leans on [Arithmetic](https://rux-lang.dev/docs/learn/arithmetic), [ElseIf](https://rux-lang.dev/docs/learn/else-if) and [For](https://rux-lang.dev/docs/learn/for).
 
 ```sh
 rux run
